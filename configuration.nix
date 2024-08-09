@@ -6,7 +6,8 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./grafana-config.nix
     ];
@@ -38,7 +39,7 @@
   hardware.nvidia.powerManagement.enable = true;
   hardware.nvidia.prime = {
     offload.enable = true;
-    intelBusId  = "PCI:00:02:0";
+    intelBusId = "PCI:00:02:0";
     nvidiaBusId = "PCI:01:00:0";
   };
 
@@ -183,7 +184,7 @@
           stkb.rewrap
           tamasfe.even-better-toml
           ms-python.python
-          
+
         ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
           {
             name = "craftos-pc";
@@ -280,8 +281,8 @@
       gamemode
       atuin
       gthumb
-    #  ccemux
-    #  thunderbird
+      #  ccemux
+      #  thunderbird
     ];
   };
 
@@ -296,16 +297,18 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    (let
-      nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
-        export __NV_PRIME_RENDER_OFFLOAD=1
-        export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
-        export __GLX_VENDOR_LIBRARY_NAME=nvidia
-        export __VK_LAYER_NV_optimus=NVIDIA_only
-        exec "$@"
-      '';
-    in
-      nvidia-offload)
+    (
+      let
+        nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
+          export __NV_PRIME_RENDER_OFFLOAD=1
+          export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+          export __GLX_VENDOR_LIBRARY_NAME=nvidia
+          export __VK_LAYER_NV_optimus=NVIDIA_only
+          exec "$@"
+        '';
+      in
+      nvidia-offload
+    )
     iosevka
     lm_sensors
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
@@ -350,20 +353,20 @@
   # started in user sessions.
   # programs.mtr.enable = true;
   programs.gnupg.agent = {
-     enable = true;
-     enableSSHSupport = true;
+    enable = true;
+    enableSSHSupport = true;
   };
 
   # List services that you want to enable:
   virtualisation.docker.enable = true;
   #virtualisation.podman = {
-    #enable = true;
+  #enable = true;
 
-    # Create a `docker` alias for podman, to use it as a drop-in replacement
-    #dockerCompat = true;
+  # Create a `docker` alias for podman, to use it as a drop-in replacement
+  #dockerCompat = true;
 
-    # Required for containers under podman-compose to be able to talk to each other.
-    #defaultNetwork.dnsname.enable = true;
+  # Required for containers under podman-compose to be able to talk to each other.
+  #defaultNetwork.dnsname.enable = true;
   #};
 
   # Enable the OpenSSH daemon.
@@ -371,7 +374,7 @@
 
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [ 80 443 ];
-  networking.firewall.allowedUDPPortRanges = [ { from = 27000; to = 27100; } ];
+  networking.firewall.allowedUDPPortRanges = [{ from = 27000; to = 27100; }];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 

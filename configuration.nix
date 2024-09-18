@@ -15,6 +15,10 @@
   # nix version
   nix.package = pkgs.nixStable;
 
+  # set nix build scheduling policies to idle to preserve interactivity
+  nix.daemonCPUSchedPolicy = "idle";
+  nix.daemonIOSchedClass = "idle";
+
   # fix for steam crashing
   hardware.opengl.driSupport32Bit = true;
 

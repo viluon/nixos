@@ -276,7 +276,6 @@
       nodejs
       tex-match
       gnumake
-      comma
       pandoc
       gamemode
       atuin

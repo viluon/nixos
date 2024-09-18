@@ -62,6 +62,9 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  # boot a rescue shell on kernel panic
+  boot.crashDump.enable = false; # TODO: enable once we find a good cache
+
   # filesystems
   boot.supportedFilesystems = [ "ntfs" ];
   fileSystems = {

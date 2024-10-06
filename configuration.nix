@@ -223,12 +223,6 @@
             sha256 = "sha256-oz0pg3n7jJ+JNCcSnEaRioqewCS8Jg+2ifC3F1feZ14=";
           }
           {
-            name = "volar";
-            publisher = "vue";
-            version = "2.0.21";
-            sha256 = "sha256-7GyCilXKo4YEuHxZJmglLKeS+67vSLem8aO4+NKLD5U=";
-          }
-          {
             name = "vscode-typescript-vue-plugin";
             publisher = "vue";
             version = "1.8.22";

@@ -67,7 +67,7 @@
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
   # boot a rescue shell on kernel panic
-  boot.crashDump.enable = false; # TODO: enable once we find a good cache
+  boot.crashDump.enable = true; # TODO: enable once we find a good cache
 
   # filesystems
   boot.supportedFilesystems = [ "ntfs" ];
@@ -169,47 +169,34 @@
     description = "Andrew Kvapil";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
-      firefox
       (vscode-with-extensions.override {
         vscodeExtensions = with vscode-extensions; [
-          sumneko.lua
-          rust-lang.rust-analyzer
           bbenoist.nix
-          github.copilot
-          ms-vscode-remote.remote-ssh
-          ms-vsliveshare.vsliveshare
-          ms-vscode.hexeditor
-          ms-azuretools.vscode-docker
-          timonwong.shellcheck
-          wakatime.vscode-wakatime
-          github.vscode-github-actions
-          github.vscode-pull-request-github
-          github.codespaces
-          streetsidesoftware.code-spell-checker
           dbaeumer.vscode-eslint
           esbenp.prettier-vscode
-          stkb.rewrap
-          tamasfe.even-better-toml
+          github.codespaces
+          github.copilot
+          github.copilot-chat
+          github.vscode-github-actions
+          github.vscode-pull-request-github
+          ms-azuretools.vscode-docker
           ms-python.python
-
+          ms-vscode-remote.remote-ssh
+          ms-vscode.hexeditor
+          ms-vsliveshare.vsliveshare
+          rust-lang.rust-analyzer
+          stkb.rewrap
+          streetsidesoftware.code-spell-checker
+          sumneko.lua
+          tamasfe.even-better-toml
+          timonwong.shellcheck
+          wakatime.vscode-wakatime
         ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
           {
             name = "craftos-pc";
             publisher = "jackmacwindows";
             version = "1.2.2";
             sha256 = "sha256-A+MNroXv0t9Mw/gr0Fyov3cXyF/GGzwRLKrIxQ2tKCE=";
-          }
-          {
-            name = "copilot-chat";
-            publisher = "GitHub";
-            version = "0.9.2023100901";
-            sha256 = "sha256-EFMmUQnX+cizuzZCAo0t40l2b9/sY3Rrlm0BeLbfqiM=";
-          }
-          {
-            name = "copilot-labs";
-            publisher = "GitHub";
-            version = "0.15.1019";
-            sha256 = "sha256-XQU3+XG6zJjpu43reE1MKhnHhR5s90wk7T9yIxj0s4E=";
           }
           {
             name = "groovylambda";
@@ -253,42 +240,40 @@
             version = "1.0.5";
             sha256 = "sha256-CQVtMdt/fZcNIbH/KybJixnLqCsz5iF1U0k+GfL65Ok=";
           }
-          #
         ];
       })
-      nvitop
-      vlc
-      ffmpeg
-      rustup
-      texlive.combined.scheme-full
-      openssl
-      pkg-config
-      mold
-      wasm-pack
-      eza
-      qbittorrent
-      jetbrains.idea-ultimate
-      obsidian
-      gimp
-      calibre
-      mozjpeg
-      xournalpp
-      steam
-      luajit
-      lua5_1
       alass
-      craftos-pc
-      cloc
-      gifski
-      nodejs
-      tex-match
-      gnumake
-      pandoc
-      gamemode
       atuin
+      calibre
+      cloc
+      craftos-pc
+      eza
+      ffmpeg
+      firefox
+      gamemode
+      gifski
+      gimp
+      gnumake
       gthumb
-      #  ccemux
-      #  thunderbird
+      jetbrains.idea-ultimate
+      lua5_1
+      luajit
+      mold
+      mozjpeg
+      nodejs
+      nvitop
+      obsidian
+      openssl
+      pandoc
+      pkg-config
+      qbittorrent
+      rustup
+      steam
+      tex-match
+      texlive.combined.scheme-full
+      vlc
+      wasm-pack
+      xournalpp
     ];
   };
 

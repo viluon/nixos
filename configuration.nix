@@ -167,7 +167,7 @@
   users.users.viluon = {
     isNormalUser = true;
     description = "Andrew Kvapil";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "cdrom" "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       (vscode-with-extensions.override {
         vscodeExtensions = with vscode-extensions; [
@@ -239,6 +239,7 @@
       alass
       atuin
       calibre
+      cdemu-client
       cloc
       craftos-pc
       eza
@@ -260,7 +261,9 @@
       openssl
       pandoc
       pkg-config
+      ps3-disc-dumper
       qbittorrent
+      rpcs3
       rustup
       steam
       tex-match
@@ -372,6 +375,8 @@
   system.stateVersion = "22.11"; # Did you read the comment?
 
   programs.gnome-disks.enable = true;
+  programs.cdemu.enable = true;
+
   # todo: remove
   nixpkgs.config.permittedInsecurePackages = [
     "electron-25.9.0"

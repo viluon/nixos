@@ -69,6 +69,9 @@
   # boot a rescue shell on kernel panic
   boot.crashDump.enable = true; # TODO: enable once we find a good cache
 
+  # enable sysrq
+  boot.kernel.sysctl."kernel.sysrq" = 502;
+
   # filesystems
   boot.supportedFilesystems = [ "ntfs" ];
   fileSystems = {

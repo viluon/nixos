@@ -98,7 +98,7 @@
           "showLegend": true
         },
         "mergeValues": true,
-        "rowHeight": 0.9,
+        "rowHeight": 0.5,
         "showValue": "never",
         "tooltip": {
           "mode": "single",
@@ -135,9 +135,10 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "continuous-RdYlGr"
           },
           "mappings": [],
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -192,11 +193,42 @@
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
-          "refId": "A",
+          "refId": "free",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "c8568344-a181-47a2-9f3d-b8697c00bd83"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "node_filesystem_size_bytes{mountpoint=\"/\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "total",
+          "range": true,
+          "refId": "total",
           "useBackend": false
         }
       ],
       "title": "free space",
+      "transformations": [
+        {
+          "id": "configFromData",
+          "options": {
+            "configRefId": "total",
+            "mappings": [
+              {
+                "fieldName": "total",
+                "handlerKey": "max"
+              }
+            ]
+          }
+        }
+      ],
       "type": "gauge"
     },
     {
@@ -1560,7 +1592,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "5s",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
@@ -1574,6 +1606,6 @@
   "timezone": "",
   "title": "nixluon central",
   "uid": "b7a8be2d-5b0a-49fc-8808-1801a8185ad0",
-  "version": 50,
+  "version": 53,
   "weekStart": ""
 }

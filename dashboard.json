@@ -15,6 +15,7 @@
       }
     ]
   },
+  "description": "Hardware overview.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -223,6 +224,114 @@
             "mappings": [
               {
                 "fieldName": "total",
+                "handlerKey": "max"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "c8568344-a181-47a2-9f3d-b8697c00bd83"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "id": 14,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "10.4.10",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "c8568344-a181-47a2-9f3d-b8697c00bd83"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "node_power_supply_energy_watthour{power_supply=\"BAT0\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "battery level",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "c8568344-a181-47a2-9f3d-b8697c00bd83"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "node_power_supply_energy_full{power_supply=\"BAT0\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "battery capacity",
+          "useBackend": false
+        }
+      ],
+      "title": "battery level",
+      "transformations": [
+        {
+          "id": "configFromData",
+          "options": {
+            "applyTo": {
+              "id": "byType",
+              "options": "number"
+            },
+            "configRefId": "battery capacity",
+            "mappings": [
+              {
+                "fieldName": "{__name__=\"node_power_supply_energy_full\", instance=\"127.0.0.1:9002\", job=\"chrysalis\", power_supply=\"BAT0\"}",
                 "handlerKey": "max"
               }
             ]
@@ -1445,7 +1554,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.9",
+      "pluginVersion": "10.4.10",
       "targets": [
         {
           "datasource": {
@@ -1674,6 +1783,6 @@
   "timezone": "",
   "title": "nixluon central",
   "uid": "b7a8be2d-5b0a-49fc-8808-1801a8185ad0",
-  "version": 56,
+  "version": 63,
   "weekStart": ""
 }

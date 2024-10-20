@@ -53,11 +53,12 @@ jobs:
       - name: open pull request
         uses: peter-evans/create-pull-request@v7.0.5
         with:
-          token: "${{ steps.generate-token.outputs.token }}"
-          title: "Automated Flake update"
-          body: "${{ steps.commit.outputs.pr }}"
-          commit-message: "${{ steps.commit.outputs.message }}"
           add-paths: |
             flake.lock
+          body: "${{ steps.commit.outputs.pr }}"
+          branch: feature/update-flake
+          commit-message: "${{ steps.commit.outputs.message }}"
           delete-branch: true
           sign-commits: true
+          title: "Update ❄️ flake"
+          token: "${{ steps.generate-token.outputs.token }}"

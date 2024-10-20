@@ -9,6 +9,25 @@
         http_addr = "127.0.0.1";
       };
     };
+    provision =
+      let
+        # see https://grafana.com/tutorials/provision-dashboards-and-data-sources/#define-a-dashboard-provider
+        dashboard-providers = [
+          {
+            name = "default";
+            type = "file";
+            allowUiUpdates = true;
+            options.path = ./dashboard.json;
+          }
+        ];
+      in
+      {
+        enable = true;
+        dashboards.settings = {
+          apiVersion = 1;
+          providers = dashboard-providers;
+        };
+      };
   };
 
   # nginx reverse proxy

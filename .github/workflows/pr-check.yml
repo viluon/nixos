@@ -1,0 +1,67 @@
+name: Build pull request
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: nixosConfigurations.nixluon.config.system.build.toplevel
+
+    steps:
+      - name: install nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: setup cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: viluon
+          skipPush: true
+          extraPullNames: nix-community
+
+      - name: build system
+        env:
+          TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ matrix.target }}"
+        run: nix build $TARGET --fallback --log-format raw --print-build-logs
+
+      - name: garbage-collect build dependencies
+        run: nix-collect-garbage
+
+      - name: fetch old system to profile
+        env:
+          TARGET: "github:${{ github.repository }}/${{ github.base_ref }}#${{ matrix.target }}"
+        run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile
+
+      - name: add new system to profile
+        env:
+          TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ matrix.target }}"
+        run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile
+
+      - name: diff profile
+        id: diff
+        run: |
+          delimiter="$(openssl rand -hex 16)"
+          echo "diff<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          nix profile diff-closures --profile ./profile | perl -pe 's/\e\[[0-9;]*m(?:\e\[K)?//g' >> "${GITHUB_OUTPUT}"
+          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+
+      - name: comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ".#${{ matrix.target }}"
+          message: |
+            ### Diff of `${{ matrix.target }}`
+
+            ```
+            ${{ steps.diff.outputs.diff }}
+            ```

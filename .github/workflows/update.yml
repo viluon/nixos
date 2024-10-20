@@ -1,0 +1,63 @@
+# see https://github.com/sandhose/nixconf/blob/f8b8805a6a47be3d65c565415f87d79eeb8ea0d6/.github/workflows/update.yaml
+
+name: Update lock file
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: generate token
+        uses: actions/create-github-app-token@v1
+        id: generate-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: install
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: setup git
+        run: |
+          git config user.name 'GitHub Actions'
+          git config user.email 'noreply@github.com'
+
+      - name: update
+        run: nix flake update --no-use-registries --commit-lock-file
+
+      - name: get commit message
+        id: commit
+        run: |
+          delimiter="$(openssl rand -hex 16)"
+          echo "message<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          git log -1 --pretty=%B >> "${GITHUB_OUTPUT}"
+          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+
+          delimiter="$(openssl rand -hex 16)"
+          echo "pr<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          git log -1 --pretty=%B | tail +3 | awk -f ./.github/misc/flake-to-markdown.awk >> "${GITHUB_OUTPUT}"
+          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+
+      # Undo the commit as the action will do a new commit with signing using the GH API
+      - name: undo latest commit
+        run: git reset --soft "${{ github.sha }}"
+
+      - name: open pull request
+        uses: peter-evans/create-pull-request@v7.0.5
+        with:
+          token: "${{ steps.generate-token.outputs.token }}"
+          title: "Automated Flake update"
+          body: "${{ steps.commit.outputs.pr }}"
+          commit-message: "${{ steps.commit.outputs.message }}"
+          add-paths: |
+            flake.lock
+          delete-branch: true
+          sign-commits: true

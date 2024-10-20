@@ -2,7 +2,7 @@
 Update with
 
 ```sh
-sudo nixos-rebuild switch --flake .
+sudo nice -n 19 ionice -c 3 nixos-rebuild switch --flake .
 ```
 
 ### inspiration

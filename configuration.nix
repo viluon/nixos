@@ -29,6 +29,9 @@
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
+  # thunderbolt
+  services.hardware.bolt.enable = true;
+
   # nintendo joycon controllers
   services.joycond.enable = true;
 

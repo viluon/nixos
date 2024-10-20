@@ -9,7 +9,7 @@
     [
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./grafana-config.nix
+      ./monitoring/grafana-config.nix
     ];
 
   # nix version

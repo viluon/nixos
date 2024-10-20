@@ -14,10 +14,10 @@
         # see https://grafana.com/tutorials/provision-dashboards-and-data-sources/#define-a-dashboard-provider
         dashboard-providers = [
           {
-            name = "default";
+            name = "provisoned nixluon central";
             type = "file";
             allowUiUpdates = true;
-            options.path = ./dashboard.json;
+            options.path = ./nixluon-central.json;
           }
         ];
       in

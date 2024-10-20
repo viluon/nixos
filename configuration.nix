@@ -382,10 +382,4 @@
 
   programs.gnome-disks.enable = true;
   programs.cdemu.enable = true;
-
-  # todo: remove
-  nixpkgs.config.permittedInsecurePackages = [
-    "electron-25.9.0"
-  ];
-
 }

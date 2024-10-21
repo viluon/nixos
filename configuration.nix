@@ -98,6 +98,12 @@
   networking.nameservers = [ "100.100.100.100" "8.8.8.8" "1.1.1.1" ];
   networking.search = [ "example.ts.net" ];
 
+  # systemd-resolved
+  services.resolved = {
+    enable = true;
+    dnsovertls = "true";
+  };
+
   # Set your time zone.
   time.timeZone = "Europe/Prague";
 

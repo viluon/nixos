@@ -78,6 +78,9 @@
   # enable sysrq
   boot.kernel.sysctl."kernel.sysrq" = 502;
 
+  # boot animation
+  boot.plymouth.enable = true;
+
   # filesystems
   boot.supportedFilesystems = [ "ntfs" ];
   fileSystems = {

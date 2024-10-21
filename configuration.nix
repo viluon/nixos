@@ -19,6 +19,9 @@
   nix.daemonCPUSchedPolicy = "idle";
   nix.daemonIOSchedClass = "idle";
 
+  # trust viluon to configure binary caches
+  nix.settings.trusted-users = [ "root" "viluon" ];
+
   # fix for steam crashing
   hardware.opengl.driSupport32Bit = true;
 
@@ -244,6 +247,7 @@
       })
       alass
       atuin
+      cachix
       calibre
       cdemu-client
       cloc

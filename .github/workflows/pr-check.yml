@@ -40,7 +40,11 @@ jobs:
           swap-size-mb: 1024
 
       - name: install nix
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: cachix/install-nix-action@v25
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ github.token }}
 
       - name: setup cachix
         uses: cachix/cachix-action@v15
@@ -67,6 +71,33 @@ jobs:
           TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ matrix.target }}"
         run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile
 
+      - name: output build failure
+        if: failure()
+        run: |
+          drv=$(grep "For full logs, run" /tmp/nix-build-err.log | grep -oE "/nix/store/.*.drv")
+          if [ -n $drv ]; then
+            nix log $drv
+            echo $drv
+          fi
+          exit 1
+
+      - name: Scan for security issues
+        id: security
+        run: | # https://stackoverflow.com/a/74232400
+          nix run nixpkgs/nixos-unstable#vulnix -- \
+            -w https://raw.githubusercontent.com/ckauhaus/nixos-vulnerability-roundup/master/whitelists/nixos-unstable.toml ./profile \
+            | tee /tmp/security.txt
+          OUTPUT_SECURITY="$(cat /tmp/security.txt)"
+          OUTPUT_SECURITY="${OUTPUT_SECURITY//'%'/'%25'}"
+          OUTPUT_SECURITY="${OUTPUT_SECURITY//$'\n'/'%0A'}"
+          OUTPUT_SECURITY="${OUTPUT_SECURITY//$'\r'/'%0D'}"
+          echo "$OUTPUT_SECURITY"
+
+          delimiter="$(openssl rand -hex 16)"
+          echo "security<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          echo "$OUTPUT_SECURITY" >> "${GITHUB_OUTPUT}"
+          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+
       - name: diff profile
         id: diff
         run: |
@@ -85,3 +116,8 @@ jobs:
             ```
             ${{ steps.diff.outputs.diff }}
             ```
+
+            <details>
+            <summary> Security vulnerability report </summary> <br>
+            <pre> ${{ steps.security.outputs.security }} </pre>
+            </details>

@@ -49,9 +49,9 @@ jobs:
       - name: setup cachix
         uses: cachix/cachix-action@v15
         with:
-          name: viluon
-          skipPush: true
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           extraPullNames: nix-community
+          name: viluon
 
       - name: build system
         env:

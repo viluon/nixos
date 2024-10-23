@@ -20,7 +20,19 @@
   nix.daemonIOSchedClass = "idle";
 
   # trust viluon to configure binary caches
-  nix.settings.trusted-users = [ "root" "viluon" ];
+  nix.settings = {
+    trusted-users = [ "root" "viluon" ];
+
+    substituters = [
+      "https://cache.nixos.org"
+      "https://viluon.cachix.org"
+    ];
+
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "viluon.cachix.org-1:lYmQCd3Bb0GYrHCxPCshn2oCRDMqMmN/i5kgkBlxmNk="
+    ];
+  };
 
   # fix for steam crashing
   hardware.opengl.driSupport32Bit = true;

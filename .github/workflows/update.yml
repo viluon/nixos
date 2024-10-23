@@ -38,6 +38,8 @@ jobs:
         run: |
           delimiter="$(openssl rand -hex 16)"
           echo "message<<${delimiter}" >> "${GITHUB_OUTPUT}"
+          echo "Update flake.lock" >> "${GITHUB_OUTPUT}"
+          echo >> "${GITHUB_OUTPUT}"
           git log -1 --pretty=%B >> "${GITHUB_OUTPUT}"
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
 

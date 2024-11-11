@@ -4,13 +4,14 @@
     flake-root.url = "github:srid/flake-root";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     treefmt-nix.url = "github:numtide/treefmt-nix";
 
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-index-database, flake-parts, ... }:
+  outputs = inputs@{ self, nixpkgs, nixpkgs-unstable, nix-index-database, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.treefmt-nix.flakeModule
@@ -18,7 +19,7 @@
       ];
 
       flake = {
-        nixosConfigurations.nixluon = nixpkgs.lib.nixosSystem {
+        nixosConfigurations.nixluon = nixpkgs.lib.nixosSystem rec {
           system = "x86_64-linux";
           modules = [
             ./configuration.nix
@@ -27,6 +28,9 @@
               programs.nix-index-database.comma.enable = true;
             }
           ];
+          specialArgs = {
+            unstable-pkgs = nixpkgs-unstable.legacyPackages.${system};
+          };
         };
       };
 

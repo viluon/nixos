@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lib, ... }:
+{ config, pkgs, unstable-pkgs, lib, ... }:
 
 {
   imports =
@@ -140,7 +140,7 @@
   };
 
   # Enable the GNOME and Plasma Desktop Environments.
-  services.xserver.displayManager.sddm.enable = true;
+  services.displayManager.sddm.enable = true;
   services.xserver.displayManager.gdm.enable = false;
   services.xserver.desktopManager.gnome.enable = true;
   services.desktopManager.plasma6.enable = true;
@@ -282,6 +282,7 @@
       eza
       ffmpeg
       firefox
+      unstable-pkgs.galaxy-buds-client
       gamemode
       gifski
       gimp
@@ -299,7 +300,7 @@
       pandoc
       pkg-config
       ps3-disc-dumper
-      qbittorrent
+      unstable-pkgs.qbittorrent
       rpcs3
       rustup
       steam

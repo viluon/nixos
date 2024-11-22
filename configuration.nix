@@ -274,6 +274,7 @@
       })
       alass
       atuin
+      btrfs-assistant
       cachix
       calibre
       cdemu-client

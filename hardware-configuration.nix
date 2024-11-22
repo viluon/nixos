@@ -21,24 +21,32 @@
       options = [ "subvol=@" ];
     };
 
+  fileSystems."/var/lib/docker/btrfs" =
+    {
+      device = "/@/var/lib/docker/btrfs";
+      fsType = "none";
+      options = [ "bind" ];
+    };
+
   fileSystems."/boot/efi" =
     {
       device = "/dev/disk/by-uuid/D418-CA0C";
       fsType = "vfat";
+      options = [ "fmask=0022" "dmask=0022" ];
     };
 
-  swapDevices =
-    [{ device = "/dev/disk/by-uuid/8381b844-1e41-4269-afd9-9bbb10cb1597"; }];
+  swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.docker0.useDHCP = lib.mkDefault true;
   # networking.interfaces.enp0s31f6.useDHCP = lib.mkDefault true;
+  # networking.interfaces.tailscale0.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlp0s20f3.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

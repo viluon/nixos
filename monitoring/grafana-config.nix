@@ -30,8 +30,6 @@
       };
   };
 
-  # TODO: enable periodic GC & store optimisation
-
   # nginx reverse proxy
   services.nginx.virtualHosts.${config.services.grafana.domain} = {
     locations."/" = {

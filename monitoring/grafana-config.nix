@@ -42,6 +42,8 @@
     enable = true;
     port = 9001;
 
+    retentionTime = "365d";
+
     exporters = {
       node = {
         enable = true;

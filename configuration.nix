@@ -414,16 +414,18 @@
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  networking.firewall = let
-    warcraft3Range = { from = 6112; to = 6119; };
-  in {
-    enable = true;
+  networking.firewall =
+    let
+      warcraft3Range = { from = 6112; to = 6119; };
+    in
+    {
+      enable = true;
 
-    allowedTCPPorts = [ 80 443 ];
-    allowedTCPPortRanges = [ warcraft3Range ];
-    allowedUDPPorts = [ 16000 ];
-    allowedUDPPortRanges = [ warcraft3Range { from = 27000; to = 27100; } ];
-  };
+      allowedTCPPorts = [ 80 443 ];
+      allowedTCPPortRanges = [ warcraft3Range ];
+      allowedUDPPorts = [ 16000 ];
+      allowedUDPPortRanges = [ warcraft3Range { from = 27000; to = 27100; } ];
+    };
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 

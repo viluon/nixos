@@ -49,12 +49,6 @@
     };
   };
 
-  # fix for steam crashing
-  hardware.opengl.driSupport32Bit = true;
-
-  # va-api
-  hardware.opengl.extraPackages = with pkgs; [ intel-media-driver ];
-
   # bluetooth
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
@@ -70,7 +64,17 @@
 
   # nvidia nonfree drivers
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.opengl.enable = true;
+
+  hardware.graphics = {
+    enable = true;
+
+    # fix for steam crashing
+    enable32Bit = true;
+
+    # va-api
+    extraPackages = with pkgs; [ intel-media-driver ];
+  };
+
   hardware.nvidia = {
     # GTX 1050 :(
     open = false;
@@ -386,7 +390,8 @@
   ];
 
   i18n.inputMethod = {
-    enabled = "fcitx5";
+    enable = true;
+    type = "fcitx5";
     fcitx5.addons = with pkgs; [
       fcitx5-mozc
       fcitx5-gtk

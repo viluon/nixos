@@ -49,12 +49,6 @@
     };
   };
 
-  # fix for steam crashing
-  hardware.opengl.driSupport32Bit = true;
-
-  # va-api
-  hardware.opengl.extraPackages = with pkgs; [ intel-media-driver ];
-
   # bluetooth
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
@@ -70,14 +64,29 @@
 
   # nvidia nonfree drivers
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.opengl.enable = true;
-  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
-  hardware.nvidia.modesetting.enable = true;
-  hardware.nvidia.powerManagement.enable = true;
-  hardware.nvidia.prime = {
-    offload.enable = true;
-    intelBusId = "PCI:00:02:0";
-    nvidiaBusId = "PCI:01:00:0";
+
+  hardware.graphics = {
+    enable = true;
+
+    # fix for steam crashing
+    enable32Bit = true;
+
+    # va-api
+    extraPackages = with pkgs; [ intel-media-driver ];
+  };
+
+  hardware.nvidia = {
+    # GTX 1050 :(
+    open = false;
+
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    modesetting.enable = true;
+    powerManagement.enable = true;
+    prime = {
+      offload.enable = true;
+      intelBusId = "PCI:00:02:0";
+      nvidiaBusId = "PCI:01:00:0";
+    };
   };
 
   # docker integration
@@ -180,7 +189,6 @@
   services.sysprof.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -297,12 +305,12 @@
       eza
       ffmpeg
       firefox
-      unstable-pkgs.galaxy-buds-client
       gamemode
       gifski
       gimp
       gnumake
       gthumb
+      hieroglyphic
       jetbrains.idea-ultimate
       lua5_1
       luajit
@@ -314,13 +322,12 @@
       openssl
       pandoc
       pkg-config
-      ps3-disc-dumper
-      unstable-pkgs.qbittorrent
       rpcs3
       rustup
       steam
-      tex-match
       texlive.combined.scheme-full
+      unstable-pkgs.galaxy-buds-client
+      unstable-pkgs.qbittorrent
       vlc
       wasm-pack
       xournalpp
@@ -383,7 +390,8 @@
   ];
 
   i18n.inputMethod = {
-    enabled = "fcitx5";
+    enable = true;
+    type = "fcitx5";
     fcitx5.addons = with pkgs; [
       fcitx5-mozc
       fcitx5-gtk

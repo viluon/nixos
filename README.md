@@ -1,3 +1,8 @@
+Build with
+
+```
+nice -n 19 ionice -c 3 nix build .#nixosConfigurations.nixluon.config.system.build.toplevel
+```
 
 Update with
 

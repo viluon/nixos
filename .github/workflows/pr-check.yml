@@ -85,17 +85,13 @@ jobs:
         id: security
         run: | # https://stackoverflow.com/a/74232400
           nix run nixpkgs/nixos-unstable#vulnix -- \
-            -w https://raw.githubusercontent.com/ckauhaus/nixos-vulnerability-roundup/master/whitelists/nixos-unstable.toml ./profile \
+            --whitelist https://raw.githubusercontent.com/ckauhaus/nixos-vulnerability-roundup/master/whitelists/nixos-unstable.toml \
+            --profile ./profile \
             | tee /tmp/security.txt
-          OUTPUT_SECURITY="$(cat /tmp/security.txt)"
-          OUTPUT_SECURITY="${OUTPUT_SECURITY//'%'/'%25'}"
-          OUTPUT_SECURITY="${OUTPUT_SECURITY//$'\n'/'%0A'}"
-          OUTPUT_SECURITY="${OUTPUT_SECURITY//$'\r'/'%0D'}"
-          echo "$OUTPUT_SECURITY"
 
           delimiter="$(openssl rand -hex 16)"
           echo "security<<${delimiter}" >> "${GITHUB_OUTPUT}"
-          echo "$OUTPUT_SECURITY" >> "${GITHUB_OUTPUT}"
+          cat /tmp/security.txt >> "${GITHUB_OUTPUT}"
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
 
       - name: diff profile

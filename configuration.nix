@@ -312,6 +312,7 @@
       gthumb
       hieroglyphic
       jetbrains.idea-ultimate
+      kotlin
       lua5_1
       luajit
       mold
@@ -326,6 +327,7 @@
       rustup
       steam
       texlive.combined.scheme-full
+      toybox
       unstable-pkgs.galaxy-buds-client
       unstable-pkgs.qbittorrent
       vlc

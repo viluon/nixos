@@ -86,13 +86,20 @@ jobs:
         run: | # https://stackoverflow.com/a/74232400
           nix run nixpkgs/nixos-unstable#vulnix -- \
             --whitelist https://raw.githubusercontent.com/ckauhaus/nixos-vulnerability-roundup/master/whitelists/nixos-unstable.toml \
-            --profile ./profile \
+            ./profile \
             | tee /tmp/security.txt
 
           delimiter="$(openssl rand -hex 16)"
           echo "security<<${delimiter}" >> "${GITHUB_OUTPUT}"
           cat /tmp/security.txt >> "${GITHUB_OUTPUT}"
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+
+          # if the report has more than 3 lines
+          if [ $(wc -l < /tmp/security.txt) -gt 3 ]; then
+            echo "icon=:warning:" >> "${GITHUB_OUTPUT}"
+          else
+            echo "icon=:white_check_mark:" >> "${GITHUB_OUTPUT}"
+          fi
 
       - name: diff profile
         id: diff
@@ -114,6 +121,6 @@ jobs:
             ```
 
             <details>
-            <summary> Security vulnerability report </summary> <br>
+            <summary> ${{ steps.security.outputs.icon }} Security vulnerability report </summary> <br>
             <pre> ${{ steps.security.outputs.security }} </pre>
             </details>

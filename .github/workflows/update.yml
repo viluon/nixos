@@ -53,7 +53,7 @@ jobs:
         run: git reset --soft "${{ github.sha }}"
 
       - name: open pull request
-        uses: peter-evans/create-pull-request@v7.0.5
+        uses: peter-evans/create-pull-request@v7.0.6
         with:
           add-paths: |
             flake.lock

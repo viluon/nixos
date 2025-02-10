@@ -21,6 +21,8 @@
     daemonIOSchedClass = "idle";
 
     settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+
       # trust viluon to configure binary caches
       trusted-users = [ "root" "viluon" ];
 

@@ -20,12 +20,29 @@
             options.path = ./nixluon-central.json;
           }
         ];
+        datasource-providers = [
+          {
+            name = "local prometheus";
+            type = "prometheus";
+            uid = "prometheus-local";
+            url = "http://localhost:${toString config.services.prometheus.port}";
+            jsonData = {
+              incrementalQuerying = true;
+            };
+          }
+        ];
       in
       {
         enable = true;
+
         dashboards.settings = {
           apiVersion = 1;
           providers = dashboard-providers;
+        };
+
+        datasources.settings = {
+          apiVersion = 1;
+          datasources = datasource-providers;
         };
       };
   };

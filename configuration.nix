@@ -427,11 +427,12 @@
   networking.firewall =
     let
       warcraft3Range = { from = 6112; to = 6119; };
+      steamLocalTransferPort = 27040;
     in
     {
       enable = true;
 
-      allowedTCPPorts = [ 80 443 ];
+      allowedTCPPorts = [ 80 443 steamLocalTransferPort ];
       allowedTCPPortRanges = [ warcraft3Range ];
       allowedUDPPorts = [ 16000 ];
       allowedUDPPortRanges = [ warcraft3Range { from = 27000; to = 27100; } ];

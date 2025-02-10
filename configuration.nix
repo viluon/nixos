@@ -106,7 +106,7 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  boot.loader.efi.efiSysMountPoint = "/boot";
 
   # boot a rescue shell on kernel panic
   boot.crashDump.enable = true; # TODO: enable once we find a good cache

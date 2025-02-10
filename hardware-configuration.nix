@@ -16,21 +16,13 @@
 
   fileSystems."/" =
     {
-      device = "/dev/disk/by-uuid/4843b868-8b48-4bf7-aadb-c992d698392a";
+      device = "/dev/disk/by-label/nixos";
       fsType = "btrfs";
-      options = [ "subvol=@" ];
     };
 
-  fileSystems."/var/lib/docker/btrfs" =
+  fileSystems."/boot" =
     {
-      device = "/@/var/lib/docker/btrfs";
-      fsType = "none";
-      options = [ "bind" ];
-    };
-
-  fileSystems."/boot/efi" =
-    {
-      device = "/dev/disk/by-uuid/D418-CA0C";
+      device = "/dev/disk/by-label/boot";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };

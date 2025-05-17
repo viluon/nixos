@@ -4,6 +4,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     nix-index-database.url = "github:nix-community/nix-index-database";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     treefmt-nix.url = "github:numtide/treefmt-nix";
@@ -14,7 +15,7 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, disko, nixpkgs, nixpkgs-unstable, nix-index-database, flake-parts, ... }:
+  outputs = inputs@{ self, disko, nixpkgs, nixpkgs-unstable, nixos-hardware, nix-index-database, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.treefmt-nix.flakeModule
@@ -26,6 +27,7 @@
           system = "x86_64-linux";
           modules = [
             ./configuration.nix
+            nixos-hardware.nixosModules.framework-amd-ai-300-series
             nix-index-database.nixosModules.nix-index
             {
               programs.nix-index-database.comma.enable = true;

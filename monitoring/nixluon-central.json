@@ -19,11 +19,11 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 1,
+  "id": 3,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -31,6 +31,7 @@
         "y": 0
       },
       "id": 10,
+      "panels": [],
       "title": "status",
       "type": "row"
     },
@@ -106,7 +107,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.9",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -179,7 +180,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "10.4.10",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -283,7 +284,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "10.4.10",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -370,6 +371,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -435,6 +437,7 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -469,6 +472,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "scheme",
@@ -514,19 +518,53 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "max"
+              "id": "byRegexp",
+              "options": "/max[0-9]*/"
             },
             "properties": [
-              {
-                "id": "custom.fillBelowTo",
-                "value": "min"
-              },
               {
                 "id": "color",
                 "value": {
                   "mode": "fixed"
                 }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/min[0-9]*/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg[0-9]*/"
+            },
+            "properties": [
+              {
+                "id": "custom.lineInterpolation",
+                "value": "smooth"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max0"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min0"
               },
               {
                 "id": "custom.gradientMode",
@@ -537,26 +575,368 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "min"
+              "options": "max1"
             },
             "properties": [
               {
-                "id": "color",
-                "value": {
-                  "mode": "fixed"
-                }
+                "id": "custom.fillBelowTo",
+                "value": "min1"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "avg"
+              "options": "max2"
             },
             "properties": [
               {
-                "id": "custom.lineInterpolation",
-                "value": "smooth"
+                "id": "custom.fillBelowTo",
+                "value": "min2"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max3"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min3"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max4"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min4"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max5"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min5"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max6"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min6"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max7"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min7"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max8"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min8"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max9"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min9"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max10"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min10"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max11"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min11"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max12"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min12"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max13"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min13"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max14"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min14"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max15"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min15"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max16"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min16"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max17"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min17"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max18"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min18"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max19"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min19"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max20"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min20"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max21"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min21"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max22"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min22"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max23"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "min23"
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
               }
             ]
           }
@@ -582,41 +962,54 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus-local"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "min(node_cpu_scaling_frequency_hertz)",
-          "legendFormat": "min",
+          "expr": "min by(cpu) (node_cpu_scaling_frequency_hertz)",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "legendFormat": "min{{cpu}}",
           "range": true,
-          "refId": "min"
+          "refId": "min",
+          "useBackend": false
         },
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus-local"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "max(node_cpu_scaling_frequency_hertz)",
+          "expr": "max by(cpu) (node_cpu_scaling_frequency_hertz)",
+          "fullMetaSearch": false,
           "hide": false,
-          "legendFormat": "max",
+          "includeNullMetadata": true,
+          "legendFormat": "max{{cpu}}",
           "range": true,
-          "refId": "max"
+          "refId": "max",
+          "useBackend": false
         },
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus-local"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg(node_cpu_scaling_frequency_hertz)",
+          "expr": "avg by(cpu) (node_cpu_scaling_frequency_hertz)",
+          "fullMetaSearch": false,
           "hide": false,
-          "legendFormat": "avg",
+          "includeNullMetadata": true,
+          "legendFormat": "avg{{cpu}}",
           "range": true,
-          "refId": "avg"
+          "refId": "avg",
+          "useBackend": false
         }
       ],
       "title": "CPU frequency",
@@ -639,6 +1032,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 50,
             "gradientMode": "opacity",
@@ -897,6 +1291,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1033,6 +1428,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1096,6 +1492,7 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1130,6 +1527,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "scheme",
@@ -1162,7 +1560,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue"
+                "color": "blue",
+                "value": null
               },
               {
                 "color": "green",
@@ -1280,7 +1679,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "node_hwmon_fan_rpm"
+              "options": "🌀 fan1"
             },
             "properties": [
               {
@@ -1335,7 +1734,7 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "9.5.13",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1392,7 +1791,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "node_hwmon_fan_rpm",
+          "expr": "avg by(sensor) (node_hwmon_fan_rpm)",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1423,6 +1822,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1454,7 +1854,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1485,6 +1886,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1519,7 +1921,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "green",
@@ -1543,6 +1946,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -1554,7 +1958,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.10",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1593,6 +1997,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1624,7 +2029,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1655,6 +2061,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1690,6 +2097,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1721,7 +2129,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1752,6 +2161,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1769,8 +2179,9 @@
       "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "5s",
-  "schemaVersion": 39,
+  "schemaVersion": 40,
   "tags": [],
   "templating": {
     "list": []
@@ -1783,6 +2194,6 @@
   "timezone": "",
   "title": "nixluon central",
   "uid": "b7a8be2d-5b0a-49fc-8808-1801a8185ad0",
-  "version": 63,
+  "version": 2,
   "weekStart": ""
 }

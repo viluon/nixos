@@ -51,6 +51,12 @@
     };
   };
 
+  # kernel version
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # firmware upgrades
+  services.fwupd.enable = true;
+
   # bluetooth
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
@@ -91,7 +97,7 @@
   boot.loader.efi.efiSysMountPoint = "/boot";
 
   # boot a rescue shell on kernel panic
-  boot.crashDump.enable = true; # TODO: enable once we find a good cache
+  # boot.crashDump.enable = true; # TODO: enable once we find a good cache
 
   # enable sysrq
   boot.kernel.sysctl."kernel.sysrq" = 502;

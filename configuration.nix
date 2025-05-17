@@ -292,7 +292,6 @@
       craftos-pc
       eza
       ffmpeg
-      firefox
       gamemode
       gifski
       gimp
@@ -322,6 +321,11 @@
       wasm-pack
       xournalpp
     ];
+  };
+
+  programs.firefox = {
+    enable = true;
+    package = pkgs.firefox-devedition;
   };
 
   programs.git = {

@@ -64,9 +64,6 @@
   # new xbox controller support
   hardware.xpadneo.enable = true;
 
-  # nvidia nonfree drivers
-  services.xserver.videoDrivers = [ "nvidia" ];
-
   hardware.graphics = {
     enable = true;
 
@@ -76,23 +73,6 @@
     # va-api
     extraPackages = with pkgs; [ intel-media-driver ];
   };
-
-  hardware.nvidia = {
-    # GTX 1050 :(
-    open = false;
-
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-    modesetting.enable = true;
-    powerManagement.enable = true;
-    prime = {
-      offload.enable = true;
-      intelBusId = "PCI:00:02:0";
-      nvidiaBusId = "PCI:01:00:0";
-    };
-  };
-
-  # docker integration
-  hardware.nvidia-container-toolkit.enable = true;
 
   # on-demand debug info
   services.nixseparatedebuginfod.enable = true;
@@ -349,18 +329,6 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    (
-      let
-        nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
-          export __NV_PRIME_RENDER_OFFLOAD=1
-          export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
-          export __GLX_VENDOR_LIBRARY_NAME=nvidia
-          export __VK_LAYER_NV_optimus=NVIDIA_only
-          exec "$@"
-        '';
-      in
-      nvidia-offload
-    )
     iosevka
     lm_sensors
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.

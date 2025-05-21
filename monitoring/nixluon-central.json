@@ -19,11 +19,11 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 1,
+  "id": 3,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -31,6 +31,7 @@
         "y": 0
       },
       "id": 10,
+      "panels": [],
       "title": "status",
       "type": "row"
     },
@@ -106,7 +107,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.9",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -179,7 +180,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "10.4.10",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -283,7 +284,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "10.4.10",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -370,6 +371,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -435,6 +437,7 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -469,6 +472,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "scheme",
@@ -582,12 +586,14 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus-local"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
           "expr": "min(node_cpu_scaling_frequency_hertz)",
           "legendFormat": "min",
@@ -639,6 +645,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 50,
             "gradientMode": "opacity",
@@ -897,6 +904,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1033,6 +1041,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1096,6 +1105,7 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1130,6 +1140,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "scheme",
@@ -1162,7 +1173,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue"
+                "color": "blue",
+                "value": null
               },
               {
                 "color": "green",
@@ -1280,7 +1292,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "node_hwmon_fan_rpm"
+              "options": "🌀 fan1"
             },
             "properties": [
               {
@@ -1335,7 +1347,7 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "9.5.13",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1392,7 +1404,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "node_hwmon_fan_rpm",
+          "expr": "avg by(sensor) (node_hwmon_fan_rpm)",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1423,6 +1435,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1454,7 +1467,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1485,6 +1499,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1519,7 +1534,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "green",
@@ -1543,6 +1559,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -1554,7 +1571,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.10",
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1593,6 +1610,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1624,7 +1642,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1655,6 +1674,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1690,6 +1710,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1721,7 +1742,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1752,6 +1774,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.6",
       "targets": [
         {
           "datasource": {
@@ -1769,8 +1792,9 @@
       "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "5s",
-  "schemaVersion": 39,
+  "schemaVersion": 40,
   "tags": [],
   "templating": {
     "list": []
@@ -1783,6 +1807,6 @@
   "timezone": "",
   "title": "nixluon central",
   "uid": "b7a8be2d-5b0a-49fc-8808-1801a8185ad0",
-  "version": 63,
+  "version": 2,
   "weekStart": ""
 }

@@ -51,6 +51,12 @@
     };
   };
 
+  # kernel version
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # firmware upgrades
+  services.fwupd.enable = true;
+
   # bluetooth
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
@@ -64,9 +70,6 @@
   # new xbox controller support
   hardware.xpadneo.enable = true;
 
-  # nvidia nonfree drivers
-  services.xserver.videoDrivers = [ "nvidia" ];
-
   hardware.graphics = {
     enable = true;
 
@@ -76,23 +79,6 @@
     # va-api
     extraPackages = with pkgs; [ intel-media-driver ];
   };
-
-  hardware.nvidia = {
-    # GTX 1050 :(
-    open = false;
-
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-    modesetting.enable = true;
-    powerManagement.enable = true;
-    prime = {
-      offload.enable = true;
-      intelBusId = "PCI:00:02:0";
-      nvidiaBusId = "PCI:01:00:0";
-    };
-  };
-
-  # docker integration
-  hardware.nvidia-container-toolkit.enable = true;
 
   # on-demand debug info
   services.nixseparatedebuginfod.enable = true;
@@ -111,7 +97,7 @@
   boot.loader.efi.efiSysMountPoint = "/boot";
 
   # boot a rescue shell on kernel panic
-  boot.crashDump.enable = true; # TODO: enable once we find a good cache
+  # boot.crashDump.enable = true; # TODO: enable once we find a good cache
 
   # enable sysrq
   boot.kernel.sysctl."kernel.sysrq" = 502;
@@ -210,11 +196,7 @@
 
   services.flatpak.enable = true;
 
-  services.fprintd = {
-    enable = true;
-    tod.enable = true;
-    tod.driver = pkgs.libfprint-2-tod1-vfs0090;
-  };
+  services.fprintd.enable = true;
   security.pam.services.login.fprintAuth = true;
 
   services.fstrim.enable = true;
@@ -306,7 +288,6 @@
       craftos-pc
       eza
       ffmpeg
-      firefox
       gamemode
       gifski
       gimp
@@ -338,6 +319,11 @@
     ];
   };
 
+  programs.firefox = {
+    enable = true;
+    package = pkgs.firefox-devedition;
+  };
+
   programs.git = {
     enable = true;
     lfs.enable = true;
@@ -349,18 +335,6 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    (
-      let
-        nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
-          export __NV_PRIME_RENDER_OFFLOAD=1
-          export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
-          export __GLX_VENDOR_LIBRARY_NAME=nvidia
-          export __VK_LAYER_NV_optimus=NVIDIA_only
-          exec "$@"
-        '';
-      in
-      nvidia-offload
-    )
     iosevka
     lm_sensors
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
@@ -448,7 +422,7 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
 
   programs.gnome-disks.enable = true;
   programs.cdemu.enable = true;

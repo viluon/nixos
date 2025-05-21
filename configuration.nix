@@ -196,11 +196,7 @@
 
   services.flatpak.enable = true;
 
-  services.fprintd = {
-    enable = true;
-    tod.enable = true;
-    tod.driver = pkgs.libfprint-2-tod1-vfs0090;
-  };
+  services.fprintd.enable = true;
   security.pam.services.login.fprintAuth = true;
 
   services.fstrim.enable = true;

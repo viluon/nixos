@@ -286,6 +286,7 @@
       cdemu-client
       cloc
       craftos-pc
+      ddcui
       eza
       ffmpeg
       gamemode

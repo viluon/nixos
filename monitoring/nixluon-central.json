@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 3,
+  "id": 7,
   "links": [],
   "panels": [
     {
@@ -244,6 +244,7 @@
             "mode": "continuous-RdYlGr"
           },
           "mappings": [],
+          "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -258,7 +259,7 @@
               }
             ]
           },
-          "unit": "watth"
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -293,7 +294,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "node_power_supply_energy_watthour{power_supply=\"BAT0\"}",
+          "expr": "node_power_supply_capacity{power_supply=\"BAT1\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -309,9 +310,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "node_power_supply_energy_full{power_supply=\"BAT0\"}",
+          "expr": "node_power_supply_charge_full{power_supply=\"BAT1\"}",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -321,24 +322,6 @@
         }
       ],
       "title": "battery level",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byType",
-              "options": "number"
-            },
-            "configRefId": "battery capacity",
-            "mappings": [
-              {
-                "fieldName": "{__name__=\"node_power_supply_energy_full\", instance=\"127.0.0.1:9002\", job=\"chrysalis\", power_supply=\"BAT0\"}",
-                "handlerKey": "max"
-              }
-            ]
-          }
-        }
-      ],
       "type": "gauge"
     },
     {
@@ -1651,7 +1634,7 @@
               }
             ]
           },
-          "unit": "watth"
+          "unit": "watt"
         },
         "overrides": []
       },
@@ -1681,16 +1664,20 @@
             "type": "prometheus",
             "uid": "prometheus-local"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "node_power_supply_energy_watthour",
+          "expr": "node_power_supply_current_ampere * node_power_supply_voltage_volt",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "instant": true,
           "key": "Q-748c44f0-5bb1-46fa-b825-2aae482f1ffe-0",
-          "legendFormat": "__auto",
+          "legendFormat": "{{power_supply}}",
           "range": true,
-          "refId": "A"
+          "refId": "power",
+          "useBackend": false
         }
       ],
-      "title": "batteries [Wh]",
+      "title": "power",
       "type": "timeseries"
     },
     {
@@ -1800,7 +1787,7 @@
     "list": []
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},

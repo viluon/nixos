@@ -6,7 +6,7 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
 
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";

@@ -5,6 +5,7 @@
     flake-root.url = "github:srid/flake-root";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nixpkgs-old.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
@@ -15,7 +16,7 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, disko, nixpkgs, nixpkgs-unstable, nixos-hardware, nix-index-database, flake-parts, ... }:
+  outputs = inputs@{ self, disko, nixpkgs, nixpkgs-old, nixpkgs-unstable, nixos-hardware, nix-index-database, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.treefmt-nix.flakeModule
@@ -36,6 +37,7 @@
             ./disko-config.nix
           ];
           specialArgs = {
+            old-pkgs = nixpkgs-old.legacyPackages.${system};
             unstable-pkgs = nixpkgs-unstable.legacyPackages.${system};
           };
         };

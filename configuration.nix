@@ -329,6 +329,15 @@
     lfs.enable = true;
   };
 
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+  };
+
+  programs.hyprlock.enable = true;
+  programs.iio-hyprland.enable = true;
+  services.hypridle.enable = true;
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 

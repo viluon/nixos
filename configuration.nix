@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, unstable-pkgs, lib, ... }:
+{ config, pkgs, old-pkgs, unstable-pkgs, lib, ... }:
 
 {
   imports =
@@ -177,7 +177,7 @@
   services.sysprof.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -277,7 +277,6 @@
           }
         ];
       })
-      alass
       atuin
       bottles
       btrfs-assistant
@@ -285,7 +284,7 @@
       calibre
       cdemu-client
       cloc
-      craftos-pc
+      old-pkgs.craftos-pc
       ddcui
       eza
       ffmpeg

@@ -33,8 +33,10 @@
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
-        inputs.treefmt-nix.flakeModule
+        ./home/flake-module.nix
         inputs.flake-root.flakeModule
+        inputs.home-manager.flakeModules.home-manager
+        inputs.treefmt-nix.flakeModule
       ];
 
       flake = {
@@ -49,15 +51,6 @@
             }
             disko.nixosModules.disko
             ./disko-config.nix
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users.viluon = ./users/viluon/home.nix;
-
-              # Optionally, use home-manager.extraSpecialArgs to pass
-              # arguments to home.nix
-            }
           ];
           specialArgs = {
             old-pkgs = nixpkgs-old.legacyPackages.${system};

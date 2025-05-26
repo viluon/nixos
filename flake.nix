@@ -3,6 +3,7 @@
     disko.url = "github:nix-community/disko/latest";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-old.url = "github:NixOS/nixpkgs/nixos-24.11";
@@ -12,6 +13,7 @@
 
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };

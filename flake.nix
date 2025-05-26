@@ -18,7 +18,19 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, disko, nixpkgs, nixpkgs-old, nixpkgs-unstable, nixos-hardware, nix-index-database, flake-parts, ... }:
+  outputs =
+    inputs@
+    { self
+    , disko
+    , flake-parts
+    , home-manager
+    , nix-index-database
+    , nixos-hardware
+    , nixpkgs
+    , nixpkgs-old
+    , nixpkgs-unstable
+    , ...
+    }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.treefmt-nix.flakeModule
@@ -37,6 +49,15 @@
             }
             disko.nixosModules.disko
             ./disko-config.nix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.viluon = ./users/viluon/home.nix;
+
+              # Optionally, use home-manager.extraSpecialArgs to pass
+              # arguments to home.nix
+            }
           ];
           specialArgs = {
             old-pkgs = nixpkgs-old.legacyPackages.${system};

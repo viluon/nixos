@@ -1,11 +1,6 @@
 { config, pkgs, ... }:
 
 {
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
-  home.username = "viluon";
-  home.homeDirectory = "/home/viluon";
-
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
   # introduces backwards incompatible changes.
@@ -21,6 +16,7 @@
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
+    pkgs.grimblast
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
@@ -59,6 +55,28 @@
       lh = "ls -lhF";
       ll = "ls -lhFA";
     };
+  };
+
+  wayland.windowManager.hyprland.settings = {
+    "$mod" = "SUPER";
+    bind =
+      [
+        "$mod, F, exec, firefox"
+        ", Print, exec, grimblast copy area"
+      ]
+      ++ (
+        # workspaces
+        # binds $mod + [shift +] {1..9} to [move to] workspace {1..9}
+        builtins.concatLists (builtins.genList
+          (i:
+            let ws = i + 1;
+            in [
+              "$mod, code:1${toString i}, workspace, ${toString ws}"
+              "$mod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
+            ]
+          )
+          9)
+      );
   };
 
   # Home Manager can also manage your environment variables through

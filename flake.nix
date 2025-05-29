@@ -3,6 +3,7 @@
     disko.url = "github:nix-community/disko/latest";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-old.url = "github:NixOS/nixpkgs/nixos-24.11";
@@ -12,15 +13,30 @@
 
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, disko, nixpkgs, nixpkgs-old, nixpkgs-unstable, nixos-hardware, nix-index-database, flake-parts, ... }:
+  outputs =
+    inputs@
+    { self
+    , disko
+    , flake-parts
+    , home-manager
+    , nix-index-database
+    , nixos-hardware
+    , nixpkgs
+    , nixpkgs-old
+    , nixpkgs-unstable
+    , ...
+    }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
-        inputs.treefmt-nix.flakeModule
+        ./home/flake-module.nix
         inputs.flake-root.flakeModule
+        inputs.home-manager.flakeModules.home-manager
+        inputs.treefmt-nix.flakeModule
       ];
 
       flake = {

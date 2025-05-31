@@ -58,3 +58,5 @@ export PATH="$PATH:/nix/var/nix/profiles/system/sw/bin"
 - [rxyhn/yuki](https://github.com/rxyhn/yuki/blob/2fcbd0c1cde5fcd6e2236b0aa90c72629dbb3740/flake.nix)
 - the [NixOS & Flakes book](https://nixos-and-flakes.thiscute.world/nixos-with-flakes/nixos-flake-configuration-explained)
 - [felschr/nixos-config](https://github.com/felschr/nixos-config)
+- [kaleocheng/nix-dots](https://github.com/kaleocheng/nix-dots)
+- [Flake-parts: writing custom flake modules](https://www.vtimofeenko.com/posts/flake-parts-writing-custom-flake-modules/)

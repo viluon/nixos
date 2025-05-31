@@ -2,7 +2,14 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, old-pkgs, unstable-pkgs, lib, ... }:
+{ config
+, pkgs
+, old-pkgs
+, unstable-pkgs
+, lib
+, vscode-customised
+, ...
+}:
 
 {
   imports =
@@ -150,8 +157,8 @@
   };
 
   # Enable the GNOME and Plasma Desktop Environments.
-  services.displayManager.sddm.enable = true;
-  services.xserver.displayManager.gdm.enable = false;
+  services.displayManager.sddm.enable = false;
+  services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
   services.desktopManager.plasma6.enable = true;
   # Use this for the kssshaskpass
@@ -197,7 +204,7 @@
   services.flatpak.enable = true;
 
   services.fprintd.enable = true;
-  security.pam.services.login.fprintAuth = true;
+  security.pam.services.login.fprintAuth = lib.mkForce true;
 
   services.fstrim.enable = true;
 
@@ -210,73 +217,7 @@
     description = "Andrew Kvapil";
     extraGroups = [ "cdrom" "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
-      (vscode-with-extensions.override {
-        vscodeExtensions = with vscode-extensions; [
-          bbenoist.nix
-          dbaeumer.vscode-eslint
-          esbenp.prettier-vscode
-          github.codespaces
-          github.copilot
-          github.copilot-chat
-          github.vscode-github-actions
-          github.vscode-pull-request-github
-          ms-azuretools.vscode-docker
-          ms-python.python
-          ms-vscode-remote.remote-ssh
-          ms-vscode.hexeditor
-          ms-vsliveshare.vsliveshare
-          rust-lang.rust-analyzer
-          stkb.rewrap
-          streetsidesoftware.code-spell-checker
-          sumneko.lua
-          tamasfe.even-better-toml
-          timonwong.shellcheck
-          wakatime.vscode-wakatime
-        ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-          {
-            name = "craftos-pc";
-            publisher = "jackmacwindows";
-            version = "1.2.2";
-            sha256 = "sha256-A+MNroXv0t9Mw/gr0Fyov3cXyF/GGzwRLKrIxQ2tKCE=";
-          }
-          {
-            name = "groovylambda";
-            publisher = "sheaf";
-            version = "0.1.0";
-            sha256 = "sha256-bv1TgtFUYliKCorSvlyHABAZXVrbvBdUjepzDJI3XMg=";
-          }
-          {
-            name = "code-spell-checker-czech";
-            publisher = "streetsidesoftware";
-            version = "1.0.4";
-            sha256 = "sha256-WxmOfF8s4biiJ7TLKMkhmoCQmFrSeGcP4aIz0KRygdA=";
-          }
-          {
-            name = "code-spell-checker-british-english";
-            publisher = "streetsidesoftware";
-            version = "1.3.0";
-            sha256 = "sha256-w6RNWJH8Orc3dM0iH0sFh+WdvYTThn74HJ89KTPNAUA=";
-          }
-          {
-            name = "transpose";
-            publisher = "v4run";
-            version = "0.0.6";
-            sha256 = "sha256-oz0pg3n7jJ+JNCcSnEaRioqewCS8Jg+2ifC3F1feZ14=";
-          }
-          {
-            name = "vscode-typescript-vue-plugin";
-            publisher = "vue";
-            version = "1.8.22";
-            sha256 = "sha256-nPYsneBIXEotGYf1CQWwfjHO6nPrCxU26fKi993vJIE=";
-          }
-          {
-            name = "vscode-todo-highlight";
-            publisher = "wayou";
-            version = "1.0.5";
-            sha256 = "sha256-CQVtMdt/fZcNIbH/KybJixnLqCsz5iF1U0k+GfL65Ok=";
-          }
-        ];
-      })
+      vscode-customised
       atuin
       bottles
       btrfs-assistant

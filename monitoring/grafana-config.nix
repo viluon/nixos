@@ -1,5 +1,136 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+let
   # grafana configuration
+  services.alloy = {
+    enable = true;
+  };
+
+  environment.etc."alloy/config.alloy".text = ''
+    logging {
+      level = "info"
+    }
+
+    loki.source.journal "system" {
+      forward_to = [loki.process.json.receiver]
+      format_as_json = true
+      labels = {
+        job = "systemd-journal",
+        host = "__journal__hostname",
+      }
+    }
+
+    loki.process "json" {
+      forward_to = [loki.write.default.receiver]
+
+      stage.json {
+        expressions = {
+          level = "PRIORITY",
+          unit = "_SYSTEMD_UNIT",
+          message = "MESSAGE",
+          pid = "_PID",
+          comm = "_COMM",
+          hostname = "_HOSTNAME",
+          boot_id = "_BOOT_ID",
+          transport = "_TRANSPORT",
+        }
+      }
+
+      stage.structured_metadata {
+        values = {
+          level = "",
+          unit = "",
+          pid = "",
+          comm = "",
+          hostname = "",
+          boot_id = "",
+          transport = "",
+        }
+      }
+    }
+
+    loki.write "default" {
+      endpoint {
+        url = "http://localhost:${toString lokiPort}/loki/api/v1/push"
+      }
+    }
+  '';
+
+  lokiPort = 3100;
+  lokiGrpcPort = 9095;
+
+  grpc_client_config = {
+    max_recv_msg_size = 100 * 1024 * 1024;
+    max_send_msg_size = 100 * 1024 * 1024;
+    grpc_compression = "gzip";
+  };
+
+  services.loki = {
+    enable = true;
+    configuration = {
+      auth_enabled = false;
+
+      server = {
+        http_listen_port = lokiPort;
+        grpc_server_max_recv_msg_size = grpc_client_config.max_recv_msg_size;
+        grpc_server_max_send_msg_size = grpc_client_config.max_send_msg_size;
+      };
+
+      limits_config = {
+        ingestion_rate_mb = 16; # up from default 4MB
+        ingestion_burst_size_mb = 32; # larger burst size
+        per_stream_rate_limit = "16MB";
+        per_stream_rate_limit_burst = "32MB";
+        retention_period = "365d"; # keep logs for 1 year
+        volume_enabled = true;
+      };
+
+      ingester_client = {
+        inherit grpc_client_config;
+      };
+
+      query_scheduler = {
+        inherit grpc_client_config;
+      };
+
+      frontend = {
+        inherit grpc_client_config;
+      };
+
+      frontend_worker = {
+        inherit grpc_client_config;
+      };
+
+      common = {
+        ring = {
+          instance_addr = "127.0.0.1";
+          instance_port = lokiGrpcPort;
+          kvstore.store = "inmemory";
+        };
+        replication_factor = 1;
+        path_prefix = "/tmp/loki";
+      };
+
+      schema_config = {
+        configs = [{
+          from = "2020-05-15";
+          store = "tsdb";
+          object_store = "filesystem";
+          schema = "v13";
+          index = {
+            prefix = "index_";
+            period = "24h";
+          };
+        }];
+      };
+
+      storage_config = {
+        filesystem.directory = "/tmp/loki/chunks";
+      };
+    };
+
+    dataDir = "/var/lib/loki";
+  };
+
   services.grafana = {
     enable = true;
     settings = {
@@ -30,6 +161,12 @@
               incrementalQuerying = true;
             };
           }
+          {
+            name = "local loki";
+            type = "loki";
+            uid = "loki-local";
+            url = "http://localhost:${toString lokiPort}";
+          }
         ];
       in
       {
@@ -50,7 +187,7 @@
   # nginx reverse proxy
   services.nginx.virtualHosts.${config.services.grafana.domain} = {
     locations."/" = {
-      proxyPass = "http://127.0.0.1:${toString config.services.grafana.port}";
+      proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
       proxyWebsockets = true;
     };
   };
@@ -66,6 +203,7 @@
         enable = true;
         enabledCollectors = [
           "hwmon"
+          "ethtool"
         ];
         port = 9002;
       };
@@ -98,4 +236,9 @@
       }
     ];
   };
+
+  networking.firewall.allowedTCPPorts = [ lokiPort lokiGrpcPort ];
+in
+{
+  inherit services environment networking;
 }

@@ -49,15 +49,22 @@ localFlake:
         }
       );
 
-      # devShells.vscode = pkgs.mkShell {
-      #   buildInputs = [ packages.default ];
-      #   shellHook = ''
-      #     printf "VS Code with extensions:\n"
-      #     code --list-extensions
-      #   '';
-      # };
+      devShells.vscode = localFlake.withSystem system ({ pkgs, ... }: pkgs.mkShell {
+        buildInputs = [ packages.vscode-customised ];
+        shellHook = ''
+          printf "VS Code with extensions:\n"
+          code --list-extensions
+        '';
+      });
+
+      checks.vscode = localFlake.withSystem system ({ pkgs, ... }:
+        pkgs.runCommand "vscode-check" { } ''
+          ${packages.vscode-customised}/bin/code --version
+          mkdir -p $out
+        ''
+      );
     in
     {
-      inherit packages; #devShells;
+      inherit packages devShells checks;
     };
 }

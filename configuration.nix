@@ -158,6 +158,7 @@
 
   # Enable the GNOME and Plasma Desktop Environments.
   services.displayManager.sddm.enable = false;
+  services.displayManager.defaultSession = "gnome";
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
   services.desktopManager.plasma6.enable = true;
@@ -229,7 +230,10 @@
   services.flatpak.enable = true;
 
   services.fprintd.enable = true;
-  security.pam.services.login.fprintAuth = lib.mkForce true;
+  security.pam.services.login = {
+    enableGnomeKeyring = true;
+    fprintAuth = lib.mkForce true;
+  };
 
   services.fstrim.enable = true;
 

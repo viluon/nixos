@@ -112,6 +112,33 @@
   # boot animation
   boot.plymouth.enable = true;
 
+  console = {
+    earlySetup = true;
+    font = "${pkgs.terminus_font}/share/consolefonts/ter-132n.psf.gz";
+    keyMap = "us";
+    packages = with pkgs; [ terminus_font ];
+
+    # see https://github.com/catppuccin/base16/blob/99aa911b29c9c7972f7e1d868b6242507efd508c/base16/mocha.yaml
+    colors = [
+      "1e1e2e" # base
+      "181825" # mantle
+      "313244" # surface0
+      "45475a" # surface1
+      "585b70" # surface2
+      "cdd6f4" # text
+      "f5e0dc" # rosewater
+      "b4befe" # lavender
+      "f38ba8" # red
+      "fab387" # peach
+      "f9e2af" # yellow
+      "a6e3a1" # green
+      "94e2d5" # teal
+      "89b4fa" # blue
+      "cba6f7" # mauve
+      "f2cdcd" # flamingo
+    ];
+  };
+
   # filesystems
   boot.supportedFilesystems = [ "ntfs" ];
   fileSystems = {
@@ -306,7 +333,7 @@
 
   programs.hyprlock.enable = true;
   programs.iio-hyprland.enable = true;
-  services.hypridle.enable = true;
+  # services.hypridle.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;

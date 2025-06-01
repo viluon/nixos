@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 8,
+  "id": 10,
   "links": [],
   "panels": [
     {
@@ -344,7 +344,9 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "fixedColor": "red",
+            "mode": "continuous-BlYlRd",
+            "seriesBy": "max"
           },
           "custom": {
             "axisBorderShow": false,
@@ -355,7 +357,7 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 100,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -369,18 +371,17 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "none"
+              "mode": "normal"
             },
             "thresholdsStyle": {
               "mode": "off"
             }
           },
           "mappings": [],
-          "max": 1,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -411,12 +412,13 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
         },
         "tooltip": {
           "hideZeros": false,
+          "maxHeight": 400,
           "mode": "multi",
-          "sort": "desc"
+          "sort": "none"
         }
       },
       "pluginVersion": "12.0.0+security-01",
@@ -1044,7 +1046,8 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-GrYlRd",
+            "seriesBy": "max"
           },
           "custom": {
             "axisBorderShow": false,
@@ -1055,7 +1058,7 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 100,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -1069,11 +1072,11 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "none"
+              "mode": "normal"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -1109,12 +1112,13 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
         },
         "tooltip": {
           "hideZeros": false,
+          "maxHeight": 400,
           "mode": "multi",
-          "sort": "desc"
+          "sort": "none"
         }
       },
       "pluginVersion": "12.0.0+security-01",
@@ -1124,11 +1128,15 @@
             "type": "prometheus",
             "uid": "prometheus-local"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "irate(node_cpu_seconds_total{mode=\"iowait\"}[1m]) * 100",
+          "expr": "label_replace(irate(node_cpu_seconds_total{mode=\"iowait\"}[1m]) * 100, \"cpu\", \"cpu$1\", \"cpu\", \"(.*)\")",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "legendFormat": "{{cpu}}",
           "range": true,
-          "refId": "A"
+          "refId": "A",
+          "useBackend": false
         }
       ],
       "title": "IO wait",

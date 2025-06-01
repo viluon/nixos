@@ -40,10 +40,12 @@
       let
         inherit (flake-parts-lib) importApply;
         vscode-module = importApply ./vscode.nix { inherit withSystem; };
+        amd-epp-tool-module = importApply ./amd-epp-tool.nix { inherit withSystem; };
       in
       {
         imports = [
           ./home/flake-module.nix
+          amd-epp-tool-module
           vscode-module
           inputs.flake-root.flakeModule
           inputs.home-manager.flakeModules.home-manager
@@ -64,7 +66,7 @@
               ./disko-config.nix
             ];
             specialArgs = {
-              inherit (self.packages.${system}) vscode-customised;
+              inherit (self.packages.${system}) vscode-customised amd-epp-tool;
               old-pkgs = nixpkgs-old.legacyPackages.${system};
               unstable-pkgs = nixpkgs-unstable.legacyPackages.${system};
             };

@@ -62,7 +62,4 @@ in
       ];
     }
   ];
-
-  # Ensure cpufreq modules are loaded
-  boot.kernelModules = [ "cpufreq_ondemand" "cpufreq_conservative" "cpufreq_powersave" "cpufreq_performance" ];
 }

@@ -8,6 +8,7 @@
 , unstable-pkgs
 , lib
 , vscode-customised
+, amd-epp-tool
 , ...
 }:
 
@@ -274,7 +275,7 @@
     description = "Andrew Kvapil";
     extraGroups = [ "cdrom" "networkmanager" "wheel" "docker" "uinput" ];
     packages = with pkgs; [
-      vscode-customised
+      amd-epp-tool
       atuin
       bottles
       btrfs-assistant
@@ -282,7 +283,6 @@
       calibre
       cdemu-client
       cloc
-      old-pkgs.craftos-pc
       ddcui
       eza
       ffmpeg
@@ -301,6 +301,7 @@
       nodejs
       nvitop
       obsidian
+      old-pkgs.craftos-pc
       openssl
       pandoc
       pkg-config
@@ -312,6 +313,7 @@
       unstable-pkgs.galaxy-buds-client
       unstable-pkgs.qbittorrent
       vlc
+      vscode-customised
       wasm-pack
       xournalpp
     ];
@@ -354,20 +356,6 @@
   environment.variables = {
     # crashes Gnome on Wayland presently
     #MUTTER_DEBUG_FORCE_EGL_STREAM = "1";
-  };
-
-  # tlp properly
-  services.power-profiles-daemon.enable = false;
-  powerManagement.powertop.enable = true;
-  services.tlp = {
-    enable = true;
-    settings = {
-      START_CHARGE_THRESH_BAT0 = 75;
-      STOP_CHARGE_THRESH_BAT0 = 91;
-      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-      #
-      #
-    };
   };
 
   fonts.packages = with pkgs; [

@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 11,
+  "id": 13,
   "links": [],
   "panels": [
     {
@@ -42,6 +42,42 @@
       },
       "fieldConfig": {
         "defaults": {
+          "actions": [
+            {
+              "confirmation": "Are you sure you want to switch CPU ${__field.labels.cpu} to the powersave scaling governor?",
+              "fetch": {
+                "body": "{\"core\": \"${__field.labels.cpu}\", \"governor\": \"powersave\"}",
+                "headers": [
+                  [
+                    "Content-Type",
+                    "application/json"
+                  ]
+                ],
+                "method": "POST",
+                "queryParams": [],
+                "url": "http://localhost:8080/set-governor"
+              },
+              "title": "Set to powersave",
+              "type": "fetch"
+            },
+            {
+              "confirmation": "Are you sure you want to switch CPU ${__field.labels.cpu} to the performance scaling governor?",
+              "fetch": {
+                "body": "{\"core\": \"${__field.labels.cpu}\", \"governor\": \"performance\"}",
+                "headers": [
+                  [
+                    "Content-Type",
+                    "application/json"
+                  ]
+                ],
+                "method": "POST",
+                "queryParams": [],
+                "url": "http://localhost:8080/set-governor"
+              },
+              "title": "Set to performance",
+              "type": "fetch"
+            }
+          ],
           "color": {
             "mode": "fixed"
           },
@@ -2049,7 +2085,7 @@
     }
   ],
   "preload": false,
-  "refresh": "",
+  "refresh": "10s",
   "schemaVersion": 41,
   "tags": [],
   "templating": {

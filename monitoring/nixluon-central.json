@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 15,
+  "id": 16,
   "links": [],
   "panels": [
     {
@@ -61,6 +61,23 @@
               "type": "fetch"
             },
             {
+              "confirmation": "Are you sure you want to switch CPU ${__field.labels.cpu} to the schedutil scaling governor?",
+              "fetch": {
+                "body": "{\"core\": \"${__field.labels.cpu}\", \"governor\": \"schedutil\"}",
+                "headers": [
+                  [
+                    "Content-Type",
+                    "application/json"
+                  ]
+                ],
+                "method": "POST",
+                "queryParams": [],
+                "url": "http://localhost:8080/set-governor"
+              },
+              "title": "Set to schedutil",
+              "type": "fetch"
+            },
+            {
               "confirmation": "Are you sure you want to switch CPU ${__field.labels.cpu} to the performance scaling governor?",
               "fetch": {
                 "body": "{\"core\": \"${__field.labels.cpu}\", \"governor\": \"performance\"}",
@@ -96,14 +113,19 @@
           "mappings": [
             {
               "options": {
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "schedutil"
+                },
                 "1": {
                   "color": "light-blue",
-                  "index": 0,
+                  "index": 1,
                   "text": "powersave"
                 },
                 "2": {
                   "color": "semi-dark-orange",
-                  "index": 1,
+                  "index": 2,
                   "text": "performance"
                 }
               },

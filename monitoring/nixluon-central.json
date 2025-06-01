@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 13,
+  "id": 14,
   "links": [],
   "panels": [
     {
@@ -554,6 +554,18 @@
               {
                 "id": "custom.gradientMode",
                 "value": "opacity"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 15
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
               }
             ]
           },
@@ -568,6 +580,14 @@
                 "value": {
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
               }
             ]
           },
@@ -580,6 +600,68 @@
               {
                 "id": "custom.lineInterpolation",
                 "value": "smooth"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p75"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "p25"
+              },
+              {
+                "id": "custom.lineInterpolation",
+                "value": "smooth"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 10
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p25"
+            },
+            "properties": [
+              {
+                "id": "custom.lineInterpolation",
+                "value": "smooth"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
               }
             ]
           }
@@ -625,12 +707,16 @@
             "type": "prometheus",
             "uid": "prometheus-local"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "max(node_cpu_scaling_frequency_hertz)",
+          "expr": "quantile(0.25, node_cpu_scaling_frequency_hertz)",
+          "fullMetaSearch": false,
           "hide": false,
-          "legendFormat": "max",
+          "includeNullMetadata": true,
+          "legendFormat": "p25",
           "range": true,
-          "refId": "max"
+          "refId": "p25",
+          "useBackend": false
         },
         {
           "datasource": {
@@ -643,6 +729,34 @@
           "legendFormat": "avg",
           "range": true,
           "refId": "avg"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-local"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "quantile(0.75, node_cpu_scaling_frequency_hertz)",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "legendFormat": "p75",
+          "range": true,
+          "refId": "p75",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-local"
+          },
+          "editorMode": "builder",
+          "expr": "max(node_cpu_scaling_frequency_hertz)",
+          "hide": false,
+          "legendFormat": "max",
+          "range": true,
+          "refId": "max"
         }
       ],
       "title": "CPU frequency",

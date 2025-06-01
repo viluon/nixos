@@ -944,7 +944,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "node_memory_Cached_bytes + node_memory_Buffers_bytes + node_memory_KReclaimable_bytes",
+          "expr": "node_memory_Cached_bytes + node_memory_Buffers_bytes + node_memory_SReclaimable_bytes",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -978,6 +978,21 @@
           "id": "calculateField",
           "options": {
             "alias": "total",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "total"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "available"
+                }
+              }
+            },
             "mode": "reduceRow",
             "reduce": {
               "include": [
@@ -993,13 +1008,28 @@
           "id": "calculateField",
           "options": {
             "alias": "available",
-            "mode": "reduceRow",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "total"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "used"
+                }
+              }
+            },
+            "mode": "binary",
             "reduce": {
               "include": [
                 "free",
                 "cached"
               ],
-              "reducer": "sum"
+              "reducer": "diff"
             }
           }
         }

@@ -8,7 +8,6 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    nixpkgs-old.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
@@ -31,7 +30,6 @@
     , nix-index-database
     , nixos-hardware
     , nixpkgs
-    , nixpkgs-old
     , nixpkgs-unstable
     , ...
     }:
@@ -67,7 +65,6 @@
             ];
             specialArgs = {
               inherit (self.packages.${system}) vscode-customised amd-epp-tool;
-              old-pkgs = nixpkgs-old.legacyPackages.${system};
               unstable-pkgs = nixpkgs-unstable.legacyPackages.${system};
             };
           };

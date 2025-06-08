@@ -4,7 +4,6 @@
 
 { config
 , pkgs
-, old-pkgs
 , unstable-pkgs
 , lib
 , vscode-customised
@@ -301,7 +300,7 @@
       nodejs
       nvitop
       obsidian
-      old-pkgs.craftos-pc
+      craftos-pc
       openssl
       pandoc
       pkg-config

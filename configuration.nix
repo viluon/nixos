@@ -75,6 +75,18 @@
   # nintendo joycon controllers
   services.joycond.enable = true;
 
+  # btrfs dedupe
+  services.beesd.filesystems.root = {
+    spec = config.fileSystems."/partition-root".device;
+    hashTableSizeMB = 4 * 1024;
+    extraOptions = [
+      "--thread-min"
+      "1"
+      "--loadavg-target"
+      "2.0"
+    ];
+  };
+
   # new xbox controller support
   hardware.xpadneo.enable = true;
 
@@ -142,9 +154,6 @@
 
   # filesystems
   boot.supportedFilesystems = [ "ntfs" ];
-  fileSystems = {
-    "/".options = [ "compress=zstd" ];
-  };
 
   networking.hostName = "nixluon"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -282,6 +291,7 @@
       calibre
       cdemu-client
       cloc
+      coreutils
       ddcui
       eza
       ffmpeg

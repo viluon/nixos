@@ -3,7 +3,7 @@
     disk = {
       main = {
         type = "disk";
-        device = "/dev/disk/by-id/usb-WD_BLACK_SN850X_2000GB_012345678901-0:0";
+        device = "/dev/disk/by-id/nvme-WD_BLACK_SN850X_2000GB_250304804903";
         content = {
           type = "gpt";
           partitions = {
@@ -30,21 +30,18 @@
                 subvolumes = {
                   # Subvolume name is different from mountpoint
                   "/rootfs" = {
+                    mountOptions = [ "compress=zstd:8" ];
                     mountpoint = "/";
                   };
                   # Subvolume name is the same as the mountpoint
                   "/home" = {
-                    mountOptions = [ "compress=zstd" ];
                     mountpoint = "/home";
                   };
                   # Sub(sub)volume doesn't need a mountpoint as its parent is mounted
                   "/home/user" = { };
                   # Parent is not mounted so the mountpoint must be set
                   "/nix" = {
-                    mountOptions = [
-                      "compress=zstd:8"
-                      "noatime"
-                    ];
+                    mountOptions = [ "noatime" ];
                     mountpoint = "/nix";
                   };
                 };

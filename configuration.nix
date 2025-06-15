@@ -379,16 +379,13 @@
   };
 
   # List services that you want to enable:
-  virtualisation.docker.enable = true;
-  #virtualisation.podman = {
-  #enable = true;
-
-  # Create a `docker` alias for podman, to use it as a drop-in replacement
-  #dockerCompat = true;
-
-  # Required for containers under podman-compose to be able to talk to each other.
-  #defaultNetwork.dnsname.enable = true;
-  #};
+  virtualisation.containerd.enable = true;
+  virtualisation.podman = {
+    enable = true;
+    # Create a `docker` alias for podman, to use it as a drop-in replacement
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;

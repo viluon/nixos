@@ -101,13 +101,13 @@ let
       };
 
       common = {
+        instance_addr = "::0";
         ring = {
-          instance_addr = "127.0.0.1";
           instance_port = lokiGrpcPort;
           kvstore.store = "inmemory";
         };
         replication_factor = 1;
-        path_prefix = "/tmp/loki";
+        path_prefix = "/var/lib/loki";
       };
 
       schema_config = {
@@ -124,7 +124,7 @@ let
       };
 
       storage_config = {
-        filesystem.directory = "/tmp/loki/chunks";
+        filesystem.directory = "/var/lib/loki/chunks";
       };
     };
 

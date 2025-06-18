@@ -83,7 +83,7 @@
       "--thread-min"
       "1"
       "--loadavg-target"
-      "2.0"
+      "4.0"
     ];
   };
 
@@ -292,12 +292,14 @@
       cdemu-client
       cloc
       coreutils
+      craftos-pc
       ddcui
       eza
       ffmpeg
       gamemode
       gifski
       gimp
+      gnome-tweaks
       gnumake
       gthumb
       hieroglyphic
@@ -310,7 +312,6 @@
       nodejs
       nvitop
       obsidian
-      craftos-pc
       openssl
       pandoc
       pkg-config

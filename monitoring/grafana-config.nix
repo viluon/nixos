@@ -5,6 +5,8 @@ let
     enable = true;
   };
 
+  systemd.services.alloy.serviceConfig.TimeoutStopSec = "8s";
+
   environment.etc."alloy/config.alloy".text = ''
     logging {
       level = "info"

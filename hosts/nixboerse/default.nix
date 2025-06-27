@@ -80,6 +80,31 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  # Swap caps lock & escape on Wayland too (user must be in the uinput group)
+  hardware.uinput.enable = true;
+  services.kanata = {
+    enable = true;
+    keyboards.framework.config = ''
+      (defsrc
+        esc
+        grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+        tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
+        caps a    s    d    f    g    h    j    k    l    ;    '    ret
+        lsft z    x    c    v    b    n    m    ,    .    /    rsft
+        lctl lmet lalt           spc            ralt rctl
+      )
+
+      (deflayer swapped
+        caps
+        grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+        tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
+        esc  a    s    d    f    g    h    j    k    l    ;    '    ret
+        lsft z    x    c    v    b    n    m    ,    .    /    rsft
+        lctl lmet lalt           spc            ralt rctl
+      )
+    '';
+  };
+
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
@@ -119,7 +144,7 @@
   users.users.viluon = {
     isNormalUser = true;
     description = "Ondrej Kvapil";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "cdrom" "networkmanager" "wheel" "docker" "uinput" ];
     packages = with pkgs; [
       vscode-customised
       #  thunderbird

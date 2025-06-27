@@ -68,6 +68,21 @@
               unstable-pkgs = nixpkgs-unstable.legacyPackages.${system};
             };
           };
+          nixosConfigurations.nixboerse = nixpkgs.lib.nixosSystem rec {
+            system = "x86_64-linux";
+            modules = [
+              ./hosts/nixboerse/configuration.nix
+              nixos-hardware.nixosModules.lenovo-thinkpad-p1-gen3
+              nix-index-database.nixosModules.nix-index
+              {
+                programs.nix-index-database.comma.enable = true;
+              }
+            ];
+            specialArgs = {
+              inherit (self.packages.${system}) vscode-customised;
+              unstable-pkgs = nixpkgs-unstable.legacyPackages.${system};
+            };
+          };
         };
 
         systems = [

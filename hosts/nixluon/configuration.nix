@@ -16,8 +16,8 @@
     [
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./monitoring/governor-control.nix
-      ./monitoring/grafana-config.nix
+      ../../monitoring/governor-control.nix
+      ../../monitoring/grafana-config.nix
     ];
 
   nix = {

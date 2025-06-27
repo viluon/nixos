@@ -54,14 +54,14 @@
           nixosConfigurations.nixluon = nixpkgs.lib.nixosSystem rec {
             system = "x86_64-linux";
             modules = [
-              ./configuration.nix
+              ./hosts/nixluon/configuration.nix
               nixos-hardware.nixosModules.framework-amd-ai-300-series
               nix-index-database.nixosModules.nix-index
               {
                 programs.nix-index-database.comma.enable = true;
               }
               disko.nixosModules.disko
-              ./disko-config.nix
+              ./hosts/nixluon/disko-configuration.nix
             ];
             specialArgs = {
               inherit (self.packages.${system}) vscode-customised amd-epp-tool;

@@ -54,14 +54,14 @@
           nixosConfigurations.nixluon = nixpkgs.lib.nixosSystem rec {
             system = "x86_64-linux";
             modules = [
-              ./hosts/nixluon/configuration.nix
+              ./hosts/nixluon
               nixos-hardware.nixosModules.framework-amd-ai-300-series
               nix-index-database.nixosModules.nix-index
               {
                 programs.nix-index-database.comma.enable = true;
               }
               disko.nixosModules.disko
-              ./hosts/nixluon/disko-configuration.nix
+              ./hosts/nixluon/disko.nix
             ];
             specialArgs = {
               inherit (self.packages.${system}) vscode-customised amd-epp-tool;
@@ -71,7 +71,7 @@
           nixosConfigurations.nixboerse = nixpkgs.lib.nixosSystem rec {
             system = "x86_64-linux";
             modules = [
-              ./hosts/nixboerse/configuration.nix
+              ./hosts/nixboerse
               nixos-hardware.nixosModules.lenovo-thinkpad-p1-gen3
               nix-index-database.nixosModules.nix-index
               {

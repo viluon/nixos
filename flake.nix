@@ -56,14 +56,13 @@
           inputs.treefmt-nix.flakeModule
         ];
 
-        flake = {
-          nixosConfigurations.nixluon = nixpkgs.lib.nixosSystem rec {
+        flake.nixosConfigurations = {
+          nixluon = nixpkgs.lib.nixosSystem rec {
             system = "x86_64-linux";
             modules = [
               ./hosts/nixluon
               nixos-hardware.nixosModules.framework-amd-ai-300-series
               disko.nixosModules.disko
-              ./hosts/nixluon/disko.nix
             ] ++ comma-modules;
             specialArgs = {
               inherit (self.packages.${system}) vscode-customised amd-epp-tool;
@@ -71,7 +70,7 @@
             };
           };
 
-          nixosConfigurations.nixboerse = nixpkgs.lib.nixosSystem rec {
+          nixboerse = nixpkgs.lib.nixosSystem rec {
             system = "x86_64-linux";
             modules = [
               ./hosts/nixboerse

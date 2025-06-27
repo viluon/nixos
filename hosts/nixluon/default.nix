@@ -77,7 +77,7 @@
   # fix for "network activation failed"
   # source: https://gist.github.com/Pitometsu/6db6ec921e19a7b37472
   boot.extraModprobeConfig = ''
-    options iwlwifi 11n_disable=8
+    options cfg80211 ieee80211_regdom="CZ"
   '';
 
   # Bootloader.
@@ -136,7 +136,7 @@
 
   # MagicDNS
   networking.nameservers = [ "100.100.100.100" "8.8.8.8" "1.1.1.1" ];
-  networking.search = [ "example.ts.net" ];
+  networking.search = [ "werewolf-torino.ts.net" ];
 
   # systemd-resolved
   services.resolved = {

@@ -19,6 +19,8 @@ jobs:
         include:
           - os: ubuntu-24.04
             target: nixosConfigurations.nixluon.config.system.build.toplevel
+          - os: ubuntu-24.04
+            target: nixosConfigurations.nixboerse.config.system.build.toplevel
 
     steps:
       - name: create nix mount point

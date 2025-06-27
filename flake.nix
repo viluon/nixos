@@ -39,6 +39,12 @@
         inherit (flake-parts-lib) importApply;
         vscode-module = importApply ./vscode.nix { inherit withSystem; };
         amd-epp-tool-module = importApply ./amd-epp-tool.nix { inherit withSystem; };
+        comma-modules = [
+          nix-index-database.nixosModules.nix-index
+          {
+            programs.nix-index-database.comma.enable = true;
+          }
+        ];
       in
       {
         imports = [
@@ -56,28 +62,21 @@
             modules = [
               ./hosts/nixluon
               nixos-hardware.nixosModules.framework-amd-ai-300-series
-              nix-index-database.nixosModules.nix-index
-              {
-                programs.nix-index-database.comma.enable = true;
-              }
               disko.nixosModules.disko
               ./hosts/nixluon/disko.nix
-            ];
+            ] ++ comma-modules;
             specialArgs = {
               inherit (self.packages.${system}) vscode-customised amd-epp-tool;
               unstable-pkgs = nixpkgs-unstable.legacyPackages.${system};
             };
           };
+
           nixosConfigurations.nixboerse = nixpkgs.lib.nixosSystem rec {
             system = "x86_64-linux";
             modules = [
               ./hosts/nixboerse
               nixos-hardware.nixosModules.lenovo-thinkpad-p1-gen3
-              nix-index-database.nixosModules.nix-index
-              {
-                programs.nix-index-database.comma.enable = true;
-              }
-            ];
+            ] ++ comma-modules;
             specialArgs = {
               inherit (self.packages.${system}) vscode-customised;
               unstable-pkgs = nixpkgs-unstable.legacyPackages.${system};

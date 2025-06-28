@@ -1,20 +1,18 @@
-name: Flake Check
+name: check
 
 on:
   push:
-  pull_request:
   workflow_dispatch:
 
 jobs:
-  flake-checks:
-    name: Nix Flake Checks
+  flake:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: checkout
         uses: actions/checkout@v4
 
-      - name: Install Nix
+      - name: install nix
         uses: cachix/install-nix-action@v31
         with:
           install_url: https://nixos.org/nix/install
@@ -22,5 +20,12 @@ jobs:
             auto-optimise-store = true
             experimental-features = nix-command flakes
 
-      - name: Run Nix Flake Check
+      - name: setup cachix
+        uses: cachix/cachix-action@v16
+        with:
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          extraPullNames: nix-community
+          name: viluon
+
+      - name: check
         run: nix flake check

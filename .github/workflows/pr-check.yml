@@ -1,6 +1,6 @@
 # see https://github.com/EdenEast/nyx/blob/718063918f0ffe36ca1e049b222d5a5d3e939025/.github/workflows/pr.yml
 
-name: Build pull request
+name: pr
 
 on:
   pull_request:
@@ -11,17 +11,21 @@ permissions:
 
 jobs:
   build:
-    name: Build ${{ matrix.target }}
+    name: build/${{ matrix.host }}
     runs-on: ${{ matrix.os }}
+    concurrency:
+      group: pr-${{ github.event.pull_request.number }}-${{ matrix.host }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: ubuntu-24.04
-            target: nixosConfigurations.nixluon.config.system.build.toplevel
+            host: nixluon
           - os: ubuntu-24.04
-            target: nixosConfigurations.nixboerse.config.system.build.toplevel
-
+            host: nixboerse
+    env:
+      output: nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
     steps:
       - name: create nix mount point
         if: contains(matrix.os, 'ubuntu')
@@ -57,7 +61,7 @@ jobs:
 
       - name: build system
         env:
-          TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ matrix.target }}"
+          TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ env.output }}"
         run: nix build $TARGET --fallback --log-format raw --print-build-logs
 
       - name: garbage-collect build dependencies
@@ -65,12 +69,12 @@ jobs:
 
       - name: fetch old system to profile
         env:
-          TARGET: "github:${{ github.repository }}/${{ github.base_ref }}#${{ matrix.target }}"
+          TARGET: "github:${{ github.repository }}/${{ github.base_ref }}#${{ env.output }}"
         run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile
 
       - name: add new system to profile
         env:
-          TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ matrix.target }}"
+          TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ env.output }}"
         run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile
 
       - name: output build failure
@@ -114,9 +118,9 @@ jobs:
       - name: comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          header: ".#${{ matrix.target }}"
+          header: ".#${{ matrix.host }}"
           message: |
-            ### Diff of `${{ matrix.target }}`
+            ### Diff of `${{ env.output }}`
 
             ```
             ${{ steps.diff.outputs.diff }}

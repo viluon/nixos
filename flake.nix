@@ -5,6 +5,8 @@
     flake-root.url = "github:srid/flake-root";
     flake-utils.url = "github:numtide/flake-utils";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
+    lix-module.url = "git+https://git@git.lix.systems/lix-project/nixos-module";
+    lix.url = "git+https://git@git.lix.systems/lix-project/lix.git";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
@@ -15,6 +17,9 @@
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    lix-module.inputs.lix.follows = "lix";
+    lix-module.inputs.nixpkgs.follows = "nixpkgs";
+    lix.inputs.nixpkgs.follows = "nixpkgs";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nix-vscode-extensions.inputs.flake-utils.follows = "flake-utils";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
@@ -27,6 +32,7 @@
     , disko
     , flake-parts
     , home-manager
+    , lix-module
     , nix-index-database
     , nixos-hardware
     , nixpkgs
@@ -44,11 +50,12 @@
           system = config.system;
           modules = [
             ./hosts/${hostname}
-            nixos-hardware.nixosModules.${config.hardware}
-            disko.nixosModules.disko
             { networking.hostName = hostname; }
-            nix-index-database.nixosModules.nix-index
             { programs.nix-index-database.comma.enable = true; }
+            disko.nixosModules.disko
+            lix-module.nixosModules.default
+            nix-index-database.nixosModules.nix-index
+            nixos-hardware.nixosModules.${config.hardware}
           ];
           specialArgs = self.packages.${config.system} // {
             unstable-pkgs = nixpkgs-unstable.legacyPackages.${config.system};

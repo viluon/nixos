@@ -46,6 +46,11 @@ in
 
   flake = {
     inherit homeModules homeConfigurations;
+
+    # Export users for NixOS home-manager integration
     homeUsers = users;
+
+    # Export function to create users for a specific host
+    mkHomeUsers = hostname: users;
   };
 }

@@ -55,9 +55,9 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.users = self.homeUsers;
+              home-manager.users = self.mkHomeUsers hostname;
               home-manager.extraSpecialArgs = {
-                inherit inputs;
+                inherit inputs hostname;
                 unstable-pkgs = nixpkgs-unstable.legacyPackages.${config.system};
               };
             }

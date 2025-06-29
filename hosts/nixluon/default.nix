@@ -14,8 +14,8 @@
 {
   imports =
     [
-      # Include the results of the hardware scan.
       ./disko.nix
+      # Include the results of the hardware scan.
       ./hardware.nix
       ../../modules/system/monitoring/governor-control.nix
       ../../modules/system/monitoring/grafana-config.nix
@@ -138,55 +138,6 @@
   };
 
   services.fstrim.enable = true;
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  # nixluon-specific user packages
-  users.users.viluon.packages = with pkgs; [
-    amd-epp-tool
-    atuin
-    bottles
-    btrfs-assistant
-    cachix
-    calibre
-    cdemu-client
-    cloc
-    coreutils
-    craftos-pc
-    ddcui
-    eza
-    ffmpeg
-    gamemode
-    gifski
-    gimp
-    gnumake
-    gthumb
-    hieroglyphic
-    jetbrains.idea-ultimate
-    kotlin
-    lua5_1
-    luajit
-    mold
-    mozjpeg
-    nodejs
-    nvitop
-    obsidian
-    openssl
-    pandoc
-    pkg-config
-    rpcs3
-    rustup
-    steam
-    texlive.combined.scheme-full
-    toybox
-    unstable-pkgs.galaxy-buds-client
-    unstable-pkgs.qbittorrent
-    vlc
-    wasm-pack
-    xournalpp
-  ];
 
   programs.hyprland = {
     enable = true;

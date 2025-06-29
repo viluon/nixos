@@ -1,5 +1,88 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, inputs, hostname ? "unknown", ... }:
 
+let
+  commonPackages = with pkgs; [
+    grimblast
+  ];
+
+  # Host-specific packages
+  hostPackages = {
+    nixluon = with pkgs; [
+      # Development tools
+      atuin
+      cloc
+      compsize
+      coreutils
+      eza
+      kotlin
+      (lib.hiPrio lua5_1)
+      (lib.lowPrio luajit)
+      mold
+      nodejs
+      rustup
+      wasm-pack
+
+      # Media and graphics
+      ffmpeg
+      gifski
+      gimp
+      gthumb
+      mozjpeg
+      vlc
+
+      # Gaming and emulation
+      bottles
+      gamemode
+      rpcs3
+      steam
+
+      # System utilities
+      btrfs-assistant
+      cachix
+      ddcui
+      nvitop
+
+      # Applications
+      calibre
+      cdemu-client
+      (pkgs.symlinkJoin {
+        name = "craftos-pc-no-lua";
+        paths = [ pkgs.craftos-pc ];
+        postBuild = ''
+          rm -f $out/lib/liblua.so*
+        '';
+      })
+      hieroglyphic
+      jetbrains.idea-ultimate
+      obsidian
+      pandoc
+      xournalpp
+
+      # Tools and libraries
+      gnumake
+      openssl
+      pkg-config
+      texlive.combined.scheme-full
+
+      # Unstable packages
+      inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.galaxy-buds-client
+      inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.qbittorrent
+    ] ++ [
+      # Host-specific packages that need special args
+      inputs.self.packages.${pkgs.system}.amd-epp-tool
+    ];
+
+    nixboerse = with pkgs; [
+    ];
+  };
+
+  # Function to get packages for current host
+  getHostPackages = hostname:
+    if builtins.hasAttr hostname hostPackages
+    then hostPackages.${hostname}
+    else [ ];
+
+in
 {
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -12,25 +95,7 @@
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = [
-    # # Adds the 'hello' command to your environment. It prints a friendly
-    # # "Hello, world!" when run.
-    # pkgs.hello
-    pkgs.grimblast
-
-    # # It is sometimes useful to fine-tune packages, for example, by applying
-    # # overrides. You can do that directly here, just don't forget the
-    # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
-    # # fonts?
-    # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
-
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
-  ];
+  home.packages = commonPackages ++ (getHostPackages hostname);
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.

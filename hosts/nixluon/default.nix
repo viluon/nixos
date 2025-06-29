@@ -4,10 +4,7 @@
 
 { config
 , pkgs
-, unstable-pkgs
 , lib
-, vscode-customised
-, amd-epp-tool
 , ...
 }:
 

@@ -1,4 +1,7 @@
-{ config, pkgs, lib, vscode-customised, ... }:
+{ pkgs
+, vscode-customised
+, ...
+}:
 
 {
   # Define common user account
@@ -6,7 +9,7 @@
     isNormalUser = true;
     description = "Andrew Kvapil";
     extraGroups = [ "cdrom" "networkmanager" "wheel" "docker" "uinput" ];
-    packages = with pkgs; [
+    packages = [
       vscode-customised
     ];
   };

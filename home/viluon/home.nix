@@ -118,16 +118,10 @@ let
       inputs.self.packages.${pkgs.system}.amd-epp-tool
     ];
 
-    nixboerse = with pkgs; [
-    ];
+    nixboerse = [ ];
   };
 
-  # Function to get packages for current host
-  getHostPackages = hostname:
-    if builtins.hasAttr hostname hostPackages
-    then hostPackages.${hostname}
-    else [ ];
-
+  getHostPackages = hostname: hostPackages.${hostname};
 in
 {
   imports = [

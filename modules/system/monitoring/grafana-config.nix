@@ -1,4 +1,7 @@
-{ config, pkgs, ... }:
+{ config
+, ...
+}:
+
 let
   # grafana configuration
   services.alloy = {
@@ -242,5 +245,5 @@ let
   networking.firewall.allowedTCPPorts = [ lokiPort lokiGrpcPort ];
 in
 {
-  inherit services environment networking;
+  inherit services systemd environment networking;
 }

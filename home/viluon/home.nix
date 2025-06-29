@@ -122,6 +122,13 @@ in
     };
   };
 
+  # Enable direnv for automatic dev shell activation
+  programs.direnv = {
+    enable = true;
+    enableBashIntegration = true;
+    nix-direnv.enable = true;
+  };
+
   wayland.windowManager.hyprland.settings = {
     "$mod" = "SUPER";
     bind =

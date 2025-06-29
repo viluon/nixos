@@ -5,6 +5,9 @@
 }:
 
 let
+  userDirs = builtins.attrNames (lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./.));
+  homeModules = lib.genAttrs userDirs (user: import ./${user}/home.nix);
+
   mkHomeConfiguration =
     { user
     , system
@@ -26,24 +29,23 @@ let
         ]
         ++ modules;
     };
+
+  homeConfigurations = lib.genAttrs userDirs (user:
+    mkHomeConfiguration {
+      inherit user;
+      system = "x86_64-linux";
+      modules = [ homeModules.${user} ];
+    }
+  );
+
+  # Provide users attrset for NixOS integration
+  users = lib.genAttrs userDirs (user: homeModules.${user});
 in
 {
   imports = [ inputs.home-manager.flakeModules.home-manager ];
 
   flake = {
-    homeModules = {
-      viluon = import ./viluon/home.nix;
-    };
-    homeConfigurations = {
-      viluon = mkHomeConfiguration {
-        user = "viluon";
-        system = "x86_64-linux";
-        modules = [
-          self.homeModules.viluon
-        ];
-      };
-    };
-    homeManagerModules = lib.warn "`homeManagerModules` is deprecated. Use `homeModules` instead." self.homeModules;
+    inherit homeModules homeConfigurations;
+    homeUsers = users;
   };
 }
-

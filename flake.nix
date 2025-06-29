@@ -51,6 +51,16 @@
             { networking.hostName = hostname; }
             nix-index-database.nixosModules.nix-index
             { programs.nix-index-database.comma.enable = true; }
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users = self.homeUsers;
+              home-manager.extraSpecialArgs = {
+                inherit inputs;
+                unstable-pkgs = nixpkgs-unstable.legacyPackages.${config.system};
+              };
+            }
           ];
           specialArgs = self.packages.${config.system} // {
             unstable-pkgs = nixpkgs-unstable.legacyPackages.${config.system};
@@ -70,11 +80,10 @@
       in
       {
         imports = [
-          ./home/flake-module.nix
+          ./home
           amd-epp-tool-module
           vscode-module
           inputs.flake-root.flakeModule
-          inputs.home-manager.flakeModules.home-manager
           inputs.treefmt-nix.flakeModule
         ];
 

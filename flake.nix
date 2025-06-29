@@ -41,9 +41,9 @@
       { withSystem, flake-parts-lib, ... }:
       let
         inherit (flake-parts-lib) importApply;
-        vscode-module = importApply ./vscode.nix { inherit withSystem; };
         amd-epp-tool-module = importApply ./amd-epp-tool.nix { inherit withSystem; };
         idea-module = importApply ./modules/editors/idea.nix { inherit withSystem; };
+        vscode-module = importApply ./modules/editors/vscode.nix { inherit withSystem; };
 
         buildNixosSystem = hostname: config: nixpkgs.lib.nixosSystem {
           system = config.system;

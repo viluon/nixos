@@ -12,6 +12,14 @@
     packages = [
       vscode-customised
     ];
+    openssh.authorizedKeys.keys =
+      let
+        githubKeysJson = builtins.fetchurl {
+          url = "https://api.github.com/users/viluon/keys";
+          sha256 = "1fj9ic79qsh3s2s8wc9kjzzli2xl46qs22jnj90hfzdzjp8fymnw";
+        };
+      in
+      map (key: key.key) (builtins.fromJSON (builtins.readFile githubKeysJson));
   };
 
   # Common programs
@@ -57,9 +65,6 @@
 
   # Timezone
   time.timeZone = "Europe/Prague";
-
-  # Networking
-  networking.networkmanager.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;

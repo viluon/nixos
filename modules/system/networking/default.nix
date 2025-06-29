@@ -3,6 +3,16 @@
 
 {
   networking.firewall.enable = true;
+  networking.networkmanager.enable = true;
+
+  # sshd
+  services.openssh = {
+    enable = true;
+    settings = {
+      PermitRootLogin = "prohibit-password";
+      PasswordAuthentication = false;
+    };
+  };
 
   # systemd-resolved
   services.resolved = {

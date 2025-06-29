@@ -95,6 +95,22 @@
         "type": "github"
       }
     },
+    "ml4w-dotfiles": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1751195622,
+        "narHash": "sha256-598sNelyIpQm0Bz/99Qvo0ErP8jQw3mjqv9FpeWVZaA=",
+        "owner": "mylinuxforwork",
+        "repo": "dotfiles",
+        "rev": "3a02d3bc84b22098fe6ae5c35f19dc43e568182b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mylinuxforwork",
+        "repo": "dotfiles",
+        "type": "github"
+      }
+    },
     "nix-index-database": {
       "inputs": {
         "nixpkgs": [
@@ -215,6 +231,7 @@
         "flake-root": "flake-root",
         "flake-utils": "flake-utils",
         "home-manager": "home-manager",
+        "ml4w-dotfiles": "ml4w-dotfiles",
         "nix-index-database": "nix-index-database",
         "nix-vscode-extensions": "nix-vscode-extensions",
         "nix4vscode": "nix4vscode",

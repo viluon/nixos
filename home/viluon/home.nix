@@ -3,6 +3,13 @@
 let
   commonPackages = with pkgs; [
     grimblast
+    fzf
+    starship
+    eza
+    bat
+    ripgrep
+    fd
+    vivid
   ];
 
   # Host-specific packages
@@ -122,10 +129,105 @@ in
     };
   };
 
+  # Modern zsh configuration
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+
+    shellAliases = {
+      lh = "eza -lhF";
+      ll = "eza -lhaF";
+      ls = "eza";
+      cat = "bat";
+      grep = "rg";
+      find = "fd";
+    };
+
+    history = {
+      size = 100 * 1000;
+      path = "${config.xdg.dataHome}/zsh/history";
+    };
+
+    oh-my-zsh = {
+      enable = true;
+      plugins = [ "git" "sudo" ];
+    };
+
+    initContent = ''
+      # Better history search with fzf
+      source ${pkgs.fzf}/share/fzf/key-bindings.zsh
+      source ${pkgs.fzf}/share/fzf/completion.zsh
+
+      # Case insensitive completion
+      zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+      # Better ls colors
+      export LS_COLORS="$(vivid generate catppuccin-mocha)"
+
+      # Docker completion
+      if command -v docker >/dev/null 2>&1; then
+        source <(docker completion zsh)
+      fi
+
+      # Kubectl completion
+      if command -v kubectl >/dev/null 2>&1; then
+        source <(kubectl completion zsh)
+      fi
+    '';
+  };
+
+  # Starship prompt
+  programs.starship = {
+    enable = true;
+    enableZshIntegration = true;
+    settings = {
+      format = "$all$character";
+      character = {
+        success_symbol = "[➜](bold green) ";
+        error_symbol = "[➜](bold red) ";
+      };
+      directory = {
+        truncation_length = 3;
+        truncation_symbol = "…/";
+      };
+      git_branch = {
+        symbol = " ";
+      };
+      git_status = {
+        ahead = "⇡\${count}";
+        diverged = "⇕⇡\${ahead_count}⇣\${behind_count}";
+        behind = "⇣\${count}";
+      };
+    };
+  };
+
+  # Kitty terminal emulator
+  programs.kitty = {
+    enable = true;
+    font = {
+      name = "Iosevka";
+      size = 10;
+    };
+    themeFile = "Catppuccin-Mocha";
+    settings = {
+      background_opacity = "0.95";
+      confirm_os_window_close = 0;
+      cursor_trail = 1;
+      dynamic_background_opacity = true;
+      enable_audio_bell = false;
+      mouse_hide_wait = "-1.0";
+      shell = "${pkgs.zsh}/bin/zsh";
+      window_padding_width = 10;
+    };
+  };
+
   # Enable direnv for automatic dev shell activation
   programs.direnv = {
     enable = true;
     enableBashIntegration = true;
+    enableZshIntegration = true;
     nix-direnv.enable = true;
   };
 

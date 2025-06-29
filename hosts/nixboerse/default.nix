@@ -13,7 +13,7 @@
       ./hardware.nix
       ../../modules/system/networking
       ../../modules/system/nix
-      ../../modules/desktop/gnome.nix
+      ../../modules/desktop/gnome
       ../../modules/desktop/input-methods.nix
       ../../modules/hardware/audio.nix
       ../../modules/hardware/graphics.nix

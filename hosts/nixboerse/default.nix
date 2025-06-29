@@ -13,154 +13,30 @@
     [
       # Include the results of the hardware scan.
       ./hardware.nix
+      ../../modules/system/networking
       ../../modules/system/nix
+      ../../modules/desktop/gnome.nix
+      ../../modules/desktop/input-methods.nix
+      ../../modules/hardware/audio.nix
+      ../../modules/hardware/graphics.nix
+      ../../modules/users/common.nix
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "nixboerse"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "Europe/Prague";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_GB.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
-  # Swap caps lock & escape on Wayland too (user must be in the uinput group)
-  hardware.uinput.enable = true;
-  services.kanata = {
-    enable = true;
-    keyboards.framework.config = ''
-      (defsrc
-        esc
-        grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
-        tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
-        caps a    s    d    f    g    h    j    k    l    ;    '    ret
-        lsft z    x    c    v    b    n    m    ,    .    /    rsft
-        lctl lmet lalt           spc            ralt rctl
-      )
-
-      (deflayer swapped
-        caps
-        grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
-        tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
-        esc  a    s    d    f    g    h    j    k    l    ;    '    ret
-        lsft z    x    c    v    b    n    m    ,    .    /    rsft
-        lctl lmet lalt           spc            ralt rctl
-      )
-    '';
-  };
-
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
+  # NVIDIA-specific configuration
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia.open = true;
 
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
+  # Intel-specific configuration
+  hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
-  };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.viluon = {
-    isNormalUser = true;
-    description = "Ondrej Kvapil";
-    extraGroups = [ "cdrom" "networkmanager" "wheel" "docker" "uinput" ];
-    packages = with pkgs; [
-      vscode-customised
-      #  thunderbird
-    ];
-  };
-
-  programs.firefox = {
-    enable = true;
-    package = pkgs.firefox-devedition;
-  };
-
-  programs.git = {
-    enable = true;
-    lfs.enable = true;
-  };
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  # Host-specific packages
   environment.systemPackages = with pkgs; [
     efibootmgr
-    iosevka
-    vim
   ];
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

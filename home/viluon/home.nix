@@ -9,6 +9,7 @@ let
     bat
     ripgrep
     fd
+    shellcheck
     vivid
 
     # Hyprland ecosystem
@@ -63,6 +64,7 @@ let
       (lib.hiPrio lua5_1)
       (lib.lowPrio luajit)
       mold
+      nixd
       nodejs
       rustup
       wasm-pack
@@ -571,7 +573,8 @@ in
   #  /etc/profiles/per-user/viluon/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
-    # EDITOR = "emacs";
+    EDITOR = "vim";
+    NIXD_FLAGS = "-log=error";
   };
 
   # Let Home Manager install and manage itself.

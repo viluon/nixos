@@ -17,7 +17,6 @@ localFlake:
           };
           extensions = [
             # "jackmacwindows.craftos-pc"
-            "bbenoist.nix"
             "dbaeumer.vscode-eslint"
             "esbenp.prettier-vscode"
             "github.codespaces"
@@ -25,6 +24,7 @@ localFlake:
             "github.copilot"
             "github.vscode-github-actions"
             "github.vscode-pull-request-github"
+            "jnoortheen.nix-ide"
             "ms-azuretools.vscode-docker"
             "ms-python.python"
             "ms-vscode-remote.remote-ssh"

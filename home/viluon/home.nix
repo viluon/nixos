@@ -118,16 +118,12 @@ let
       inputs.self.packages.${pkgs.system}.amd-epp-tool
     ];
 
-    nixboerse = with pkgs; [
-    ];
+    nixboerse = [ ];
   };
 
-  # Function to get packages for current host
-  getHostPackages = hostname:
-    if builtins.hasAttr hostname hostPackages
-    then hostPackages.${hostname}
-    else [ ];
+  getHostPackages = hostname: hostPackages.${hostname};
 
+  inherit (import ./dconf { inherit lib; }) getGnomeSettings;
 in
 {
   imports = [
@@ -579,4 +575,14 @@ in
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+
+  # GNOME dconf settings
+  dconf.settings = {
+    # Common GNOME settings
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+      enable-animations = true;
+      show-battery-percentage = true;
+    };
+  } // (getGnomeSettings hostname); # Merge host-specific settings
 }

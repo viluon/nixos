@@ -1,14 +1,11 @@
 localFlake:
-{ self
-, inputs
-, lib
-, config
+{ inputs
 , ...
 }:
 {
   perSystem = { system, ... }:
     let
-      packages.vscode-customised = localFlake.withSystem system ({ pkgs, ... }:
+      packages.vscode-customised = localFlake.withSystem system ({ ... }:
         let
           patched-pkgs = import inputs.nixpkgs {
             system = system;

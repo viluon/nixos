@@ -2,9 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config
-, pkgs
-, vscode-customised
+{ pkgs
 , ...
 }:
 
@@ -15,7 +13,7 @@
       ./hardware.nix
       ../../modules/system/networking
       ../../modules/system/nix
-      ../../modules/desktop/gnome.nix
+      ../../modules/desktop/gnome
       ../../modules/desktop/input-methods.nix
       ../../modules/hardware/audio.nix
       ../../modules/hardware/graphics.nix

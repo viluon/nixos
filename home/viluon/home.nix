@@ -98,7 +98,6 @@ let
         '';
       })
       hieroglyphic
-      jetbrains.idea-ultimate
       obsidian
       pandoc
       xournalpp
@@ -129,6 +128,10 @@ let
 
 in
 {
+  imports = [
+    inputs.self.homeModules.idea
+  ];
+
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
   # introduces backwards incompatible changes.
@@ -257,7 +260,7 @@ in
         truncation_symbol = "…/";
       };
       git_branch = {
-        symbol = " ";
+        symbol = "[](bold blue) ";
       };
       git_status = {
         ahead = "⇡\${count}";
@@ -276,7 +279,7 @@ in
     };
     themeFile = "Catppuccin-Mocha";
     settings = {
-      background_opacity = "0.95";
+      background_opacity = "0.75";
       confirm_os_window_close = 0;
       cursor_trail = 1;
       dynamic_background_opacity = true;
@@ -322,10 +325,6 @@ in
       # Input configuration
       input = {
         kb_layout = "us";
-        kb_variant = "";
-        kb_model = "";
-        kb_options = "caps:swapescape";
-        kb_rules = "";
 
         follow_mouse = 1;
         sensitivity = 0;
@@ -416,7 +415,7 @@ in
         "$mod, R, exec, $menu"
         "$mod, P, pseudo," # dwindle
         "$mod, J, togglesplit," # dwindle
-        "$mod, F, exec, firefox"
+        "$mod, F, exec, firefox-devedition"
 
         # Move focus with mainMod + arrow keys
         "$mod, left, movefocus, l"
@@ -530,6 +529,7 @@ in
         "pin, title:^(Picture-in-Picture)$"
         "size 800 600, title:^(Picture-in-Picture)$"
         "move 100%-820 100%-620, title:^(Picture-in-Picture)$"
+        "minsize 300 400, class:^(jetbrains-)(.*)$, title:^(\s*)$"
       ];
 
       # Layer rules

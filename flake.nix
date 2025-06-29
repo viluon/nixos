@@ -43,6 +43,7 @@
         inherit (flake-parts-lib) importApply;
         vscode-module = importApply ./vscode.nix { inherit withSystem; };
         amd-epp-tool-module = importApply ./amd-epp-tool.nix { inherit withSystem; };
+        idea-module = importApply ./modules/editors/idea.nix { inherit withSystem; };
 
         buildNixosSystem = hostname: config: nixpkgs.lib.nixosSystem {
           system = config.system;
@@ -86,6 +87,7 @@
           ./home
           amd-epp-tool-module
           vscode-module
+          idea-module
           inputs.flake-root.flakeModule
           inputs.treefmt-nix.flakeModule
         ];

@@ -2,14 +2,15 @@
 
 let
   commonPackages = with pkgs; [
-    grimblast
-    fzf
-    starship
-    eza
     bat
-    ripgrep
+    eza
     fd
+    fzf
+    grimblast
+    nixd
+    ripgrep
     shellcheck
+    starship
     vivid
 
     # Hyprland ecosystem
@@ -64,7 +65,6 @@ let
       (lib.hiPrio lua5_1)
       (lib.lowPrio luajit)
       mold
-      nixd
       nodejs
       rustup
       wasm-pack

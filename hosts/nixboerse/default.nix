@@ -11,6 +11,7 @@
     [
       # Include the results of the hardware scan.
       ./hardware.nix
+      ./nvidia.nix
       ../../modules/system/networking
       ../../modules/system/nix
       ../../modules/desktop/gnome
@@ -26,10 +27,21 @@
 
   # NVIDIA-specific configuration
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.nvidia.open = true;
+  hardware.nvidia = {
+    open = true;
+    prime.offload.enable = true;
+    powerManagement.finegrained = true;
+  };
 
   # Intel-specific configuration
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
+
+  programs.virt-manager.enable = true;
+  virtualisation.libvirtd.enable = true;
+  virtualisation.libvirtd.qemu.package = pkgs.qemu_kvm;
+  virtualisation.libvirtd.hooks.network = {
+    libvirtd-network-hook = ./libvirtd-network-hook.sh;
+  };
 
   # Host-specific packages
   environment.systemPackages = with pkgs; [
@@ -43,5 +55,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?
-
 }

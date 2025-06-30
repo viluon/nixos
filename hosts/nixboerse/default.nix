@@ -37,10 +37,23 @@
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
 
   programs.virt-manager.enable = true;
-  virtualisation.libvirtd.enable = true;
-  virtualisation.libvirtd.qemu.package = pkgs.qemu_kvm;
-  virtualisation.libvirtd.hooks.network = {
-    libvirtd-network-hook = ./libvirtd-network-hook.sh;
+
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu.package = pkgs.qemu_kvm;
+    hooks.qemu = {
+      libvirtd-network-hook = pkgs.writeShellScript "libvirtd-network-hook" ''
+        set -euo pipefail
+
+        case $1:$2 in
+          ubuntu:start)
+            ${pkgs.systemd}/bin/resolvectl dns virbr0 100.64.0.2
+            ${pkgs.systemd}/bin/resolvectl domain virbr0 deutsche-boerse.de oa.pnrad.net dbgcloud.io
+            ${pkgs.systemd}/bin/resolvectl default-route virbr0 no
+            ;;
+        esac
+      '';
+    };
   };
 
   # better legacy OS compatibility

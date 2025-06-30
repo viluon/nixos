@@ -46,6 +46,7 @@
   # Host-specific packages
   environment.systemPackages = with pkgs; [
     efibootmgr
+    linux-entra-sso
   ];
 
   # This value determines the NixOS release from which the default

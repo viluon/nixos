@@ -2,7 +2,8 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ pkgs
+{ config
+, pkgs
 , ...
 }:
 
@@ -55,6 +56,10 @@
       '';
     };
   };
+
+  systemd.services.libvirtd.restartTriggers = [
+    config.virtualisation.libvirtd.hooks.qemu.libvirtd-network-hook
+  ];
 
   # better legacy OS compatibility
   services.envfs.enable = true;

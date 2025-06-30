@@ -2,7 +2,8 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ pkgs
+{ config
+, pkgs
 , ...
 }:
 
@@ -11,6 +12,7 @@
     [
       # Include the results of the hardware scan.
       ./hardware.nix
+      ./nvidia.nix
       ../../modules/system/networking
       ../../modules/system/nix
       ../../modules/desktop/gnome
@@ -26,15 +28,70 @@
 
   # NVIDIA-specific configuration
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.nvidia.open = true;
+  hardware.nvidia = {
+    open = true;
+    prime.offload.enable = true;
+    powerManagement.finegrained = true;
+  };
 
   # Intel-specific configuration
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
 
+  programs.virt-manager.enable = true;
+
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu.package = pkgs.qemu_kvm;
+    hooks.qemu = {
+      libvirtd-network-hook = pkgs.writeShellScript "libvirtd-network-hook" ''
+        set -euo pipefail
+
+        case $1:$2 in
+          ubuntu:start)
+            ${pkgs.systemd}/bin/resolvectl dns virbr0 100.64.0.2
+            ${pkgs.systemd}/bin/resolvectl domain virbr0 deutsche-boerse.de oa.pnrad.net dbgcloud.io
+            ${pkgs.systemd}/bin/resolvectl default-route virbr0 no
+            ;;
+        esac
+      '';
+    };
+  };
+
+  systemd.services.libvirtd.restartTriggers = [
+    config.virtualisation.libvirtd.hooks.qemu.libvirtd-network-hook
+  ];
+
+  # better legacy OS compatibility
+  services.envfs.enable = true;
+  programs.nix-ld.enable = true;
+
   # Host-specific packages
   environment.systemPackages = with pkgs; [
     efibootmgr
+    linux-entra-sso
   ];
+
+  # Enable native messaging hosts for Firefox and Chrome
+  environment.etc = {
+    "firefox/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/lib/mozilla/native-messaging-hosts/linux_entra_sso.json";
+    "opt/chrome/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/etc/opt/chrome/native-messaging-hosts/linux_entra_sso.json";
+    "chromium/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/etc/chromium/native-messaging-hosts/linux_entra_sso.json";
+  };
+
+  programs.firefox.policies = {
+    ExtensionSettings = {
+      "linux-entra-sso@example.com" = {
+        default_area = "menupanel";
+        install_url = "file://${pkgs.linux-entra-sso}/share/linux-entra-sso/firefox/linux-entra-sso.xpi";
+        installation_mode = "force_installed";
+        updates_disabled = true;
+      };
+    };
+
+    Preferences = {
+      "xpinstall.signatures.required" = false;
+    };
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -43,5 +100,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?
-
 }

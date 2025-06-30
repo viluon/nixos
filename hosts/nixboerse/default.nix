@@ -43,6 +43,10 @@
     libvirtd-network-hook = ./libvirtd-network-hook.sh;
   };
 
+  # better legacy OS compatibility
+  services.envfs.enable = true;
+  programs.nix-ld.enable = true;
+
   # Host-specific packages
   environment.systemPackages = with pkgs; [
     efibootmgr

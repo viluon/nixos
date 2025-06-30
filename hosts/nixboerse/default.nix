@@ -71,6 +71,28 @@
     linux-entra-sso
   ];
 
+  # Enable native messaging hosts for Firefox and Chrome
+  environment.etc = {
+    "firefox/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/lib/mozilla/native-messaging-hosts/linux_entra_sso.json";
+    "opt/chrome/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/etc/opt/chrome/native-messaging-hosts/linux_entra_sso.json";
+    "chromium/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/etc/chromium/native-messaging-hosts/linux_entra_sso.json";
+  };
+
+  programs.firefox.policies = {
+    ExtensionSettings = {
+      "linux-entra-sso@example.com" = {
+        default_area = "menupanel";
+        install_url = "file://${pkgs.linux-entra-sso}/share/linux-entra-sso/firefox/linux-entra-sso.xpi";
+        installation_mode = "force_installed";
+        updates_disabled = true;
+      };
+    };
+
+    Preferences = {
+      "xpinstall.signatures.required" = false;
+    };
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

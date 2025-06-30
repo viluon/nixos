@@ -65,6 +65,10 @@
                 ml4w-dotfiles = inputs.ml4w-dotfiles;
               };
             }
+            # Add packages overlay
+            {
+              nixpkgs.overlays = [ (import ./packages) ];
+            }
           ];
           specialArgs = self.packages.${config.system} // {
             unstable-pkgs = nixpkgs-unstable.legacyPackages.${config.system};
@@ -93,6 +97,13 @@
         ];
 
         flake.nixosConfigurations = nixpkgs.lib.mapAttrs buildNixosSystem hostConfigs;
+
+        flake.packages = nixpkgs.lib.genAttrs (nixpkgs.lib.unique (nixpkgs.lib.mapAttrsToList (_: config: config.system) hostConfigs)) (system:
+          let pkgs = nixpkgs.legacyPackages.${system}.extend (import ./packages);
+          in {
+            linux-entra-sso = pkgs.linux-entra-sso;
+          }
+        );
 
         systems = nixpkgs.lib.unique (nixpkgs.lib.mapAttrsToList (_: config: config.system) hostConfigs);
 

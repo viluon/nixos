@@ -182,6 +182,16 @@ in
       source = "${ml4w-dotfiles}/share/wallpapers";
       recursive = true;
     };
+
+    # Firefox native messaging host for linux-entra-sso
+    ".mozilla/native-messaging-hosts/linux_entra_sso.json" = {
+      source = "${pkgs.linux-entra-sso}/firefox/linux_entra_sso.json";
+    };
+
+    # Chromium native messaging host for linux-entra-sso
+    ".config/chromium/NativeMessagingHosts/linux_entra_sso.json" = {
+      source = "${pkgs.linux-entra-sso}/chrome/linux_entra_sso.json";
+    };
   };
 
   programs.bash = {

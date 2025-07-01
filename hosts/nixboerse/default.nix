@@ -26,6 +26,13 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Ubuntu boot partition
+  fileSystems."/mnt/ubuntu-boot" = {
+    device = "/dev/disk/by-uuid/a111f378-e9db-4d4c-8d45-70e7a74b0b3b";
+    fsType = "ext4";
+    options = [ "ro" ];
+  };
+
   # NVIDIA-specific configuration
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {

@@ -17,7 +17,7 @@
   # systemd-resolved
   services.resolved = {
     enable = true;
-    dnsovertls = "true";
+    dnsovertls = "false";
   };
 
   # MagicDNS

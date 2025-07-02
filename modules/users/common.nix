@@ -1,4 +1,5 @@
-{ pkgs
+{ config
+, pkgs
 , vscode-customised
 , ...
 }:
@@ -8,7 +9,14 @@
   users.users.viluon = {
     isNormalUser = true;
     description = "Andrew Kvapil";
-    extraGroups = [ "cdrom" "networkmanager" "wheel" "docker" "uinput" ];
+    extraGroups = [
+      "cdrom"
+      "docker"
+      "networkmanager"
+      "uinput"
+      "wheel"
+      config.hardware.i2c.group
+    ];
     packages = [
       vscode-customised
     ];

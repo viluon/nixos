@@ -26,6 +26,9 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # access to i2c for monitor control
+  hardware.i2c.enable = true;
+
   # Ubuntu boot partition
   fileSystems."/mnt/ubuntu-boot" = {
     device = "/dev/disk/by-uuid/a111f378-e9db-4d4c-8d45-70e7a74b0b3b";
@@ -78,6 +81,7 @@
     efibootmgr
     chromium
     linux-entra-sso
+    minikube
   ];
 
   # Enable native messaging hosts for Firefox and Chrome
@@ -86,6 +90,14 @@
     "opt/chrome/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/etc/opt/chrome/native-messaging-hosts/linux_entra_sso.json";
     "chromium/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/etc/chromium/native-messaging-hosts/linux_entra_sso.json";
   };
+
+  programs.java.enable = true;
+
+  virtualisation.docker = {
+    enable = true;
+  };
+
+  services.ddccontrol.enable = true;
 
   programs.chromium = {
     enable = true;

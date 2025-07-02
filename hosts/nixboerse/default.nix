@@ -56,7 +56,7 @@
         case $1:$2 in
           ubuntu:start)
             ${pkgs.systemd}/bin/resolvectl dns virbr0 100.64.0.2
-            ${pkgs.systemd}/bin/resolvectl domain virbr0 deutsche-boerse.de oa.pnrad.net dbgcloud.io amplls.cedelgroup.com
+            ${pkgs.systemd}/bin/resolvectl domain virbr0 deutsche-boerse.de oa.pnrad.net dbgcloud.io amplls.cedelgroup.com googleapis.com gke.goog
             ${pkgs.systemd}/bin/resolvectl default-route virbr0 no
             ${pkgs.systemd}/bin/resolvectl dnsovertls virbr0 no
             ;;

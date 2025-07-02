@@ -107,6 +107,11 @@
         installation_mode = "force_installed";
         updates_disabled = true;
       };
+      "firefox.container-shortcuts@strategery.io" = {
+        install_url = "https://addons.mozilla.org/firefox/downloads/file/4068015/easy_container_shortcuts-1.6.0.xpi";
+        installation_mode = "force_installed";
+        updates_disabled = true;
+      };
     };
 
     Preferences = {

@@ -95,7 +95,7 @@
         expression = "${id};file://${pkgs.linux-entra-sso}/chrome/linux-entra-sso.zip";
       in
       [
-        (builtins.replaceStrings ["\n"] [""] expression)
+        (builtins.replaceStrings [ "\n" ] [ "" ] expression)
       ];
   };
 

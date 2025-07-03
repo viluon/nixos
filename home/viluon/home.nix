@@ -214,8 +214,8 @@ in
     syntaxHighlighting.enable = true;
 
     shellAliases = {
-      lh = "eza -lhF";
-      ll = "eza -lhaF";
+      lh = "eza --long --git --icons=auto --classify=always";
+      ll = "eza --long --git --icons=auto --classify=always --all";
       ls = "eza";
       cat = "bat";
       grep = "rg";
@@ -252,6 +252,9 @@ in
       if command -v kubectl >/dev/null 2>&1; then
         source <(kubectl completion zsh)
       fi
+
+      # completion for aliases
+      setopt completealiases
     '';
   };
 

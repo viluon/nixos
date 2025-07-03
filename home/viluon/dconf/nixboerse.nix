@@ -5,6 +5,12 @@
 with lib.hm.gvariant;
 
 {
+  "org/gnome/shell" = {
+    enabled-extensions = [
+      "display-brightness-ddcutil@themightydeity.github.com"
+    ];
+  };
+
   "org/gnome/desktop/input-sources" = {
     mru-sources = [ (mkTuple [ "xkb" "us" ]) ];
     sources = [ (mkTuple [ "xkb" "us" ]) ];

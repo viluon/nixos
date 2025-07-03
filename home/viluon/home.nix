@@ -118,7 +118,9 @@ let
       inputs.self.packages.${pkgs.system}.amd-epp-tool
     ];
 
-    nixboerse = [ ];
+    nixboerse = with pkgs; [
+      gnomeExtensions.brightness-control-using-ddcutil
+    ];
   };
 
   getHostPackages = hostname: hostPackages.${hostname};

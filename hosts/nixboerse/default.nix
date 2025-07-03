@@ -80,6 +80,7 @@
   environment.systemPackages = with pkgs; [
     efibootmgr
     chromium
+    ddcutil
     linux-entra-sso
     minikube
   ];

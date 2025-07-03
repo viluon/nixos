@@ -81,8 +81,12 @@
     efibootmgr
     chromium
     ddcutil
+    kubernetes-helm
     linux-entra-sso
     minikube
+    obsidian
+    openssl
+    parallel
   ];
 
   # Enable native messaging hosts for Firefox and Chrome

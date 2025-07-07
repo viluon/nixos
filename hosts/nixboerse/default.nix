@@ -81,6 +81,7 @@
     efibootmgr
     chromium
     ddcutil
+    kubectl
     kubernetes-helm
     linux-entra-sso
     minikube
@@ -96,7 +97,10 @@
     "chromium/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/etc/chromium/native-messaging-hosts/linux_entra_sso.json";
   };
 
-  programs.java.enable = true;
+  programs.java = {
+    package = pkgs.zulu;
+    enable = true;
+  };
 
   virtualisation.docker = {
     enable = true;

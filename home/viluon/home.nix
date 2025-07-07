@@ -333,6 +333,7 @@ in
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
+        "REPORTMEMORY,1000"
       ];
 
       # Input configuration

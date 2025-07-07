@@ -12,6 +12,7 @@
     [
       # Include the results of the hardware scan.
       ./hardware.nix
+      ./kernel.nix
       ./nvidia.nix
       ../../modules/system/networking
       ../../modules/system/nix

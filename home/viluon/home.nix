@@ -333,7 +333,6 @@ in
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
-        "REPORTMEMORY,1000"
       ];
 
       # Input configuration
@@ -587,6 +586,7 @@ in
   home.sessionVariables = {
     EDITOR = "vim";
     NIXD_FLAGS = "-log=error";
+    REPORTMEMORY = "1000";
   };
 
   # Let Home Manager install and manage itself.

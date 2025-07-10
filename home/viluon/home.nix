@@ -2,14 +2,15 @@
 
 let
   commonPackages = with pkgs; [
-    grimblast
-    fzf
-    starship
-    eza
     bat
-    ripgrep
+    eza
     fd
+    fzf
+    grimblast
+    nixd
+    ripgrep
     shellcheck
+    starship
     vivid
 
     # Hyprland ecosystem
@@ -64,7 +65,6 @@ let
       (lib.hiPrio lua5_1)
       (lib.lowPrio luajit)
       mold
-      nixd
       nodejs
       rustup
       wasm-pack
@@ -118,7 +118,9 @@ let
       inputs.self.packages.${pkgs.system}.amd-epp-tool
     ];
 
-    nixboerse = [ ];
+    nixboerse = with pkgs; [
+      gnomeExtensions.brightness-control-using-ddcutil
+    ];
   };
 
   getHostPackages = hostname: hostPackages.${hostname};
@@ -182,6 +184,16 @@ in
       source = "${ml4w-dotfiles}/share/wallpapers";
       recursive = true;
     };
+
+    # Firefox native messaging host for linux-entra-sso
+    ".mozilla/native-messaging-hosts/linux_entra_sso.json" = {
+      source = "${pkgs.linux-entra-sso}/firefox/linux_entra_sso.json";
+    };
+
+    # Chromium native messaging host for linux-entra-sso
+    ".config/chromium/NativeMessagingHosts/linux_entra_sso.json" = {
+      source = "${pkgs.linux-entra-sso}/chrome/linux_entra_sso.json";
+    };
   };
 
   programs.bash = {
@@ -202,8 +214,8 @@ in
     syntaxHighlighting.enable = true;
 
     shellAliases = {
-      lh = "eza -lhF";
-      ll = "eza -lhaF";
+      lh = "eza --long --git --icons=auto --classify=always";
+      ll = "eza --long --git --icons=auto --classify=always --all";
       ls = "eza";
       cat = "bat";
       grep = "rg";
@@ -240,6 +252,9 @@ in
       if command -v kubectl >/dev/null 2>&1; then
         source <(kubectl completion zsh)
       fi
+
+      # completion for aliases
+      setopt completealiases
     '';
   };
 
@@ -571,6 +586,7 @@ in
   home.sessionVariables = {
     EDITOR = "vim";
     NIXD_FLAGS = "-log=error";
+    REPORTMEMORY = "1000";
   };
 
   # Let Home Manager install and manage itself.

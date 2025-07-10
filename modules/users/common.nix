@@ -1,4 +1,5 @@
-{ pkgs
+{ config
+, pkgs
 , vscode-customised
 , ...
 }:
@@ -8,7 +9,14 @@
   users.users.viluon = {
     isNormalUser = true;
     description = "Andrew Kvapil";
-    extraGroups = [ "cdrom" "networkmanager" "wheel" "docker" "uinput" ];
+    extraGroups = [
+      "cdrom"
+      "docker"
+      "networkmanager"
+      "uinput"
+      "wheel"
+      config.hardware.i2c.group
+    ];
     packages = [
       vscode-customised
     ];
@@ -16,11 +24,21 @@
       let
         githubKeysJson = builtins.fetchurl {
           url = "https://api.github.com/users/viluon/keys";
-          sha256 = "1fj9ic79qsh3s2s8wc9kjzzli2xl46qs22jnj90hfzdzjp8fymnw";
+          sha256 = "0iyqnwnsmx51y7yl7czsmz3aclr9ynxkphyjgr5v76dyz3x8islf";
         };
       in
       map (key: key.key) (builtins.fromJSON (builtins.readFile githubKeysJson));
+    shell = pkgs.zsh;
   };
+
+  security.pam.loginLimits = [
+    {
+      domain = "viluon";
+      type = "-";
+      item = "memlock";
+      value = "unlimited";
+    }
+  ];
 
   # Common programs
   programs.firefox = {
@@ -37,6 +55,8 @@
     enable = true;
     enableSSHSupport = true;
   };
+
+  programs.zsh.enable = true;
 
   # Common system packages
   environment.systemPackages = with pkgs; [

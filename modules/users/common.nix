@@ -28,7 +28,17 @@
         };
       in
       map (key: key.key) (builtins.fromJSON (builtins.readFile githubKeysJson));
+    shell = pkgs.zsh;
   };
+
+  security.pam.loginLimits = [
+    {
+      domain = "viluon";
+      type = "-";
+      item = "memlock";
+      value = "unlimited";
+    }
+  ];
 
   # Common programs
   programs.firefox = {
@@ -45,6 +55,8 @@
     enable = true;
     enableSSHSupport = true;
   };
+
+  programs.zsh.enable = true;
 
   # Common system packages
   environment.systemPackages = with pkgs; [

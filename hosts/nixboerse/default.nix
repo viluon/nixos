@@ -109,6 +109,8 @@
 
   services.ddccontrol.enable = true;
 
+  programs.wireshark.enable = true;
+
   programs.chromium = {
     enable = true;
     extensions =

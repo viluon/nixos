@@ -98,11 +98,11 @@
     "ml4w-dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1752579432,
-        "narHash": "sha256-xUBXHPhNeXhAQN0blazmbFkPvaytMDMwwqaa9gjKW1g=",
+        "lastModified": 1752676577,
+        "narHash": "sha256-gzbzsu3VBEpPQO0PffQLohssgkT1RcYExBgkzilLaYA=",
         "owner": "mylinuxforwork",
         "repo": "dotfiles",
-        "rev": "14aa095876aa5208e7b0ac2ac2423a4d6ced3d94",
+        "rev": "fe249341852c66d08c240bbb16fbf9b1186b96e6",
         "type": "github"
       },
       "original": {
@@ -177,11 +177,11 @@
     },
     "nixos-hardware": {
       "locked": {
-        "lastModified": 1752048960,
-        "narHash": "sha256-gATnkOe37eeVwKKYCsL+OnS2gU4MmLuZFzzWCtaKLI8=",
+        "lastModified": 1752666637,
+        "narHash": "sha256-P8J72psdc/rWliIvp8jUpoQ6qRDlVzgSDDlgkaXQ0Fw=",
         "owner": "NixOS",
         "repo": "nixos-hardware",
-        "rev": "7ced9122cff2163c6a0212b8d1ec8c33a1660806",
+        "rev": "d1bfa8f6ccfb5c383e1eba609c1eb67ca24ed153",
         "type": "github"
       },
       "original": {

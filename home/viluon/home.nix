@@ -312,7 +312,7 @@ in
   };
 
   wayland.windowManager.hyprland = {
-    enable = true;
+    enable = false;
     settings = {
       # Monitor configuration
       monitor = [

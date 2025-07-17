@@ -7,6 +7,9 @@
 , ...
 }:
 
+let
+  minikube-subnet = "192.168.49.0/24";
+in
 {
   imports =
     [
@@ -88,6 +91,22 @@
   systemd.services.libvirtd.restartTriggers = [
     config.virtualisation.libvirtd.hooks.qemu.libvirtd-network-hook
   ];
+
+  # fix routing from Docker interfaces to virbr0
+  networking.firewall = {
+    extraCommands = ''
+      # Allow traffic from minikube to virbr0
+      iptables -I FORWARD -s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
+
+      # More restricted established connection handling
+      iptables -I FORWARD -i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    '';
+
+    extraStopCommands = ''
+      iptables -D FORWARD -s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT || true
+      iptables -D FORWARD -i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || true
+    '';
+  };
 
   # better legacy OS compatibility
   services.envfs.enable = true;

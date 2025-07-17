@@ -13,7 +13,7 @@ sudo -E `which nix` --extra-experimental-features 'nix-command flakes' run -vL g
 Build with
 
 ```sh
-nice -n 19 ionice -c 3 nix build .#nixosConfigurations.nixluon.config.system.build.toplevel
+nice -n 19 ionice -c 3 nix build .#nixosConfigurations.$(hostname).config.system.build.toplevel
 ```
 
 Update with

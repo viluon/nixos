@@ -7,6 +7,9 @@
 , ...
 }:
 
+let
+  minikube-subnet = "192.168.49.0/24";
+in
 {
   imports =
     [
@@ -53,25 +56,57 @@
   virtualisation.libvirtd = {
     enable = true;
     qemu.package = pkgs.qemu_kvm;
-    hooks.qemu = {
-      libvirtd-network-hook = pkgs.writeShellScript "libvirtd-network-hook" ''
-        set -euo pipefail
+    hooks.qemu =
+      let
+        domains = builtins.concatStringsSep " " [
+          "cedelgroup.com"
+          "cloudconsole-pa.clients6.google.com"
+          "cloudusersettings-pa.clients6.google.com"
+          "dbgcloud.io"
+          "deutsche-boerse.de"
+          "gke.goog"
+          "googleapis.com"
+          "oa.pnrad.net"
+        ];
 
-        case $1:$2 in
-          ubuntu:start)
-            ${pkgs.systemd}/bin/resolvectl dns virbr0 100.64.0.2
-            ${pkgs.systemd}/bin/resolvectl domain virbr0 deutsche-boerse.de oa.pnrad.net dbgcloud.io googleapis.com gke.goog cloudusersettings-pa.clients6.google.com cloudconsole-pa.clients6.google.com
-            ${pkgs.systemd}/bin/resolvectl default-route virbr0 no
-            ${pkgs.systemd}/bin/resolvectl dnsovertls virbr0 no
-            ;;
-        esac
-      '';
-    };
+        resolvectl = "${pkgs.systemd}/bin/resolvectl";
+        VM = "ubuntu";
+      in
+      {
+        libvirtd-network-hook = pkgs.writeShellScript "libvirtd-network-hook" ''
+          set -euo pipefail
+
+          case $1:$2 in
+            ${VM}:start)
+              ${resolvectl} dns virbr0 100.64.0.2
+              ${resolvectl} domain virbr0 ${domains}
+              ${resolvectl} default-route virbr0 no
+              ${resolvectl} dnsovertls virbr0 no
+              ;;
+          esac
+        '';
+      };
   };
 
   systemd.services.libvirtd.restartTriggers = [
     config.virtualisation.libvirtd.hooks.qemu.libvirtd-network-hook
   ];
+
+  # fix routing from Docker interfaces to virbr0
+  networking.firewall = {
+    extraCommands = ''
+      # Allow traffic from minikube to virbr0
+      iptables -I FORWARD -s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
+
+      # More restricted established connection handling
+      iptables -I FORWARD -i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    '';
+
+    extraStopCommands = ''
+      iptables -D FORWARD -s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT || true
+      iptables -D FORWARD -i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || true
+    '';
+  };
 
   # better legacy OS compatibility
   services.envfs.enable = true;
@@ -108,6 +143,8 @@
   };
 
   services.ddccontrol.enable = true;
+
+  programs.wireshark.enable = true;
 
   programs.chromium = {
     enable = true;

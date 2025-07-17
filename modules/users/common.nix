@@ -15,6 +15,7 @@
       "networkmanager"
       "uinput"
       "wheel"
+      "wireshark"
       config.hardware.i2c.group
     ];
     packages = [

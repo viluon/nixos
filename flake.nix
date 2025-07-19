@@ -43,7 +43,6 @@
         inherit (flake-parts-lib) importApply;
         amd-epp-tool-module = importApply ./amd-epp-tool.nix { inherit withSystem; };
         idea-module = importApply ./modules/editors/idea.nix { inherit withSystem; };
-        vscode-module = importApply ./modules/editors/vscode.nix { inherit withSystem; };
 
         buildNixosSystem = hostname: config: nixpkgs.lib.nixosSystem {
           system = config.system;
@@ -67,7 +66,10 @@
             }
             # Add packages overlay
             {
-              nixpkgs.overlays = [ (import ./packages) ];
+              nixpkgs.overlays = [
+                (import ./packages)
+                inputs.nix4vscode.overlays.default
+              ];
             }
           ];
           specialArgs = self.packages.${config.system} // {
@@ -90,7 +92,6 @@
         imports = [
           ./home
           amd-epp-tool-module
-          vscode-module
           idea-module
           inputs.flake-root.flakeModule
           inputs.treefmt-nix.flakeModule
@@ -110,7 +111,6 @@
         perSystem = { config, pkgs, ... }: {
           treefmt.config = {
             inherit (config.flake-root) projectRootFile;
-            # formats .nix files
             programs.nixpkgs-fmt.enable = true;
           };
 

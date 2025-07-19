@@ -125,6 +125,7 @@ let
 in
 {
   imports = [
+    ../../modules/editors/vscode.nix
     inputs.self.homeModules.idea
   ];
 

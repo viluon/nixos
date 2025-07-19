@@ -1,6 +1,5 @@
 { config
 , pkgs
-, vscode-customised
 , ...
 }:
 
@@ -19,7 +18,6 @@
       config.hardware.i2c.group
     ];
     packages = [
-      vscode-customised
     ];
     openssh.authorizedKeys.keys =
       let

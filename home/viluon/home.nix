@@ -33,10 +33,6 @@ let
     blueman
     polkit_gnome
 
-    # File manager and utilities
-    xfce.thunar
-    xfce.tumbler # Thumbnails for thunar
-
     # Fonts
     noto-fonts
     noto-fonts-emoji
@@ -413,7 +409,7 @@ in
 
       # Variables
       "$terminal" = "kitty";
-      "$fileManager" = "thunar";
+      "$fileManager" = "nautilus";
       "$menu" = "rofi -show drun";
       "$mod" = "SUPER";
 

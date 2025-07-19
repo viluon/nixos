@@ -62,12 +62,14 @@
   # Common system packages
   environment.systemPackages = with pkgs; [
     iosevka
+    ryujinx
     vim
   ];
 
   # Font configuration
   fonts.packages = with pkgs; [
     iosevka
+    libertine
   ];
 
   # Internationalization

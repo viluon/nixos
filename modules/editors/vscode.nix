@@ -7,15 +7,15 @@
     enable = true;
     package = pkgs.vscode;
 
-    profiles.default.extensions = pkgs.nix4vscode.forVscode [
-      # "jackmacwindows.craftos-pc"
+    profiles.default.extensions = pkgs.nix4vscode.forVscodeVersion config.programs.vscode.package.version [
       "dbaeumer.vscode-eslint"
       "esbenp.prettier-vscode"
       "github.codespaces"
-      "github.copilot-chat"
-      "github.copilot"
+      # "GitHub.copilot-chat"
+      "GitHub.copilot"
       "github.vscode-github-actions"
       "github.vscode-pull-request-github"
+      "jackmacwindows.craftos-pc"
       "jnoortheen.nix-ide"
       "ms-azuretools.vscode-docker"
       "ms-python.python"

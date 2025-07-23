@@ -134,7 +134,7 @@ in
   };
 
   programs.java = {
-    package = pkgs.zulu;
+    package = pkgs.zulu24;
     enable = true;
   };
 

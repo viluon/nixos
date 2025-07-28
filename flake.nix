@@ -5,8 +5,6 @@
     flake-root.url = "github:srid/flake-root";
     flake-utils.url = "github:numtide/flake-utils";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
-    ml4w-dotfiles.url = "github:mylinuxforwork/dotfiles";
-    ml4w-dotfiles.flake = false;
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix4vscode.url = "github:nix-community/nix4vscode";

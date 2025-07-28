@@ -23,7 +23,7 @@
       let
         githubKeysJson = builtins.fetchurl {
           url = "https://api.github.com/users/viluon/keys";
-          sha256 = "08c894v7lg2i6m7d2bdq30v6bn3qm37gwq4drhpxf4fsbcvcxrz6";
+          sha256 = "08ri08npwzxafcfxgk0g390brgisnkzw1i9y3ycmq3q2a6l34fvg";
         };
       in
       map (key: key.key) (builtins.fromJSON (builtins.readFile githubKeysJson));

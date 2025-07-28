@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, hostname, ml4w-dotfiles, ... }:
+{ config, pkgs, lib, inputs, hostname, ... }:
 
 let
   commonPackages = with pkgs; [
@@ -145,43 +145,6 @@ in
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
-    # Copy ML4W Hyprland scripts
-    ".config/hypr/scripts" = {
-      source = "${ml4w-dotfiles}/share/dotfiles/.config/hypr/scripts";
-      recursive = true;
-      executable = true;
-    };
-
-    # Copy ML4W Waybar configuration
-    ".config/waybar" = {
-      source = "${ml4w-dotfiles}/share/dotfiles/.config/waybar";
-      recursive = true;
-    };
-
-    # Copy ML4W Rofi configuration
-    ".config/rofi" = {
-      source = "${ml4w-dotfiles}/share/dotfiles/.config/rofi";
-      recursive = true;
-    };
-
-    # Copy ML4W Dunst configuration
-    ".config/dunst" = {
-      source = "${ml4w-dotfiles}/share/dotfiles/.config/dunst";
-      recursive = true;
-    };
-
-    # Copy ML4W wlogout configuration
-    ".config/wlogout" = {
-      source = "${ml4w-dotfiles}/share/dotfiles/.config/wlogout";
-      recursive = true;
-    };
-
-    # Copy ML4W wallpapers
-    ".local/share/wallpapers" = {
-      source = "${ml4w-dotfiles}/share/wallpapers";
-      recursive = true;
-    };
-
     # Firefox native messaging host for linux-entra-sso
     ".mozilla/native-messaging-hosts/linux_entra_sso.json" = {
       source = "${pkgs.linux-entra-sso}/firefox/linux_entra_sso.json";

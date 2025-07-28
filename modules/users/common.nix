@@ -21,12 +21,27 @@
     ];
     openssh.authorizedKeys.keys =
       let
-        githubKeysJson = builtins.fetchurl {
-          url = "https://api.github.com/users/viluon/keys";
-          sha256 = "08ri08npwzxafcfxgk0g390brgisnkzw1i9y3ycmq3q2a6l34fvg";
+        stableGithubKeys = pkgs.stdenv.mkDerivation {
+          name = "github-keys-viluon";
+
+          dontUnpack = true;
+          nativeBuildInputs = with pkgs; [ cacert curl jq ];
+
+          outputHashMode = "flat";
+          outputHashAlgo = "sha256";
+          outputHash = "sha256-Dcy7cfuBqjcEntNKroyMXz5gEVLxc2p/fLDyyaU7yEk=";
+
+          buildPhase = ''
+            curl "https://api.github.com/users/viluon/keys" | \
+              jq 'map(.key) | sort' > keys.json
+          '';
+
+          installPhase = ''
+            cp keys.json $out
+          '';
         };
       in
-      map (key: key.key) (builtins.fromJSON (builtins.readFile githubKeysJson));
+      builtins.fromJSON (builtins.readFile stableGithubKeys);
     shell = pkgs.zsh;
   };
 

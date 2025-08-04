@@ -31,9 +31,6 @@
     options = "--delete-older-than 60d";
   };
 
-  # kernel version
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-
   # firmware upgrades
   services.fwupd.enable = true;
 

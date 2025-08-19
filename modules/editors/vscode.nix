@@ -28,7 +28,7 @@
       "streetsidesoftware.code-spell-checker-british-english"
       "streetsidesoftware.code-spell-checker-czech"
       "streetsidesoftware.code-spell-checker"
-      "sumneko.lua"
+      # "sumneko.lua"
       "tamasfe.even-better-toml"
       "timonwong.shellcheck"
       "v4run.transpose"

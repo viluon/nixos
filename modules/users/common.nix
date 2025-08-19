@@ -42,7 +42,9 @@
         };
       in
       builtins.fromJSON (builtins.readFile stableGithubKeys);
+
     shell = pkgs.zsh;
+    initialHashedPassword = "$6$rounds=2000000$9V4QeLdb.yXDzOEM$37G75PGikc2/v2pogHnjnNp4By3aCwlPEWyVa1wD/myF1wo8Ur7WWFlsZ6atN.43wJdfi9pwebd.PqPDEw0WF1";
   };
 
   security.pam.loginLimits = [

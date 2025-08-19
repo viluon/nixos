@@ -178,6 +178,25 @@ in
     };
   };
 
+  virtualisation.vmVariant = {
+    virtualisation = {
+      cores = 2;
+      memorySize = 4096;
+      qemu = {
+        options = [
+          "-enable-kvm"
+          "-display gtk,grab-on-hover=on"
+        ];
+        package = pkgs.qemu_kvm;
+      };
+    };
+
+    services.qemuGuest.enable = true;
+
+    # Ensure virtio modules are loaded
+    boot.kernelModules = [ "virtio_pci" "virtio_net" "virtio_blk" "virtio_scsi" "virtio_balloon" ];
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

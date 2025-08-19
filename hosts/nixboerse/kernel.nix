@@ -7,7 +7,7 @@
     {
       name = "cgroups-v1-for-jvm";
       patch = null;
-      extraStructuredConfig = {
+      structuredExtraConfig = {
         CPUSETS_V1 = lib.kernel.yes;
         MEMCG_V1 = lib.kernel.yes;
       };

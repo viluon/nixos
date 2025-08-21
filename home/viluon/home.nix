@@ -124,6 +124,7 @@ let
   inherit (import ./dconf { inherit lib; }) getGnomeSettings;
 
   rj-notifier = import ./scripts/rj-notifier.nix { inherit pkgs; };
+  git-prefix-messages = import ./scripts/git-prefix-messages.nix { inherit pkgs; };
 
 in
 {
@@ -143,7 +144,7 @@ in
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = commonPackages ++ (getHostPackages hostname) ++ [ rj-notifier ];
+  home.packages = commonPackages ++ (getHostPackages hostname) ++ [ rj-notifier git-prefix-messages ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.

@@ -101,7 +101,7 @@ pkgs.writeShellApplication {
     } &
 
     # Run timg in background and capture its PID
-    timg --center ~/Pictures/polish-cow.gif &
+    timg --upscale=i --fit-width --compress=5 -a -g128x --center ${../assets/polish-cow.gif} &
     TIMG_PID=$!
 
     # Wait for the git operations to complete by reading from FIFO

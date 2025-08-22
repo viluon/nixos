@@ -122,6 +122,11 @@ let
   getHostPackages = hostname: hostPackages.${hostname};
 
   inherit (import ./dconf { inherit lib; }) getGnomeSettings;
+
+  scripts = lib.mapAttrsToList
+    (name: _type: import ./scripts/${name} { inherit pkgs; })
+    (builtins.readDir ./scripts);
+
 in
 {
   imports = [
@@ -140,7 +145,7 @@ in
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = commonPackages ++ (getHostPackages hostname);
+  home.packages = commonPackages ++ (getHostPackages hostname) ++ scripts;
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.

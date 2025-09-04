@@ -47,6 +47,7 @@
   # GNOME-specific packages
   environment.systemPackages = with pkgs; [
     gnome-tweaks
+    gnomeExtensions.kimpanel
   ];
 
   # Wayland session variables

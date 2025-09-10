@@ -117,9 +117,9 @@ in
 
   # Host-specific packages
   environment.systemPackages = with pkgs; [
-    efibootmgr
     chromium
     ddcutil
+    efibootmgr
     kubectl
     kubernetes-helm
     linux-entra-sso
@@ -147,7 +147,10 @@ in
 
   services.ddccontrol.enable = true;
 
-  programs.wireshark.enable = true;
+  programs.wireshark = {
+    enable = true;
+    package = pkgs.wireshark-qt;
+  };
 
   programs.chromium = {
     enable = true;

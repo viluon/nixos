@@ -159,6 +159,10 @@ in
     ".config/chromium/NativeMessagingHosts/linux_entra_sso.json" = {
       source = "${pkgs.linux-entra-sso}/chrome/linux_entra_sso.json";
     };
+
+    ".config/wireshark/plugins/websocket-protobuf.lua" = {
+      source = ./wireshark/plugins/websocket-protobuf.lua;
+    };
   };
 
   programs.bash = {

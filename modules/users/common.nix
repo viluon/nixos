@@ -83,6 +83,7 @@
 
   # Font configuration
   fonts.packages = with pkgs; [
+    corefonts
     iosevka
     libertine
   ];

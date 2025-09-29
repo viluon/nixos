@@ -5,6 +5,7 @@
     flake-root.url = "github:srid/flake-root";
     flake-utils.url = "github:numtide/flake-utils";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
+    niri.url = "github:sodiboo/niri-flake";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix4vscode.url = "github:nix-community/nix4vscode";
@@ -16,6 +17,10 @@
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    niri.inputs = {
+      nixpkgs-stable.follows = "nixpkgs";
+      nixpkgs.follows = "nixpkgs-unstable";
+    };
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nix-vscode-extensions.inputs.flake-utils.follows = "flake-utils";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
@@ -75,7 +80,10 @@
                 ];
               }
             ];
-            specialArgs = self.packages.${config.system} // { inherit unstable-pkgs; };
+            specialArgs = self.packages.${config.system} // {
+              inherit unstable-pkgs;
+              niri = inputs.niri;
+            };
           };
 
         hostConfigs = {

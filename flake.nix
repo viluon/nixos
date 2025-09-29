@@ -42,38 +42,41 @@
         amd-epp-tool-module = importApply ./amd-epp-tool.nix { inherit withSystem; };
         idea-module = importApply ./modules/editors/idea.nix { inherit withSystem; };
 
-        buildNixosSystem = hostname: config: nixpkgs.lib.nixosSystem {
-          system = config.system;
-          modules = [
-            ./hosts/${hostname}
-            nixos-hardware.nixosModules.${config.hardware}
-            disko.nixosModules.disko
-            { networking.hostName = hostname; }
-            nix-index-database.nixosModules.nix-index
-            { programs.nix-index-database.comma.enable = true; }
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users = self.mkHomeUsers hostname;
-              home-manager.extraSpecialArgs = {
-                inherit inputs hostname;
-                unstable-pkgs = nixpkgs-unstable.legacyPackages.${config.system};
-                ml4w-dotfiles = inputs.ml4w-dotfiles;
-              };
-            }
-            # Add packages overlay
-            {
-              nixpkgs.overlays = [
-                (import ./packages)
-                inputs.nix4vscode.overlays.default
-              ];
-            }
-          ];
-          specialArgs = self.packages.${config.system} // {
-            unstable-pkgs = nixpkgs-unstable.legacyPackages.${config.system};
+        buildNixosSystem = hostname: config:
+          let
+            unstable-pkgs = import nixpkgs-unstable {
+              system = config.system;
+              config = { allowUnfree = true; };
+            };
+          in
+          nixpkgs.lib.nixosSystem {
+            system = config.system;
+            modules = [
+              ./hosts/${hostname}
+              nixos-hardware.nixosModules.${config.hardware}
+              disko.nixosModules.disko
+              { networking.hostName = hostname; }
+              nix-index-database.nixosModules.nix-index
+              { programs.nix-index-database.comma.enable = true; }
+              home-manager.nixosModules.home-manager
+              {
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.users = self.mkHomeUsers hostname;
+                home-manager.extraSpecialArgs = {
+                  inherit inputs hostname unstable-pkgs;
+                  ml4w-dotfiles = inputs.ml4w-dotfiles;
+                };
+              }
+              {
+                nixpkgs.overlays = [
+                  (import ./packages)
+                  inputs.nix4vscode.overlays.default
+                ];
+              }
+            ];
+            specialArgs = self.packages.${config.system} // { inherit unstable-pkgs; };
           };
-        };
 
         hostConfigs = {
           nixluon = {

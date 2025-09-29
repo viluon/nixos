@@ -4,6 +4,7 @@
 
 { config
 , pkgs
+, unstable-pkgs
 , ...
 }:
 
@@ -137,7 +138,7 @@ in
   };
 
   programs.java = {
-    package = pkgs.zulu24;
+    package = unstable-pkgs.zulu25;
     enable = true;
   };
 

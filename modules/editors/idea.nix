@@ -1,5 +1,5 @@
-{ withSystem }:
-{ flake-parts-lib, ... }:
+_:
+_:
 {
   flake.homeModules.idea = { unstable-pkgs, ... }:
     let

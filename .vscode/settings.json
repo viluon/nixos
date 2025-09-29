@@ -1,7 +1,21 @@
 {
-    "github.copilot.chat.agent.terminal.allowList": {
+    "github.copilot.chat.agent.thinkingTool": true,
+    "github.copilot.chat.codesearch.enabled": true,
+    "chat.tools.terminal.autoApprove": {
         "/^nix flake check( -L)?$/": true,
-        "/^nixos-rebuild build( -L)? --flake \\.$/": true
+        "/^nixos-rebuild build( -L)? --flake \\.$/": true,
+        "rm": false,
+        "rmdir": false,
+        "del": false,
+        "kill": false,
+        "curl": false,
+        "wget": false,
+        "eval": false,
+        "chmod": false,
+        "chown": false,
+        "/^Remove-Item\\b/i": false
     },
-    "github.copilot.chat.agent.thinkingTool": true
+    "chat.todoListTool.enabled": true,
+    "chat.math.enabled": true,
+    "chat.checkpoints.showFileChanges": true
 }

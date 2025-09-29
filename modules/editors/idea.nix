@@ -1,9 +1,9 @@
 { withSystem }:
 { flake-parts-lib, ... }:
 {
-  flake.homeModules.idea = { pkgs, ... }:
+  flake.homeModules.idea = { unstable-pkgs, ... }:
     let
-      idea = pkgs.jetbrains.idea-ultimate;
+      idea = unstable-pkgs.jetbrains.idea-ultimate;
     in
     {
       home.packages = [ idea ];

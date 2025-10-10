@@ -9,15 +9,15 @@ pkgs.writeShellApplication {
     # make sure this matches the RJ timetable    #
     # for the given day                          #
     ##############################################
-    departure_time="2025-08-21T19:00:00.000+02:00"
+    departure_time="2025-10-08T07:00:00.000+02:00"
     ##############################################
 
     liberecId=17904003
     pragueId=10202003
 
     ##############################################
-    from=$pragueId
-    to=$liberecId
+    from=$liberecId
+    to=$pragueId
     ##############################################
 
     departure_date=$(echo $departure_time | cut -d'T' -f1)
@@ -45,7 +45,7 @@ pkgs.writeShellApplication {
         -H 'Sec-Fetch-Site: cross-site' \
         -H 'Pragma: no-cache' \
         -H 'TE: trailers' \
-        | jq ".routes | .[] | {seats: .freeSeatsCount, time: .departureTime} | select(.time == \"$departure_time\") | .seats"
+        | jq "[ .routes | .[] | {seats: .freeSeatsCount, time: .departureTime} | select(.time == \"$departure_time\") | .seats ] | add // 0"
       )";
 
       echo result: "$n_seats_available";

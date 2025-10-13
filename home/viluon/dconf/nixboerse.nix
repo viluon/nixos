@@ -8,6 +8,7 @@ with lib.hm.gvariant;
   "org/gnome/shell" = {
     enabled-extensions = [
       "display-brightness-ddcutil@themightydeity.github.com"
+      "kimpanel@kde.org"
     ];
   };
 

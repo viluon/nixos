@@ -6,6 +6,7 @@ let
     eza
     fd
     fzf
+    gh
     grimblast
     nixd
     ripgrep

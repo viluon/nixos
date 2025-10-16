@@ -15,10 +15,6 @@ let
 
     # Hyprland ecosystem
     waybar
-    hyprpaper
-    hypridle
-    hyprlock
-    hyprpicker
     dunst
     rofi-wayland
     wlogout

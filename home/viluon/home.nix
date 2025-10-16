@@ -125,6 +125,10 @@ let
     (name: _type: import ./scripts/${name} { inherit pkgs; })
     (builtins.readDir ./scripts);
 
+  scriptFileNames = builtins.attrNames (builtins.readDir ./scripts);
+  gitScriptVerbs = map (n: lib.removePrefix "git-" (lib.removeSuffix ".nix" n))
+    (builtins.filter (n: lib.hasPrefix "git-" n) scriptFileNames);
+  gitUserCommandsZstyle = lib.concatStringsSep " " (map (v: "${v}:'Custom git command'") gitScriptVerbs);
 in
 {
   imports = [
@@ -222,6 +226,9 @@ in
 
       # completion for aliases
       setopt completealiases
+      # Expose packaged git-* scripts as git subcommands for completion.
+      # Automatically generated from ./scripts (git-*.nix) at build time.
+      zstyle ':completion:*:*:git:*' user-commands ${gitUserCommandsZstyle}
     '';
   };
 

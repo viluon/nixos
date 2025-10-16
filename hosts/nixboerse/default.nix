@@ -33,6 +33,9 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # firmware upgrades
+  services.fwupd.enable = true;
+
   # access to i2c for monitor control
   hardware.i2c.enable = true;
 

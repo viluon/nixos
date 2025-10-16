@@ -113,6 +113,7 @@ let
 
     nixboerse = with pkgs; [
       gnomeExtensions.brightness-control-using-ddcutil
+      nodejs_24
     ];
   };
 

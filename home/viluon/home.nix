@@ -43,6 +43,12 @@ let
     wallust
     swww
     xdg-user-dirs
+
+    # Gnome extensions
+    gnomeExtensions.auto-move-windows
+    gnomeExtensions.brightness-control-using-ddcutil
+    gnomeExtensions.middle-click-to-close-in-overview
+    gnomeExtensions.vitals
   ];
 
   # Host-specific packages
@@ -112,7 +118,6 @@ let
     ];
 
     nixboerse = with pkgs; [
-      gnomeExtensions.brightness-control-using-ddcutil
       nodejs_24
     ];
   };

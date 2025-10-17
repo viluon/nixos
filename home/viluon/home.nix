@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, hostname, ... }:
+{ config, pkgs, lib, inputs, hostname, xhmm, ... }:
 
 let
   commonPackages = with pkgs; [
@@ -43,12 +43,6 @@ let
     wallust
     swww
     xdg-user-dirs
-
-    # Gnome extensions
-    gnomeExtensions.auto-move-windows
-    gnomeExtensions.brightness-control-using-ddcutil
-    gnomeExtensions.middle-click-to-close-in-overview
-    gnomeExtensions.vitals
   ];
 
   # Host-specific packages
@@ -125,6 +119,7 @@ let
   getHostPackages = hostname: hostPackages.${hostname};
 
   inherit (import ./dconf { inherit lib; }) getGnomeSettings;
+  inherit (import ./gnome-extensions { inherit lib; }) getGnomeExtensions;
 
   scripts = lib.mapAttrsToList
     (name: _type: import ./scripts/${name} { inherit pkgs; })
@@ -139,6 +134,9 @@ in
   imports = [
     ../../modules/editors/vscode.nix
     inputs.self.homeModules.idea
+    xhmm.homeModules.default
+    ./gnome-extensions/common.nix
+    (getGnomeExtensions hostname)
   ];
 
   # This value determines the Home Manager release that your configuration is

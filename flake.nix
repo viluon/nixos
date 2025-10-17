@@ -13,6 +13,7 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    xhmm.url = "github:schuelermine/xhmm";
 
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -26,6 +27,7 @@
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+    xhmm.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -71,6 +73,7 @@
                 home-manager.extraSpecialArgs = {
                   inherit inputs hostname unstable-pkgs;
                   ml4w-dotfiles = inputs.ml4w-dotfiles;
+                  xhmm = inputs.xhmm;
                 };
               }
               {

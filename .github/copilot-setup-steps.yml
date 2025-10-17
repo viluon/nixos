@@ -1,19 +1,7 @@
-#!/bin/bash
-set -euo pipefail
-
-# Install Nix with flakes support
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
-
-# Source Nix environment
-. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-
-# Configure Nix with experimental features
-mkdir -p ~/.config/nix
-cat > ~/.config/nix/nix.conf <<EOF
-experimental-features = nix-command flakes
-EOF
-
-# Setup Cachix for binary caching
-nix-env -iA cachix -f https://cachix.org/api/v1/install
-cachix use viluon
-cachix use nix-community
+steps:
+  - uses: DeterminateSystems/nix-installer-action@main
+  - uses: cachix/cachix-action@v16
+    with:
+      name: viluon
+      extraPullNames: nix-community
+      skipPush: true

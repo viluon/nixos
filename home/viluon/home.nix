@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, hostname, xhmm, ... }:
+{ config, pkgs, lib, inputs, hostname ? null, ... }:
 
 let
   commonPackages = with pkgs; [
@@ -134,10 +134,9 @@ in
   imports = [
     ../../modules/editors/vscode.nix
     inputs.self.homeModules.idea
-    "${xhmm}/desktop/gnome/extensions.nix"
+    "${inputs.xhmm}/desktop/gnome/extensions.nix"
     ./gnome-extensions/common.nix
-    (getGnomeExtensions hostname)
-  ];
+  ] ++ lib.optional (hostname != null) (getGnomeExtensions hostname);
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -314,12 +313,15 @@ in
   programs.home-manager.enable = true;
 
   # GNOME dconf settings
-  dconf.settings = {
-    # Common GNOME settings
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
-      enable-animations = true;
-      show-battery-percentage = true;
-    };
-  } // (getGnomeSettings hostname); # Merge host-specific settings
+  dconf.settings = lib.mkMerge [
+    {
+      # Common GNOME settings
+      "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
+        enable-animations = true;
+        show-battery-percentage = true;
+      };
+    }
+    (if hostname != null then getGnomeSettings hostname else {})
+  ];
 }

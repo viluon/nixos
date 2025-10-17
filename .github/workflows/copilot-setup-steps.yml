@@ -1,22 +1,19 @@
-name: Copilot Setup Steps
+#!/bin/bash
+set -euo pipefail
 
-on:
-  workflow_dispatch:
+# Install Nix with flakes support
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
 
-jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
-        with:
-          extra-conf: |
-            experimental-features = nix-command flakes
-            access-tokens = github.com=${{ github.token }}
+# Source Nix environment
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
-      - name: Setup Cachix
-        uses: cachix/cachix-action@v16
-        with:
-          name: viluon
-          extraPullNames: nix-community
-          skipPush: true
+# Configure Nix with experimental features
+mkdir -p ~/.config/nix
+cat > ~/.config/nix/nix.conf <<EOF
+experimental-features = nix-command flakes
+EOF
+
+# Setup Cachix for binary caching
+nix-env -iA cachix -f https://cachix.org/api/v1/install
+cachix use viluon
+cachix use nix-community

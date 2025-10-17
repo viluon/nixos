@@ -1,5 +1,7 @@
 { ... }:
 
 {
-  programs.gnome-shell.extensions = { };
+  gnome.extensions = {
+    enabledExtensions = [ ];
+  };
 }

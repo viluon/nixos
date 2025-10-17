@@ -134,7 +134,7 @@ in
   imports = [
     ../../modules/editors/vscode.nix
     inputs.self.homeModules.idea
-    xhmm.homeModules.default
+    "${xhmm}/desktop/gnome/extensions.nix"
     ./gnome-extensions/common.nix
     (getGnomeExtensions hostname)
   ];

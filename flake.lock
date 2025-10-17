@@ -278,7 +278,8 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "treefmt-nix": "treefmt-nix"
+        "treefmt-nix": "treefmt-nix",
+        "xhmm": "xhmm"
       }
     },
     "systems": {
@@ -329,6 +330,21 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "xhmm": {
+      "locked": {
+        "lastModified": 1755104671,
+        "narHash": "sha256-vNs6UTfofV3ZTLsbxQSXLkymJURSWxEuscSlybhet3M=",
+        "owner": "schuelermine",
+        "repo": "xhmm",
+        "rev": "786cdb0d2736847af1b0b25ea1165dbc6b844b08",
+        "type": "github"
+      },
+      "original": {
+        "owner": "schuelermine",
+        "repo": "xhmm",
         "type": "github"
       }
     },

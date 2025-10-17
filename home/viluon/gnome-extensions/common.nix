@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 {
-  dconf.extensions = {
+  programs.gnome-shell.extensions = {
     auto-move-windows = {
       package = pkgs.gnomeExtensions.auto-move-windows;
     };

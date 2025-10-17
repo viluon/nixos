@@ -1,5 +1,5 @@
 { ... }:
 
 {
-  dconf.extensions = { };
+  programs.gnome-shell.extensions = { };
 }

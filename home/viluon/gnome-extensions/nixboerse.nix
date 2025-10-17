@@ -3,7 +3,7 @@
 with lib.hm.gvariant;
 
 {
-  dconf.extensions = {
+  programs.gnome-shell.extensions = {
     auto-move-windows = {
       enable = true;
       settings."org/gnome/shell/extensions/auto-move-windows" = {

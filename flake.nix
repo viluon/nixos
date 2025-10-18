@@ -23,7 +23,6 @@
       nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
-    nix-vscode-extensions.inputs.flake-utils.follows = "flake-utils";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";

@@ -27,7 +27,6 @@
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    xhmm.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =

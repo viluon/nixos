@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, hostname ? null, ... }:
+{ config, pkgs, lib, inputs, hostname, ... }:
 
 let
   commonPackages = with pkgs; [
@@ -135,8 +135,8 @@ in
     ../../modules/editors/vscode.nix
     inputs.self.homeModules.idea
     "${inputs.xhmm}/desktop/gnome/extensions.nix"
-    ./gnome-extensions/common.nix
-  ] ++ lib.optional (hostname != null) (getGnomeExtensions hostname);
+    (getGnomeExtensions hostname)
+  ];
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -322,6 +322,6 @@ in
         show-battery-percentage = true;
       };
     }
-    (if hostname != null then getGnomeSettings hostname else { })
+    (getGnomeSettings hostname)
   ];
 }

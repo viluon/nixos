@@ -322,6 +322,6 @@ in
         show-battery-percentage = true;
       };
     }
-    (if hostname != null then getGnomeSettings hostname else {})
+    (if hostname != null then getGnomeSettings hostname else { })
   ];
 }

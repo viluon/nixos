@@ -70,7 +70,6 @@
                 home-manager.users = self.mkHomeUsers hostname;
                 home-manager.extraSpecialArgs = {
                   inherit inputs hostname unstable-pkgs;
-                  ml4w-dotfiles = inputs.ml4w-dotfiles;
                 };
               }
               {

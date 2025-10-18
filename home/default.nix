@@ -11,16 +11,13 @@ let
     { user
     , system
     , modules
-    , hostname ? user
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = import inputs.nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
-      extraSpecialArgs = {
-        inherit inputs hostname;
-      };
+      extraSpecialArgs = { inherit inputs; };
 
       modules =
         [

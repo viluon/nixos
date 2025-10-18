@@ -14,6 +14,6 @@ with lib.hm.gvariant;
 
   "org/gnome/desktop/interface" = {
     scaling-factor = mkUint32 2;
-    text-scaling-factor = 0.9;
+    text-scaling-factor = 1;
   };
 }

@@ -1,7 +1,0 @@
-{ ... }:
-
-{
-  gnome.extensions = {
-    enabledExtensions = [ ];
-  };
-}

@@ -1,3 +1,7 @@
+---
+applyTo: **
+---
+
 # NixOS Flake Configuration - AI Coding Guidelines
 
 ## Architecture Overview

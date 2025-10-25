@@ -1,5 +1,6 @@
 {
   inputs = {
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     disko.url = "github:nix-community/disko/latest";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
@@ -31,6 +32,7 @@
   outputs =
     inputs@
     { self
+    , chaotic
     , disko
     , flake-parts
     , home-manager
@@ -78,6 +80,9 @@
                   inputs.nix4vscode.overlays.default
                 ];
               }
+              chaotic.nixosModules.nyx-cache
+              chaotic.nixosModules.nyx-overlay
+              chaotic.nixosModules.nyx-registry
             ];
             specialArgs = self.packages.${config.system} // {
               inherit unstable-pkgs;

@@ -14,6 +14,7 @@
       ./disko.nix
       # Include the results of the hardware scan.
       ./hardware.nix
+      ./kernel.nix
       ../../modules/system/monitoring/governor-control.nix
       ../../modules/system/monitoring/grafana-config.nix
       ../../modules/system/networking
@@ -62,8 +63,6 @@
   # on-demand debug info
   services.nixseparatedebuginfod.enable = true;
 
-  # extra modules
-  boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
   # fix for "network activation failed"
   # source: https://gist.github.com/Pitometsu/6db6ec921e19a7b37472
   boot.extraModprobeConfig = ''

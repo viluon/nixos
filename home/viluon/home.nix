@@ -227,7 +227,7 @@ in
       fi
 
       # completion for aliases
-      setopt completealiases
+      unsetopt completealiases
       # Expose packaged git-* scripts as git subcommands for completion.
       # Automatically generated from ./scripts (git-*.nix) at build time.
       zstyle ':completion:*:*:git:*' user-commands ${gitUserCommandsZstyle}

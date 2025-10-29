@@ -78,7 +78,6 @@
   environment.systemPackages = with pkgs; [
     iosevka
     ryujinx
-    vim
   ];
 
   # Font configuration

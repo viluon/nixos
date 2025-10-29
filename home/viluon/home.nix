@@ -132,6 +132,7 @@ let
 in
 {
   imports = [
+    ../../modules/editors/neovim.nix
     ../../modules/editors/vscode.nix
     inputs.self.homeModules.idea
     "${inputs.xhmm}/desktop/gnome/extensions.nix"
@@ -304,7 +305,7 @@ in
   #  /etc/profiles/per-user/viluon/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
-    EDITOR = "vim";
+    EDITOR = "nvim";
     NIXD_FLAGS = "-log=error";
     REPORTMEMORY = "1000";
   };

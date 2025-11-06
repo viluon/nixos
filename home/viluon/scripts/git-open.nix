@@ -9,6 +9,15 @@ pkgs.writeShellApplication {
     ensure_repo_root() { git rev-parse --show-toplevel >/dev/null 2>&1 || fail "not inside a git repository"; }
     ensure_branch() { git symbolic-ref --quiet --short HEAD >/dev/null 2>&1 || fail "detached HEAD state"; }
     current_branch() { git symbolic-ref --quiet --short HEAD; }
+    default_branch() { gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'; }
+    ensure_feature_branch() {
+      local branch default
+      branch=$(current_branch)
+      default=$(default_branch)
+      if [ "$branch" = "$default" ]; then
+        fail "cannot create PR from default branch '$default'"
+      fi
+    }
 
     branch_remote() {
       local branch=$1
@@ -91,6 +100,7 @@ pkgs.writeShellApplication {
 
     ensure_repo_root
     ensure_branch
+    ensure_feature_branch
 
     push_branch
 

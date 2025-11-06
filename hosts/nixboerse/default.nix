@@ -125,6 +125,7 @@ in
     chromium
     ddcutil
     efibootmgr
+    kind
     kubectl
     kubernetes-helm
     linux-entra-sso

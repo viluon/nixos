@@ -28,4 +28,8 @@
 
   # Enable CUPS printing
   services.printing.enable = true;
+
+  # The notion of "online" is a broken concept
+  systemd.services.NetworkManager-wait-online.enable = false;
+  systemd.network.wait-online.enable = false;
 }

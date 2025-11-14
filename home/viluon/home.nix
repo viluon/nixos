@@ -9,9 +9,11 @@ let
     gh
     grimblast
     nixd
+    obsidian
     ripgrep
     shellcheck
     starship
+    steam
     vivid
 
     # Hyprland ecosystem
@@ -74,7 +76,6 @@ let
       bottles
       gamemode
       rpcs3
-      steam
 
       # System utilities
       btrfs-assistant
@@ -93,7 +94,6 @@ let
         '';
       })
       hieroglyphic
-      obsidian
       pandoc
       xournalpp
 

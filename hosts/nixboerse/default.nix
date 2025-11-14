@@ -3,6 +3,7 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config
+, lib
 , pkgs
 , unstable-pkgs
 , ...
@@ -100,7 +101,7 @@ in
 
   # fix routing from Docker interfaces to virbr0
   networking.firewall = {
-    extraCommands = ''
+    extraCommands = lib.mkAfter ''
       # Allow traffic from minikube & kind to virbr0
       iptables -I FORWARD -s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
       iptables -I FORWARD -s ${kind-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
@@ -130,7 +131,6 @@ in
     kubernetes-helm
     linux-entra-sso
     minikube
-    obsidian
     openssl
     parallel
   ];

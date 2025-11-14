@@ -212,6 +212,18 @@ in
     boot.kernelModules = [ "virtio_pci" "virtio_net" "virtio_blk" "virtio_scsi" "virtio_balloon" ];
   };
 
+  # btrfs dedupe
+  services.beesd.filesystems.root = {
+    spec = config.fileSystems."/".device;
+    hashTableSizeMB = 4 * 1024;
+    extraOptions = [
+      "--thread-min"
+      "1"
+      "--loadavg-target"
+      "2.0"
+    ];
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

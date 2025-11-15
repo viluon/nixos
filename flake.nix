@@ -36,6 +36,7 @@
     , disko
     , flake-parts
     , home-manager
+    , niri
     , nix-index-database
     , nixos-hardware
     , nixpkgs
@@ -60,6 +61,7 @@
             system = config.system;
             modules = [
               ./hosts/${hostname}
+              niri.nixosModules.niri
               nixos-hardware.nixosModules.${config.hardware}
               disko.nixosModules.disko
               { networking.hostName = hostname; }

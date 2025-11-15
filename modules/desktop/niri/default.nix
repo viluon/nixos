@@ -11,7 +11,6 @@
 
   environment.systemPackages = with pkgs; [
     btop
-    fuzzel
     grim
     networkmanagerapplet
     pavucontrol
@@ -48,6 +47,7 @@
             "XF86AudioLowerVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
 
             "Mod+Q".action = close-window;
+            "Mod+W".action = toggle-column-tabbed-display;
 
             "Mod+Left".action = focus-column-left;
             "Mod+Down".action = focus-window-down;
@@ -152,6 +152,8 @@
             "Mod+O".action = toggle-overview;
           };
         };
+
+        programs.fuzzel.enable = true;
 
         programs.waybar = {
           enable = true;

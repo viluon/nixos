@@ -20,13 +20,14 @@ in
       ./hardware.nix
       ./kernel.nix
       ./nvidia.nix
-      ../../modules/system/networking
-      ../../modules/system/nix
       ../../modules/desktop/gnome
       ../../modules/desktop/input-methods.nix
       ../../modules/desktop/niri
       ../../modules/hardware/audio.nix
       ../../modules/hardware/graphics.nix
+      ../../modules/system/networking
+      ../../modules/system/nix
+      ../../modules/system/systemd
       ../../modules/users/common.nix
     ];
 

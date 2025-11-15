@@ -15,14 +15,15 @@
       # Include the results of the hardware scan.
       ./hardware.nix
       ./kernel.nix
-      ../../modules/system/monitoring/governor-control.nix
-      ../../modules/system/monitoring/grafana-config.nix
-      ../../modules/system/networking
-      ../../modules/system/nix
       ../../modules/desktop/gnome
       ../../modules/desktop/input-methods.nix
       ../../modules/hardware/audio.nix
       ../../modules/hardware/graphics.nix
+      ../../modules/system/monitoring/governor-control.nix
+      ../../modules/system/monitoring/grafana-config.nix
+      ../../modules/system/networking
+      ../../modules/system/nix
+      ../../modules/system/systemd
       ../../modules/users/common.nix
     ];
 

@@ -23,14 +23,23 @@ let
     wlogout
 
     # System utilities
-    wl-clipboard
-    cliphist
-    playerctl
-    brightnessctl
-    pavucontrol
-    networkmanager
     blueman
+    brightnessctl
+    btrfs-assistant
+    cachix
+    cliphist
+    compsize
+    ddcui
+    file
+    gamescope
+    networkmanager
+    nvitop
+    pavucontrol
+    playerctl
     polkit_gnome
+    wl-clipboard
+    xwayland-run
+    xwayland-satellite
 
     # Fonts
     noto-fonts
@@ -76,12 +85,6 @@ let
       bottles
       gamemode
       rpcs3
-
-      # System utilities
-      btrfs-assistant
-      cachix
-      ddcui
-      nvitop
 
       # Applications
       calibre

@@ -135,6 +135,7 @@ let
 in
 {
   imports = [
+    ../../modules/desktop/input-methods.nix
     ../../modules/editors/neovim.nix
     ../../modules/editors/vscode.nix
     inputs.self.homeModules.idea

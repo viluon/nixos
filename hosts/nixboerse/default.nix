@@ -211,6 +211,12 @@ in
 
     # Ensure virtio modules are loaded
     boot.kernelModules = [ "virtio_pci" "virtio_net" "virtio_blk" "virtio_scsi" "virtio_balloon" ];
+
+    # Enable passwordless login
+    users.users.viluon = {
+      initialHashedPassword = lib.mkForce null;
+      password = "";
+    };
   };
 
   # btrfs dedupe

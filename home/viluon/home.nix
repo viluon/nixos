@@ -296,6 +296,13 @@ in
 
   programs.k9s.enable = true;
 
+  home.pointerCursor = {
+    enable = true;
+    name = "breeze_cursors";
+    size = 24;
+    package = pkgs.kdePackages.breeze;
+  };
+
   # Home Manager can also manage your environment variables through
   # 'home.sessionVariables'. These will be explicitly sourced when using a
   # shell provided by Home Manager. If you don't want to manage your shell

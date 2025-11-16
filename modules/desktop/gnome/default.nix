@@ -6,11 +6,7 @@
   # Enable the X11 windowing system
   services.xserver = {
     enable = true;
-    xkb = {
-      layout = "us";
-      variant = "";
-      options = "caps:swapescape";
-    };
+    xkb.layout = "us";
     excludePackages = [ pkgs.xterm ];
   };
 

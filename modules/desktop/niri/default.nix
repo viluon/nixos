@@ -41,6 +41,13 @@
             { argv = [ "swaybg" "--image" config.stylix.image ]; }
           ];
 
+          window-rules = [
+            {
+              matches = [{ app-id = "kitty"; }];
+              draw-border-with-background = false;
+            }
+          ];
+
           binds = {
             "Mod+Shift+Slash".action = show-hotkey-overlay;
 

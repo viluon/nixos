@@ -16,7 +16,8 @@
       ./hardware.nix
       ./kernel.nix
       ../../modules/desktop/gnome
-      ../../modules/desktop/input-methods.nix
+      ../../modules/desktop/niri
+      ../../modules/desktop/stylix
       ../../modules/hardware/audio.nix
       ../../modules/hardware/graphics.nix
       ../../modules/system/monitoring/governor-control.nix

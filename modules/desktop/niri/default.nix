@@ -11,13 +11,12 @@
 
   environment.systemPackages = with pkgs; [
     btop
-    fuzzel
     grim
     networkmanagerapplet
     pavucontrol
     playerctl
     slurp
-    swaylock
+    swaybg
     wireplumber
     wl-clipboard
     wlogout
@@ -37,6 +36,18 @@
             numlock = true;
           };
 
+          spawn-at-startup = [
+            { argv = [ "waybar" ]; }
+            { argv = [ "swaybg" "--image" config.stylix.image "--mode" "fill" ]; }
+          ];
+
+          window-rules = [
+            {
+              matches = [{ app-id = "kitty"; }];
+              draw-border-with-background = false;
+            }
+          ];
+
           binds = {
             "Mod+Shift+Slash".action = show-hotkey-overlay;
 
@@ -48,6 +59,7 @@
             "XF86AudioLowerVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
 
             "Mod+Q".action = close-window;
+            "Mod+W".action = toggle-column-tabbed-display;
 
             "Mod+Left".action = focus-column-left;
             "Mod+Down".action = focus-window-down;
@@ -152,6 +164,10 @@
             "Mod+O".action = toggle-overview;
           };
         };
+
+        programs.btop.enable = true;
+        programs.fuzzel.enable = true;
+        programs.swaylock.enable = true;
 
         programs.waybar = {
           enable = true;
@@ -333,6 +349,23 @@
           };
 
           style = builtins.readFile ./waybar.css;
+        };
+
+        systemd.user.services.polkit-gnome-authentication-agent-1 = {
+          Unit = {
+            Description = "polkit-gnome-authentication-agent-1";
+            WantedBy = [ "graphical-session.target" ];
+            Wants = [ "graphical-session.target" ];
+            After = [ "graphical-session.target" ];
+          };
+
+          Service = {
+            Type = "simple";
+            ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+            Restart = "on-failure";
+            RestartSec = 1;
+            TimeoutStopSec = 10;
+          };
         };
       }
     )

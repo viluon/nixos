@@ -15,6 +15,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     xhmm.url = "github:schuelermine/xhmm";
+    stylix.url = "github:nix-community/stylix/release-25.05";
 
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -26,6 +27,7 @@
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs";
+    stylix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -41,6 +43,7 @@
     , nixos-hardware
     , nixpkgs
     , nixpkgs-unstable
+    , stylix
     , ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } (
@@ -62,6 +65,7 @@
             modules = [
               ./hosts/${hostname}
               niri.nixosModules.niri
+              stylix.nixosModules.stylix
               nixos-hardware.nixosModules.${config.hardware}
               disko.nixosModules.disko
               { networking.hostName = hostname; }

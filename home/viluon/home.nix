@@ -135,8 +135,9 @@ let
 in
 {
   imports = [
+    ../../modules/desktop/input-methods.nix
     ../../modules/editors/neovim.nix
-    ../../modules/editors/vscode.nix
+    ../../modules/editors/vscode
     inputs.self.homeModules.idea
     "${inputs.xhmm}/desktop/gnome/extensions.nix"
     (getGnomeExtensions hostname)
@@ -268,11 +269,13 @@ in
     enable = true;
     font = {
       name = "Iosevka";
-      size = 10;
+      # override stylix default
+      size = lib.mkForce 10;
     };
     themeFile = "Catppuccin-Mocha";
     settings = {
-      background_opacity = "0.75";
+      # override stylix default
+      background_opacity = lib.mkForce "0.75";
       confirm_os_window_close = 0;
       cursor_trail = 1;
       dynamic_background_opacity = true;
@@ -289,6 +292,15 @@ in
     enableBashIntegration = true;
     enableZshIntegration = true;
     nix-direnv.enable = true;
+  };
+
+  programs.k9s.enable = true;
+
+  home.pointerCursor = {
+    enable = true;
+    name = "breeze_cursors";
+    size = 24;
+    package = pkgs.kdePackages.breeze;
   };
 
   # Home Manager can also manage your environment variables through
@@ -321,7 +333,6 @@ in
     {
       # Common GNOME settings
       "org/gnome/desktop/interface" = {
-        color-scheme = "prefer-dark";
         enable-animations = true;
         show-battery-percentage = true;
       };

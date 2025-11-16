@@ -9,7 +9,6 @@ let
 
   commonSettings = with lib.hm.gvariant; {
     "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
       enable-animations = true;
       font-antialiasing = "rgba";
       font-hinting = "full";

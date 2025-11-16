@@ -217,6 +217,11 @@ in
       initialHashedPassword = lib.mkForce null;
       password = "";
     };
+
+    services.displayManager.autoLogin = {
+      enable = true;
+      user = "viluon";
+    };
   };
 
   # btrfs dedupe

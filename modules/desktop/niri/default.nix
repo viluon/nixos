@@ -38,7 +38,7 @@
 
           spawn-at-startup = [
             { argv = [ "waybar" ]; }
-            { argv = [ "swaybg" "--image" config.stylix.image ]; }
+            { argv = [ "swaybg" "--image" config.stylix.image "--mode" "fill" ]; }
           ];
 
           window-rules = [

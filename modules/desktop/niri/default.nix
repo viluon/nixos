@@ -16,7 +16,7 @@
     pavucontrol
     playerctl
     slurp
-    swaylock
+    swaybg
     wireplumber
     wl-clipboard
     wlogout
@@ -35,6 +35,11 @@
             xkb = { };
             numlock = true;
           };
+
+          spawn-at-startup = [
+            { argv = [ "waybar" ]; }
+            { argv = [ "swaybg" "--image" config.stylix.image ]; }
+          ];
 
           binds = {
             "Mod+Shift+Slash".action = show-hotkey-overlay;
@@ -154,6 +159,8 @@
         };
 
         programs.fuzzel.enable = true;
+
+        programs.swaylock.enable = true;
 
         programs.waybar = {
           enable = true;

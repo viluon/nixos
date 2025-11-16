@@ -158,8 +158,8 @@
           };
         };
 
+        programs.btop.enable = true;
         programs.fuzzel.enable = true;
-
         programs.swaylock.enable = true;
 
         programs.waybar = {

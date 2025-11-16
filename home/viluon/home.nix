@@ -137,7 +137,7 @@ in
   imports = [
     ../../modules/desktop/input-methods.nix
     ../../modules/editors/neovim.nix
-    ../../modules/editors/vscode.nix
+    ../../modules/editors/vscode
     inputs.self.homeModules.idea
     "${inputs.xhmm}/desktop/gnome/extensions.nix"
     (getGnomeExtensions hostname)

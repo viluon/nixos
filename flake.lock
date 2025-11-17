@@ -444,11 +444,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1763344943,
-        "narHash": "sha256-6+kdZTAAPbXcBLErqTMOF7woOkKyvlpUh7ggNbpeAeA=",
+        "lastModified": 1763383974,
+        "narHash": "sha256-MkIpcb3TIbfjRWqsSR1dNiaqMNzhEhS45R8J15eHkUQ=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "2bd42d56d113c6434b0be65d919ab562e8a27cdf",
+        "rev": "260148b2ade3960c041167ed6a3305318a7d85a0",
         "type": "github"
       },
       "original": {

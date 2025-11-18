@@ -13,6 +13,11 @@
         package = pkgs.iosevka;
         name = "Iosevka";
       };
+
+      sansSerif = {
+        package = pkgs.inter;
+        name = "Inter";
+      };
     };
   };
 }

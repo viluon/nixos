@@ -212,6 +212,9 @@ in
     # Ensure virtio modules are loaded
     boot.kernelModules = [ "virtio_pci" "virtio_net" "virtio_blk" "virtio_scsi" "virtio_balloon" ];
 
+    # boot animation
+    boot.plymouth.enable = true;
+
     # Enable passwordless login
     users.users.viluon = {
       initialHashedPassword = lib.mkForce null;

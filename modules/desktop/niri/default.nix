@@ -117,6 +117,11 @@
             "Mod+Ctrl+U".action = move-column-to-workspace-down;
             "Mod+Ctrl+I".action = move-column-to-workspace-up;
 
+            "Mod+WheelScrollDown".action = focus-workspace-down;
+            "Mod+WheelScrollUp".action = focus-workspace-up;
+            "Mod+WheelScrollLeft".action = focus-column-left;
+            "Mod+WheelScrollRight".action = focus-column-right;
+
             "Mod+Shift+Page_Down".action = move-workspace-down;
             "Mod+Shift+Page_Up".action = move-workspace-up;
             "Mod+Shift+U".action = move-workspace-down;
@@ -307,7 +312,11 @@
                 };
 
                 temperature = {
-                  format = "${unicode "f2c9"} {temperatureC}${unicode "00b0"}C";
+                  format = "{icon} {temperatureC}${unicode "00b0"}C";
+                  thermal-zone = 8; # TODO: split for nixluon
+                  warning-threshold = 95;
+                  critical-threshold = 100;
+                  format-icons = [ "${unicode "f2c9"}" "${unicode "f2c8"}" "${unicode "f2c7"}" ];
                   tooltip = false;
                 };
 

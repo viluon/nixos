@@ -276,9 +276,10 @@
 
                 network = {
                   interval = 5;
+                  interface = "wlp*s*";
                   format = "{ifname}";
-                  format-wifi = "  {signalStrength}% Down: {bandwidthDownBytes} Up: {bandwidthUpBytes} {essid}";
-                  format-ethernet = "  {ifname} Down: {bandwidthDownBytes} Up: {bandwidthUpBytes}";
+                  format-wifi = "  {signalStrength}% ↓{bandwidthDownBytes} ↑{bandwidthUpBytes} {essid}";
+                  format-ethernet = "  {ifname} ↓{bandwidthDownBytes} ↑{bandwidthUpBytes}";
                   format-disconnected = "Disconnected ⚠";
                   tooltip-format = " {ifname} via {gwaddri}";
                   tooltip-format-wifi = "  {ifname} @ {essid}\nIP: {ipaddr}\nStrength: {signalStrength}%\nFreq: {frequency}MHz\nDown: {bandwidthDownBytes} Up: {bandwidthUpBytes}";

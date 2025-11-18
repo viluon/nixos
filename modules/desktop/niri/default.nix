@@ -52,7 +52,7 @@
           binds = {
             "Mod+Shift+Slash".action = show-hotkey-overlay;
 
-            "Mod+T".action = spawn "kitty";
+            "Mod+Return".action = spawn "kitty";
             "Mod+D".action = spawn "fuzzel";
             "Super+Alt+L".action = spawn "swaylock";
 
@@ -162,7 +162,7 @@
             "Mod+Shift+E".action = quit;
 
             "Mod+Shift+P".action = power-off-monitors;
-            "Mod+O".action = toggle-overview;
+            "Mod+Escape".action = toggle-overview;
           };
         };
 

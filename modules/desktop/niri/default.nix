@@ -12,6 +12,7 @@
   environment.systemPackages = with pkgs; [
     btop
     grim
+    libsecret
     networkmanagerapplet
     pavucontrol
     playerctl
@@ -351,12 +352,16 @@
           style = builtins.readFile ./waybar.css;
         };
 
+        services.gnome-keyring.enable = true;
+
+        # niri-flake would enable the KDE agent by default
+        systemd.user.services.niri-flake-polkit.Service.Enable = false;
+
         systemd.user.services.polkit-gnome-authentication-agent-1 = {
           Unit = {
             Description = "polkit-gnome-authentication-agent-1";
-            WantedBy = [ "graphical-session.target" ];
-            Wants = [ "graphical-session.target" ];
             After = [ "graphical-session.target" ];
+            Wants = [ "graphical-session.target" ];
           };
 
           Service = {
@@ -365,6 +370,10 @@
             Restart = "on-failure";
             RestartSec = 1;
             TimeoutStopSec = 10;
+          };
+
+          Install = {
+            WantedBy = [ "graphical-session.target" ];
           };
         };
       }

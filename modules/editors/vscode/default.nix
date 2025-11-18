@@ -3,6 +3,8 @@
 , ...
 }:
 {
+  home.file.".vscode/argv.json".source = ./argv.json;
+
   programs.vscode = {
     enable = true;
     package = pkgs.vscode;

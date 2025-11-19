@@ -21,14 +21,25 @@
     wireplumber
     wl-clipboard
     wlogout
+    (pkgs.writeShellApplication {
+      name = "lock";
+      runtimeInputs = with pkgs; [
+        procps
+        hyprlock
+      ];
+      text = "pidof hyprlock || hyprlock";
+    })
   ];
 
   fonts.packages = [ pkgs.maple-mono.NF-CN ];
+
+  security.pam.services.hyprlock.enable = true;
 
   # FIXME: shouldn't hardcode username
   home-manager.users.viluon.imports = [
     (
       { config
+      , lib
       , ...
       }: {
         programs.niri.settings = with config.lib.niri.actions; {
@@ -54,7 +65,7 @@
 
             "Mod+Return".action = spawn "kitty";
             "Mod+D".action = spawn "fuzzel";
-            "Super+Alt+L".action = spawn "swaylock";
+            "Super+Alt+L".action = spawn "lock";
 
             "XF86AudioRaiseVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
             "XF86AudioLowerVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
@@ -173,7 +184,11 @@
 
         programs.btop.enable = true;
         programs.fuzzel.enable = true;
-        programs.swaylock.enable = true;
+
+        programs.hyprlock = {
+          enable = true;
+          settings = import ./hyprlock-config.nix { inherit lib config; };
+        };
 
         programs.waybar = {
           enable = true;

@@ -91,7 +91,7 @@
               chaotic.nixosModules.nyx-registry
             ];
             specialArgs = self.packages.${config.system} // {
-              inherit unstable-pkgs;
+              inherit unstable-pkgs hostname;
               niri = inputs.niri;
             };
           };

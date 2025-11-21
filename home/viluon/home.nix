@@ -231,6 +231,11 @@ in
         source <(kubectl completion zsh)
       fi
 
+      # Niri completion
+      if command -v niri >/dev/null 2>&1; then
+        source <(niri completions zsh)
+      fi
+
       # completion for aliases
       unsetopt completealiases
       # Expose packaged git-* scripts as git subcommands for completion.

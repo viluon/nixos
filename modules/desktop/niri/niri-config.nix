@@ -14,7 +14,61 @@
       matches = [{ app-id = "kitty"; }];
       draw-border-with-background = false;
     }
+    {
+      matches = [{ app-id = "waybar"; }];
+      draw-border-with-background = false;
+    }
+    {
+      matches = [{ app-id = "^firefox"; }];
+      geometry-corner-radius = {
+        top-left = 12.0;
+        top-right = 12.0;
+        bottom-left = 0.0;
+        bottom-right = 0.0;
+      };
+    }
+    {
+      matches = [{ app-id = "virt-manager"; }];
+      geometry-corner-radius = {
+        top-left = 12.0;
+        top-right = 12.0;
+        bottom-left = 0.0;
+        bottom-right = 0.0;
+      };
+    }
+    {
+      matches = [{ app-id = "^org.gnome."; }];
+      geometry-corner-radius = {
+        top-left = 14.0;
+        top-right = 14.0;
+        bottom-left = 14.0;
+        bottom-right = 14.0;
+      };
+    }
   ];
+
+  layer-rules = [
+    {
+      matches = [{ namespace = "^waybar$"; }];
+      shadow.enable = false;
+    }
+  ];
+
+  layout = {
+    border.enable = false;
+
+    focus-ring = {
+      enable = true;
+      width = 3;
+
+      active.gradient = {
+        from = config.lib.stylix.colors.base0D-hex;
+        to = config.lib.stylix.colors.base09-hex;
+        angle = 135;
+        relative-to = "window";
+      };
+    };
+  };
 
   binds = {
     "Mod+Shift+Slash".action = show-hotkey-overlay;

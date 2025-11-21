@@ -10,14 +10,13 @@
       layer = "top";
 
       modules-left = [ "custom/launcher" "temperature" "backlight" "niri/workspaces" ];
-      modules-center = [ "custom/playerctl" ];
+      modules-center = [ "clock" "custom/playerctl" ];
       modules-right = [
         "pulseaudio"
         "memory"
         "cpu"
         "network"
         "battery"
-        "clock"
         "idle_inhibitor"
         "custom/powermenu"
         "tray"

@@ -47,6 +47,15 @@
     initialHashedPassword = "$6$rounds=2000000$9V4QeLdb.yXDzOEM$37G75PGikc2/v2pogHnjnNp4By3aCwlPEWyVa1wD/myF1wo8Ur7WWFlsZ6atN.43wJdfi9pwebd.PqPDEw0WF1";
   };
 
+  security.sudo.extraRules = [{
+    users = [ "viluon" ];
+    commands = [{
+      # FIXME: hardcoded home path
+      command = "/run/current-system/sw/bin/nixos-rebuild test -L --flake /home/viluon/nixos";
+      options = [ "NOPASSWD" ];
+    }];
+  }];
+
   security.pam.loginLimits = [
     {
       domain = "viluon";

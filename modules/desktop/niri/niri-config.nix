@@ -35,43 +35,37 @@
       })
       workspaces;
 
-  window-rules = [
-    {
-      matches = [{ app-id = "kitty"; }];
-      draw-border-with-background = false;
-    }
-    {
-      matches = [{ app-id = "waybar"; }];
-      draw-border-with-background = false;
-    }
-    {
-      matches = [{ app-id = "^firefox"; }];
-      geometry-corner-radius = {
-        top-left = 12.0;
-        top-right = 12.0;
-        bottom-left = 0.0;
-        bottom-right = 0.0;
-      };
-    }
-    {
-      matches = [{ app-id = "virt-manager"; }];
-      geometry-corner-radius = {
-        top-left = 12.0;
-        top-right = 12.0;
-        bottom-left = 0.0;
-        bottom-right = 0.0;
-      };
-    }
-    {
-      matches = [{ app-id = "^org.gnome."; }];
-      geometry-corner-radius = {
-        top-left = 14.0;
-        top-right = 14.0;
-        bottom-left = 14.0;
-        bottom-right = 14.0;
-      };
-    }
-  ];
+  window-rules =
+    let
+      fully-rounded = radius: { top-left = radius; top-right = radius; bottom-left = radius; bottom-right = radius; };
+      rounded-top = radius: { top-left = radius; top-right = radius; bottom-left = 0.0; bottom-right = 0.0; };
+    in
+    [
+      {
+        matches = [{ app-id = "kitty"; }];
+        draw-border-with-background = false;
+      }
+      {
+        matches = [{ app-id = "waybar"; }];
+        draw-border-with-background = false;
+      }
+      {
+        matches = [{ app-id = "^firefox"; }];
+        geometry-corner-radius = rounded-top 12.0;
+      }
+      {
+        matches = [{ app-id = "virt-manager"; }];
+        geometry-corner-radius = rounded-top 12.0;
+      }
+      {
+        matches = [{ app-id = "^org.gnome."; }];
+        geometry-corner-radius = fully-rounded 14.0;
+      }
+      {
+        matches = [{ app-id = "^code$"; is-floating = true; }];
+        geometry-corner-radius = fully-rounded 14.0;
+      }
+    ];
 
   layer-rules = [
     {

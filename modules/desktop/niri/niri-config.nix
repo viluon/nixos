@@ -1,4 +1,6 @@
-{ config }: with config.lib.niri.actions; {
+{ config
+, lib
+}: with config.lib.niri.actions; {
   input.keyboard = {
     xkb = { };
     numlock = true;
@@ -8,6 +10,30 @@
     { argv = [ "waybar" ]; }
     { argv = [ "swaybg" "--image" config.stylix.image "--mode" "fill" ]; }
   ];
+
+  workspaces =
+    let
+      workspaces = {
+        "00-firefox" = "DP-1";
+        "01-idea" = "DP-1";
+        "02-code" = "DP-1";
+        "03-terminal" = "DP-1";
+        "04-obsidian" = "DP-1";
+        "05-vs-code" = "DP-1";
+        "06-virt-manager" = "DP-1";
+
+        "07-nvitop" = "eDP-1";
+      };
+    in
+    lib.mapAttrs'
+      (name: output: {
+        inherit name;
+        value = {
+          name = lib.concatStrings (lib.drop 3 (lib.stringToCharacters name));
+          open-on-output = output;
+        };
+      })
+      workspaces;
 
   window-rules = [
     {

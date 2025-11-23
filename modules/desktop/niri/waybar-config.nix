@@ -1,6 +1,6 @@
 # inspired by https://github.com/ryan4yin/nix-config
 # Copyright (c) 2023 Ryan Yin under the MIT license
-{
+{ lib }: {
   mainBar =
     let
       unicode = code: builtins.fromJSON "\"\\u${code}\"";
@@ -25,20 +25,37 @@
       "niri/workspaces" = {
         format = "{icon}";
         on-click = "activate";
-        format-icons = {
-          "1" = "";
-          "2" = "";
-          "3" = "";
-          "4" = "";
-          "5" = "";
-          "6" = "";
-          "7" = "";
-          "8" = "";
-          "9" = "";
-          "10" = "〇";
-          focused = "";
-          default = "";
-        };
+        format-icons =
+          let
+            icons = [
+              "" # firefox
+              "" # intellij idea
+              "" # source code
+              "" # terminal
+              "󰝇" # onenote (no obsidian in nerdfonts)
+              "󰨞" # vs code
+              "" # virtual machine
+              "" # pulse
+
+              "" # files
+              "" # camera
+              "" # chrome
+              "" # chat
+              "" # media
+              "" # email
+              "〇" # other
+            ];
+          in
+          {
+            focused = ""; # filled circle
+            default = "";
+          }
+          // (builtins.listToAttrs
+            (lib.zipListsWith
+              (idx: value: { name = builtins.toString idx; inherit value; })
+              (lib.range 1 (builtins.length icons))
+              icons
+            ));
       };
 
       clock = {

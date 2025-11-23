@@ -42,7 +42,7 @@
       , lib
       , ...
       }: {
-        programs.niri.settings = import ./niri-config.nix { inherit config; };
+        programs.niri.settings = import ./niri-config.nix { inherit lib config; };
 
         programs.btop.enable = true;
         programs.fuzzel.enable = true;
@@ -54,7 +54,7 @@
 
         programs.waybar = {
           enable = true;
-          settings = import ./waybar-config.nix;
+          settings = import ./waybar-config.nix { inherit lib; };
           style = builtins.readFile ./waybar.css;
         };
 

@@ -136,7 +136,12 @@
           devShells.default = pkgs.mkShell {
             packages = [
               config.treefmt.build.wrapper
+              pkgs.just
             ] ++ (builtins.attrValues config.treefmt.build.programs);
+
+            shellHook = ''
+              just --list
+            '';
           };
         };
       }

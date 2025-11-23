@@ -32,6 +32,7 @@ let
     ddcui
     file
     gamescope
+    just
     networkmanager
     nvitop
     pavucontrol
@@ -234,6 +235,11 @@ in
       # Niri completion
       if command -v niri >/dev/null 2>&1; then
         source <(niri completions zsh)
+      fi
+
+      # Just completion
+      if command -v just >/dev/null 2>&1; then
+        source <(just --completions zsh)
       fi
 
       # completion for aliases

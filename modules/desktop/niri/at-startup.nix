@@ -8,6 +8,7 @@
     app-id = "jetbrains-idea";
     workspace = "idea";
     command = [ "idea-ultimate" ];
+    maximized = true;
   }
   {
     app-id = "obsidian";
@@ -22,7 +23,7 @@
   {
     app-id = "^code$";
     workspace = "vs-code";
-    command = [ "code" "~/nixos" ];
+    command = [ "code" "/home/viluon/nixos" ];
   }
   {
     app-id = "nvitop";

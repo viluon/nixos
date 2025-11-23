@@ -36,7 +36,11 @@
         draw-border-with-background = false;
       }
       {
-        matches = [{ app-id = "waybar"; }];
+        matches = [{ app-id = "nvitop"; }];
+        draw-border-with-background = false;
+      }
+      {
+        matches = [{ app-id = "nixos"; }];
         draw-border-with-background = false;
       }
       {
@@ -45,6 +49,10 @@
       }
       {
         matches = [{ app-id = "virt-manager"; }];
+        geometry-corner-radius = rounded-top 12.0;
+      }
+      {
+        matches = [{ app-id = "gcr-prompter"; }];
         geometry-corner-radius = rounded-top 12.0;
       }
       {
@@ -59,7 +67,13 @@
         matches = [{ app-id = "^code$"; is-floating = true; }];
         geometry-corner-radius = fully-rounded 14.0;
       }
-    ] ++ lib.map (app: { matches = [{ app-id = app.app-id; }]; open-on-workspace = app.workspace; }) (import ./at-startup.nix);
+    ] ++ lib.map
+      (app: {
+        matches = [{ app-id = app.app-id; at-startup = true; }];
+        open-on-workspace = app.workspace;
+        open-maximized = app.maximized or null;
+      })
+      (import ./at-startup.nix);
 
   layer-rules = [
     {
@@ -81,6 +95,16 @@
         angle = 135;
         relative-to = "window";
       };
+    };
+  };
+
+  outputs = {
+    "DP-1" = {
+      focus-at-startup = true;
+      position = { x = 1707; y = 0; };
+    };
+    "eDP-1" = {
+      position = { x = 0; y = 700; };
     };
   };
 

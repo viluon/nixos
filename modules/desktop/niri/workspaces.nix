@@ -10,16 +10,6 @@
     output = "DP-1";
   }
   {
-    name = "code";
-    icon = ""; # source code
-    output = "DP-1";
-  }
-  {
-    name = "terminal";
-    icon = ""; # terminal
-    output = "DP-1";
-  }
-  {
     name = "obsidian";
     icon = "󰝇"; # onenote (no obsidian in nerdfonts)
     output = "DP-1";

@@ -9,6 +9,15 @@
   spawn-at-startup = [
     { argv = [ "waybar" ]; }
     { argv = [ "swaybg" "--image" config.stylix.image "--mode" "fill" ]; }
+
+    # startup applications
+    { argv = [ "firefox-devedition" ]; }
+    { argv = [ "idea-ultimate" ]; }
+    { argv = [ "obsidian" ]; }
+    { argv = [ "virt-manager" ]; }
+    { argv = [ "code" "~/nixos" ]; }
+    { argv = [ "kitty" "--app-id=nvitop" "nvitop" ]; }
+    { argv = [ "kitty" "--app-id=nixos" "--working-directory=~/nixos" ]; }
   ];
 
   workspaces =
@@ -58,6 +67,10 @@
         geometry-corner-radius = rounded-top 12.0;
       }
       {
+        matches = [{ app-id = "polkit-gnome-authentication-agent-1"; }];
+        geometry-corner-radius = rounded-top 12.0;
+      }
+      {
         matches = [{ app-id = "^org.gnome."; }];
         geometry-corner-radius = fully-rounded 14.0;
       }
@@ -65,6 +78,15 @@
         matches = [{ app-id = "^code$"; is-floating = true; }];
         geometry-corner-radius = fully-rounded 14.0;
       }
+
+      # startup applications
+      { matches = [{ app-id = "^firefox-devedition$"; at-startup = true; }]; open-on-workspace = "firefox"; }
+      { matches = [{ app-id = "jetbrains-idea"; at-startup = true; }]; open-on-workspace = "idea"; }
+      { matches = [{ app-id = "obsidian"; at-startup = true; }]; open-on-workspace = "obsidian"; }
+      { matches = [{ app-id = "virt-manager"; at-startup = true; }]; open-on-workspace = "virt-manager"; }
+      { matches = [{ app-id = "nvitop"; at-startup = true; }]; open-on-workspace = "nvitop"; }
+      { matches = [{ app-id = "^code$"; at-startup = true; }]; open-on-workspace = "vs-code"; }
+      { matches = [{ app-id = "nixos"; at-startup = true; }]; open-on-workspace = "vs-code"; }
     ];
 
   layer-rules = [

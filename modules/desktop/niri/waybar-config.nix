@@ -27,35 +27,14 @@
         on-click = "activate";
         format-icons =
           let
-            icons = [
-              "" # firefox
-              "" # intellij idea
-              "" # source code
-              "" # terminal
-              "󰝇" # onenote (no obsidian in nerdfonts)
-              "󰨞" # vs code
-              "" # virtual machine
-              "" # pulse
-
-              "" # files
-              "" # camera
-              "" # chrome
-              "" # chat
-              "" # media
-              "" # email
-              "〇" # other
-            ];
+            icons = lib.map (app: app.icon) (import ./workspaces.nix);
           in
-          {
-            focused = ""; # filled circle
-            default = "";
-          }
-          // (builtins.listToAttrs
+          builtins.listToAttrs
             (lib.zipListsWith
               (idx: value: { name = builtins.toString idx; inherit value; })
               (lib.range 1 (builtins.length icons))
               icons
-            ));
+            );
       };
 
       clock = {

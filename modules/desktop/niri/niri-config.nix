@@ -12,28 +12,17 @@
   ] ++ lib.map (app: { argv = app.command; }) (import ./at-startup.nix);
 
   workspaces =
-    let
-      workspaces = {
-        "00-firefox" = "DP-1";
-        "01-idea" = "DP-1";
-        "02-code" = "DP-1";
-        "03-terminal" = "DP-1";
-        "04-obsidian" = "DP-1";
-        "05-vs-code" = "DP-1";
-        "06-virt-manager" = "DP-1";
-
-        "07-nvitop" = "eDP-1";
-      };
-    in
-    lib.mapAttrs'
-      (name: output: {
-        inherit name;
-        value = {
-          name = lib.concatStrings (lib.drop 3 (lib.stringToCharacters name));
-          open-on-output = output;
-        };
-      })
-      workspaces;
+    lib.listToAttrs
+      (lib.imap
+        (index: { name, output, ... }: {
+          name = lib.concatStrings [ (toString index) "-" name ];
+          value = {
+            inherit name;
+            open-on-output = output;
+          };
+        })
+        (import ./workspaces.nix)
+      );
 
   window-rules =
     let
@@ -69,7 +58,7 @@
         matches = [{ app-id = "^code$"; is-floating = true; }];
         geometry-corner-radius = fully-rounded 14.0;
       }
-    ] ++ lib.map (app: { matches = [ { app-id = app.app-id; } ]; open-on-workspace = app.workspace; }) (import ./at-startup.nix);
+    ] ++ lib.map (app: { matches = [{ app-id = app.app-id; }]; open-on-workspace = app.workspace; }) (import ./at-startup.nix);
 
   layer-rules = [
     {

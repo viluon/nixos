@@ -38,23 +38,20 @@
   # FIXME: shouldn't hardcode username
   home-manager.users.viluon.imports = [
     (
-      { config
-      , lib
-      , ...
-      }: {
-        programs.niri.settings = import ./niri-config.nix { inherit lib config; };
+      inputs: {
+        programs.niri.settings = import ./niri-config.nix inputs;
 
         programs.btop.enable = true;
         programs.fuzzel.enable = true;
 
         programs.hyprlock = {
           enable = true;
-          settings = import ./hyprlock-config.nix { inherit lib config; };
+          settings = import ./hyprlock-config.nix inputs;
         };
 
         programs.waybar = {
           enable = true;
-          settings = import ./waybar-config.nix { inherit lib; };
+          settings = import ./waybar-config.nix inputs;
           style = builtins.readFile ./waybar.css;
         };
 

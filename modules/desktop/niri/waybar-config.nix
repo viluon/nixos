@@ -1,6 +1,8 @@
 # inspired by https://github.com/ryan4yin/nix-config
 # Copyright (c) 2023 Ryan Yin under the MIT license
-{ lib }: {
+{ lib
+, ...
+}: {
   mainBar =
     let
       unicode = code: builtins.fromJSON "\"\\u${code}\"";

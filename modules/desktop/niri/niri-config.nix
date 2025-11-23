@@ -1,5 +1,6 @@
 { config
 , lib
+, ...
 }: with config.lib.niri.actions; {
   input.keyboard = {
     xkb = { };

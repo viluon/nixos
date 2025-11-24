@@ -1,13 +1,10 @@
-{ niri
+inputs@{ niri
 , pkgs
 , ...
 }: {
   nixpkgs.overlays = [ niri.overlays.niri ];
 
-  programs.niri = {
-    enable = true;
-    package = pkgs.niri-unstable;
-  };
+  programs.niri = import ./tuned.nix inputs;
 
   environment.systemPackages = with pkgs; [
     btop

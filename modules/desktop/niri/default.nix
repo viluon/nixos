@@ -1,12 +1,27 @@
 { niri
 , pkgs
+, hostname
 , ...
 }: {
   nixpkgs.overlays = [ niri.overlays.niri ];
 
   programs.niri = {
     enable = true;
-    package = pkgs.niri-unstable;
+    package =
+      let
+        # FIXME: should be defined consistently instead of pattern matching everywhere
+        arch =
+          if hostname == "nixboerse" then
+            "tigerlake"
+          else
+            if hostname == "nixluon" then
+              "znver5"
+            else
+              "x86-64-v4";
+      in
+      pkgs.niri-unstable.overrideAttrs (newAttrs: oldAttrs: {
+        RUSTFLAGS = oldAttrs.RUSTFLAGS ++ [ "-Ctarget-cpu=${arch}" ];
+      });
   };
 
   environment.systemPackages = with pkgs; [

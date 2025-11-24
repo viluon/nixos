@@ -27,16 +27,14 @@
       "niri/workspaces" = {
         format = "{icon}";
         on-click = "activate";
-        format-icons =
-          let
-            icons = lib.map (app: app.icon) (import ./workspaces.nix);
-          in
-          builtins.listToAttrs
-            (lib.zipListsWith
-              (idx: value: { name = builtins.toString idx; inherit value; })
-              (lib.range 1 (builtins.length icons))
-              icons
-            );
+        format-icons = builtins.listToAttrs (
+          lib.map
+            (workspace: {
+              name = workspace.name;
+              value = workspace.icon;
+            })
+            (import ./workspaces.nix)
+        );
       };
 
       clock = {

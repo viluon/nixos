@@ -2,27 +2,27 @@
   {
     name = "firefox";
     icon = ""; # firefox
-    output = "DP-1";
+    output = "DP-3";
   }
   {
     name = "idea";
     icon = ""; # intellij idea
-    output = "DP-1";
+    output = "DP-3";
   }
   {
     name = "obsidian";
     icon = "󰝇"; # onenote (no obsidian in nerdfonts)
-    output = "DP-1";
+    output = "DP-4";
   }
   {
     name = "vs-code";
     icon = "󰨞"; # vs code
-    output = "DP-1";
+    output = "DP-3";
   }
   {
     name = "virt-manager";
-    icon = ""; # virtual machine
-    output = "DP-1";
+    icon = ""; # virtual machine
+    output = "DP-3";
   }
   {
     name = "nvitop";

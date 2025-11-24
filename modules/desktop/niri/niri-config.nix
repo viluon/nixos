@@ -67,6 +67,11 @@
         matches = [{ app-id = "^code$"; is-floating = true; }];
         geometry-corner-radius = fully-rounded 14.0;
       }
+      {
+        matches = [{ app-id = "^jetbrains-idea$"; is-floating = true; }];
+        excludes = [{ title = ".*"; }];
+        geometry-corner-radius = rounded-top 14.0;
+      }
     ] ++ lib.map
       (app: {
         matches = [{ app-id = app.app-id; at-startup = true; }];

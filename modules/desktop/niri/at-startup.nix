@@ -3,6 +3,7 @@
     app-id = "^firefox-devedition$";
     workspace = "firefox";
     command = [ "firefox-devedition" ];
+    maximized = true;
   }
   {
     app-id = "jetbrains-idea";
@@ -14,6 +15,7 @@
     app-id = "obsidian";
     workspace = "obsidian";
     command = [ "obsidian" ];
+    maximized = true;
   }
   {
     app-id = "virt-manager";
@@ -24,15 +26,17 @@
     app-id = "^code$";
     workspace = "vs-code";
     command = [ "code" "/home/viluon/nixos" ];
+    maximized = true;
   }
   {
     app-id = "nvitop";
     workspace = "nvitop";
     command = [ "kitty" "--app-id=nvitop" "nvitop" ];
+    maximized = true;
   }
   {
     app-id = "nixos";
     workspace = "vs-code";
-    command = [ "kitty" "--app-id=nixos" "--working-directory=~/nixos" ];
+    command = [ "kitty" "--app-id=nixos" "--override=font_size=14" "--working-directory=~/nixos" ];
   }
 ]

@@ -52,7 +52,23 @@ pkgs.writeShellApplication {
       git push --set-upstream "$remote" "$branch"
     }
 
-    pr_exists() { gh pr view --json number >/dev/null 2>&1; }
+    upstream_branch_exists() {
+      local branch remote
+      branch=$(current_branch)
+      remote=$(branch_remote "$branch")
+      git ls-remote --exit-code "$remote" "refs/heads/$branch" >/dev/null 2>&1
+    }
+
+    ensure_upstream_deleted() {
+      local branch remote
+      branch=$(current_branch)
+      remote=$(branch_remote "$branch")
+      if upstream_branch_exists; then
+        fail "remote branch '$remote/$branch' already exists; delete it before creating a new PR"
+      fi
+    }
+
+    current_pr_state() { gh pr view --state all --json state --jq '.state'; }
 
     get_diff_stats() {
       local merge_base additions=0 deletions=0
@@ -102,13 +118,25 @@ pkgs.writeShellApplication {
     ensure_branch
     ensure_feature_branch
 
-    push_branch
-
-    if pr_exists; then
-      echo "pull request already exists for $(current_branch)"
-      exit 0
+    pr_state=""
+    if pr_state=$(current_pr_state 2>/dev/null); then
+      :
+    else
+      pr_state=""
     fi
 
+    case "$pr_state" in
+      OPEN)
+        push_branch
+        echo "pull request already exists for $(current_branch)"
+        exit 0
+        ;;
+      CLOSED|MERGED)
+        ensure_upstream_deleted
+        ;;
+    esac
+
+    push_branch
     create_pr
   '';
 }

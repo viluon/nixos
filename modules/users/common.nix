@@ -11,6 +11,7 @@
     extraGroups = [
       "cdrom"
       "docker"
+      "libvirtd"
       "networkmanager"
       "uinput"
       "wheel"

@@ -76,7 +76,7 @@
       };
 
       "custom/playerctl" = {
-        format = "{icon}  <span>{}</span>";
+        format = "{icon}<span>{}</span>";
         return-type = "json";
         max-length = 55;
         exec = "playerctl -a metadata --format '{\"text\": \" {{markup_escape(title)}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F";

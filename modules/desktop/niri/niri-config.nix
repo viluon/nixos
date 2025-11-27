@@ -68,9 +68,8 @@
         geometry-corner-radius = fully-rounded 14.0;
       }
       {
-        matches = [{ app-id = "^jetbrains-idea$"; is-floating = true; }];
-        excludes = [{ title = ".*"; }];
-        geometry-corner-radius = rounded-top 14.0;
+        matches = [{ app-id = "^jetbrains-idea$"; is-floating = true; title = "..*"; }];
+        geometry-corner-radius = rounded-top 4.0;
       }
     ] ++ lib.map
       (app: {
@@ -98,6 +97,7 @@
         from = config.lib.stylix.colors.base0D-hex;
         to = config.lib.stylix.colors.base09-hex;
         angle = 135;
+        in' = "oklch shorter hue";
         relative-to = "window";
       };
     };

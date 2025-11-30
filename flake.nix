@@ -2,6 +2,7 @@
   inputs = {
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     disko.url = "github:nix-community/disko/latest";
+    fenix.url = "github:nix-community/fenix";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     flake-utils.url = "github:numtide/flake-utils";
@@ -13,11 +14,12 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    stylix.url = "github:nix-community/stylix/release-25.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     xhmm.url = "github:schuelermine/xhmm";
-    stylix.url = "github:nix-community/stylix/release-25.05";
 
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    fenix.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     niri.inputs = {
@@ -92,7 +94,9 @@
             ];
             specialArgs = self.packages.${config.system} // {
               inherit unstable-pkgs hostname;
+              system = config.system;
               niri = inputs.niri;
+              fenix = inputs.fenix;
             };
           };
 

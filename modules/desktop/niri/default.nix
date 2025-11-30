@@ -1,13 +1,49 @@
 { niri
+, fenix
 , pkgs
+, hostname
+, system
 , ...
 }: {
-  nixpkgs.overlays = [ niri.overlays.niri ];
+  nixpkgs.overlays = [ niri.overlays.niri fenix.overlays.default ];
 
-  programs.niri = {
-    enable = true;
-    package = pkgs.niri-unstable;
-  };
+  programs.niri =
+    let
+      fenixToolchain = fenix.packages.${system}.latest;
+
+      nightlyRustPlatform = pkgs.makeRustPlatform {
+        rustc = fenixToolchain.rustc;
+        cargo = fenixToolchain.cargo;
+      };
+
+      nightlyNiri = (niri.lib.internal.make-package-set (pkgs // {
+        rustPlatform = nightlyRustPlatform;
+      })).niri-unstable.overrideAttrs (old: {
+        RUSTFLAGS = old.RUSTFLAGS ++ [
+          "-Ctarget-cpu=${target-cpu}"
+          "-Ztune-cpu=${tune-cpu}"
+        ];
+
+        nativeCheckInputs = (old.nativeCheckInputs or [ ]) ++ [ pkgs.pipewire ];
+      });
+      target-cpu = "x86-64-v3";
+      # FIXME: should be defined consistently instead of pattern matching everywhere
+      tune-cpu =
+        if hostname == "nixboerse" then
+          "tigerlake"
+        else
+          if hostname == "nixluon" then
+            "znver5"
+          else
+            "x86-64-v4";
+    in
+    {
+      enable = true;
+      package = nightlyNiri;
+      # pkgs.niri-unstable.overrideAttrs (newAttrs: oldAttrs: {
+      #   RUSTFLAGS = oldAttrs.RUSTFLAGS ++ [ "-Ctarget-cpu=${target-cpu} -Z tune-cpu=${tune-cpu}" ];
+      # });
+    };
 
   environment.systemPackages = with pkgs; [
     btop

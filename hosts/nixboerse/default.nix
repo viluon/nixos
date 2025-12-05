@@ -221,9 +221,13 @@ in
       password = "";
     };
 
-    services.displayManager.autoLogin = {
-      enable = true;
-      user = "viluon";
+    services.displayManager = {
+      autoLogin = {
+        enable = true;
+        user = "viluon";
+      };
+
+      defaultSession = lib.mkForce "gnome";
     };
   };
 

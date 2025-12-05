@@ -13,7 +13,7 @@
   # Enable GNOME Desktop Environment
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
-  services.displayManager.defaultSession = "gnome";
+  services.displayManager.defaultSession = "niri";
 
   # Swap caps lock & escape on Wayland (user must be in uinput group)
   hardware.uinput.enable = true;

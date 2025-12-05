@@ -41,5 +41,6 @@
     # This is sometimes needed for ddc/ci support, see
     # https://www.ddcutil.com/nvidia/
     "NVreg_RegistryDwords=RMUseSwI2c=0x01;RMI2cSpeed=100"
+    "NVreg_PreserveVideoMemoryAllocations=1"
   ];
 }

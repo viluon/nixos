@@ -13,9 +13,9 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    stylix.url = "github:nix-community/stylix/release-25.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     xhmm.url = "github:schuelermine/xhmm";
-    stylix.url = "github:nix-community/stylix/release-25.05";
 
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -92,6 +92,7 @@
             ];
             specialArgs = self.packages.${config.system} // {
               inherit unstable-pkgs hostname;
+              system = config.system;
               niri = inputs.niri;
             };
           };

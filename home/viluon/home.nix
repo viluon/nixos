@@ -19,7 +19,7 @@ let
     # Hyprland ecosystem
     waybar
     dunst
-    rofi-wayland
+    rofi
     wlogout
 
     # System utilities
@@ -44,7 +44,7 @@ let
 
     # Fonts
     noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     noto-fonts-cjk-sans
     font-awesome
 

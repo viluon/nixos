@@ -63,7 +63,7 @@
   hardware.xpadneo.enable = true;
 
   # on-demand debug info
-  services.nixseparatedebuginfod.enable = true;
+  services.nixseparatedebuginfod2.enable = true;
 
   # fix for "network activation failed"
   # source: https://gist.github.com/Pitometsu/6db6ec921e19a7b37472

@@ -87,7 +87,7 @@
   # Common system packages
   environment.systemPackages = with pkgs; [
     iosevka
-    ryujinx
+    ryubing
   ];
 
   # Font configuration

@@ -5,7 +5,7 @@
 let
   optimised-niri =
     pkgs.niri-unstable.overrideAttrs (new: old: {
-      RUSTFLAGS = old.RUSTFLAGS ++ [ "-Ctarget-cpu=${target-cpu}" ];
+      env.RUSTFLAGS = old.env.RUSTFLAGS + " -Ctarget-cpu=${target-cpu} ";
     });
 
   target-cpu = "x86-64-v3";

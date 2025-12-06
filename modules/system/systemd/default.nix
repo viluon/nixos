@@ -1,5 +1,5 @@
 {
-  systemd.extraConfig = ''
-    DefaultTimeoutStopSec=8
-  '';
+  systemd.settings.Manager = {
+    DefaultTimeoutStartSec = "8s";
+  };
 }

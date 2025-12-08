@@ -30,9 +30,23 @@
     "widget.dmabuf.force-enabled" = true;
   };
 
-  hardware.graphics.extraPackages = with pkgs; [
-    nvidia-vaapi-driver
-  ];
+  hardware = {
+    graphics.extraPackages = with pkgs; [
+      nvidia-vaapi-driver
+    ];
+
+    nvidia = {
+      open = true;
+      dynamicBoost.enable = true;
+      prime.offload.enable = true;
+      powerManagement = {
+        enable = true;
+        finegrained = true;
+      };
+    };
+  };
+
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   boot.extraModprobeConfig = "options nvidia " + lib.concatStringsSep " " [
     # nvidia assume that by default your CPU does not support PAT,

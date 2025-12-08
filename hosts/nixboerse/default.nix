@@ -51,14 +51,6 @@ in
     options = [ "ro" ];
   };
 
-  # NVIDIA-specific configuration
-  services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.nvidia = {
-    open = true;
-    prime.offload.enable = true;
-    powerManagement.finegrained = true;
-  };
-
   # Intel-specific configuration
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
 

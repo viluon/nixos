@@ -281,7 +281,7 @@ in
     font = {
       name = "Iosevka";
       # override stylix default
-      size = lib.mkForce 10;
+      size = lib.mkForce 12;
     };
     themeFile = "Catppuccin-Mocha";
     settings = {

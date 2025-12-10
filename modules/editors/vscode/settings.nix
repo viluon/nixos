@@ -327,8 +327,11 @@
     "eval" = false;
     "Invoke-Expression" = false;
     "iex" = false;
+    "kubectl describe" = true;
+    "kubectl exec" = true;
     "kubectl get" = true;
     "kubectl logs" = true;
+    "kubectl wait" = true;
     "kind get" = true;
     "nice -n 19 ionice -c 3 nix build .#nixosConfigurations.$(hostname).config.system.build.toplevel" = {
       "approve" = true;

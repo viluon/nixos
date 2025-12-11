@@ -5,7 +5,7 @@
 {
   nix = {
     # nix version
-    package = pkgs.nixStable;
+    package = pkgs.nixVersions.stable;
 
     # set nix build scheduling policies to idle to preserve interactivity
     daemonCPUSchedPolicy = "idle";

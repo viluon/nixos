@@ -235,6 +235,20 @@ in
     ];
   };
 
+  # give Alsa more headroom to fix audio stuttering
+  # see https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/Troubleshooting#stuttering-audio-in-virtual-machine
+  services.pipewire.wireplumber.extraConfig.stutter-fix."monitor.alsa.rules" = [
+    {
+      matches = [{ node.name = "~alsa_output.*"; }];
+      actions = {
+        update-props = {
+          "api.alsa.period-size" = 1024;
+          "api.alsa.headroom" = 8192;
+        };
+      };
+    }
+  ];
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

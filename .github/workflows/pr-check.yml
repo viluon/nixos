@@ -115,11 +115,9 @@ jobs:
           nix profile diff-closures --profile ./profile | perl -pe 's/\e\[[0-9;]*m(?:\e\[K)?//g' >> "${GITHUB_OUTPUT}"
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
 
-      - name: comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: ".#${{ matrix.host }}"
-          message: |
+      - name: prepare comment
+        run: |
+          cat <<EOF > ./comment.md
             ### Diff of `${{ env.output }}`
 
             ```
@@ -130,3 +128,11 @@ jobs:
             <summary> ${{ steps.security.outputs.icon }} Security vulnerability report </summary> <br>
             <pre> ${{ steps.security.outputs.security }} </pre>
             </details>
+          EOF
+
+      - name: comment
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ".#${{ matrix.host }}"
+          path: ./comment.md

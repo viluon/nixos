@@ -19,7 +19,7 @@ let
     # Hyprland ecosystem
     waybar
     dunst
-    rofi-wayland
+    rofi
     wlogout
 
     # System utilities
@@ -44,7 +44,7 @@ let
 
     # Fonts
     noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     noto-fonts-cjk-sans
     font-awesome
 
@@ -108,11 +108,11 @@ let
       texlive.combined.scheme-full
 
       # Unstable packages
-      inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.galaxy-buds-client
-      inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.qbittorrent
+      inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.galaxy-buds-client
+      inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.qbittorrent
     ] ++ [
       # Host-specific packages that need special args
-      inputs.self.packages.${pkgs.system}.amd-epp-tool
+      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.amd-epp-tool
     ];
 
     nixboerse = with pkgs; [

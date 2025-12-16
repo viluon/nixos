@@ -1,19 +1,18 @@
 {
   inputs = {
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     disko.url = "github:nix-community/disko/latest";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     flake-utils.url = "github:numtide/flake-utils";
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.url = "github:nix-community/home-manager/release-25.11";
     niri.url = "github:sodiboo/niri-flake";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix4vscode.url = "github:nix-community/nix4vscode";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    stylix.url = "github:nix-community/stylix/release-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    stylix.url = "github:nix-community/stylix/release-25.11";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     xhmm.url = "github:schuelermine/xhmm";
 
@@ -34,7 +33,6 @@
   outputs =
     inputs@
     { self
-    , chaotic
     , disko
     , flake-parts
     , home-manager
@@ -86,9 +84,6 @@
                   inputs.nix4vscode.overlays.default
                 ];
               }
-              chaotic.nixosModules.nyx-cache
-              chaotic.nixosModules.nyx-overlay
-              chaotic.nixosModules.nyx-registry
             ];
             specialArgs = self.packages.${config.system} // {
               inherit unstable-pkgs hostname;

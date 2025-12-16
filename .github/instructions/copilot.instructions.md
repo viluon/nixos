@@ -80,7 +80,7 @@ virtualisation.vmVariant = {
 ```
 
 ### Flake Input Management
-- **Stable base**: `nixpkgs` on release-25.05, `nixpkgs-unstable` for bleeding edge
+- **Stable base**: `nixpkgs` on release-25.11, `nixpkgs-unstable` for bleeding edge
 - **Input follows**: Most inputs follow main nixpkgs to reduce closures
 - **Hardware support**: `nixos-hardware` provides laptop-specific optimizations
 - **Development tools**: `nix-index-database`, `nix4vscode` for IDE integration

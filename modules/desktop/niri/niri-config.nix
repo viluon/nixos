@@ -25,12 +25,18 @@
         (import ./workspaces.nix)
       );
 
+  prefer-no-csd = true;
+
   window-rules =
     let
       fully-rounded = radius: { top-left = radius; top-right = radius; bottom-left = radius; bottom-right = radius; };
       rounded-top = radius: { top-left = radius; top-right = radius; bottom-left = 0.0; bottom-right = 0.0; };
     in
     [
+      {
+        geometry-corner-radius = fully-rounded 14.0;
+        clip-to-geometry = true;
+      }
       {
         matches = [{ app-id = "kitty"; }];
         draw-border-with-background = false;
@@ -42,30 +48,6 @@
       {
         matches = [{ app-id = "nixos"; }];
         draw-border-with-background = false;
-      }
-      {
-        matches = [{ app-id = "^firefox"; }];
-        geometry-corner-radius = rounded-top 12.0;
-      }
-      {
-        matches = [{ app-id = "virt-manager"; }];
-        geometry-corner-radius = rounded-top 12.0;
-      }
-      {
-        matches = [{ app-id = "gcr-prompter"; }];
-        geometry-corner-radius = rounded-top 12.0;
-      }
-      {
-        matches = [{ app-id = "polkit-gnome-authentication-agent-1"; }];
-        geometry-corner-radius = rounded-top 12.0;
-      }
-      {
-        matches = [{ app-id = "^org.gnome."; }];
-        geometry-corner-radius = fully-rounded 14.0;
-      }
-      {
-        matches = [{ app-id = "^code$"; is-floating = true; }];
-        geometry-corner-radius = fully-rounded 14.0;
       }
       {
         matches = [{ app-id = "^jetbrains-idea$"; is-floating = true; title = "..*"; }];

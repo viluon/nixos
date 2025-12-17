@@ -117,7 +117,7 @@ jobs:
 
       - name: prepare comment
         run: |
-          cat <<EOF > ./comment.md
+          cat <<'EOF' > ./comment.md
             ### Diff of `${{ env.output }}`
 
             ```

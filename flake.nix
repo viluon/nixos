@@ -127,6 +127,10 @@
           treefmt.config = {
             inherit (config.flake-root) projectRootFile;
             programs.nixpkgs-fmt.enable = true;
+            programs.clang-format = {
+              enable = true;
+              includes = [ "*.glsl" ];
+            };
           };
 
           devShells.default = pkgs.mkShell {

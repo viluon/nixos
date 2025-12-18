@@ -299,6 +299,22 @@ in
     };
   };
 
+  # configure Obsidian
+  stylix.targets.obsidian.vaultNames = [ "kb" ];
+  programs.obsidian.enable = true;
+  programs.obsidian.vaults.kb = {
+    enable = true;
+    target = "projects/kb";
+    settings = {
+      # override Stylix default
+      appearance.baseFontSize = lib.mkForce 17;
+      hotkeys = config.programs.obsidian.defaultSettings.hotkeys // {
+        "insert-current-time" = [{ modifiers = [ "Mod" ]; key = " "; }];
+        "insert-current-date" = [{ modifiers = [ "Mod" "Shift" ]; key = " "; }];
+      };
+    };
+  };
+
   # Enable direnv for automatic dev shell activation
   programs.direnv = {
     enable = true;

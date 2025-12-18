@@ -10,13 +10,13 @@
 
     fonts = {
       monospace = {
-        package = pkgs.iosevka;
-        name = "Iosevka";
+        package = pkgs.nerd-fonts.iosevka;
+        name = "Iosevka Nerd Font";
       };
 
       sansSerif = {
-        package = pkgs.inter;
-        name = "Inter";
+        package = pkgs.inter-nerdfont;
+        name = "Inter Nerd Font";
       };
     };
   };

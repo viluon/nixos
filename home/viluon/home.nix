@@ -86,6 +86,7 @@ let
       bottles
       gamemode
       rpcs3
+      ryubing
 
       # Applications
       calibre
@@ -279,7 +280,6 @@ in
   programs.kitty = {
     enable = true;
     font = {
-      name = "Iosevka";
       # override stylix default
       size = lib.mkForce 12;
     };

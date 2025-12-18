@@ -84,16 +84,9 @@
 
   programs.zsh.enable = true;
 
-  # Common system packages
-  environment.systemPackages = with pkgs; [
-    iosevka
-    ryubing
-  ];
-
   # Font configuration
   fonts.packages = with pkgs; [
     corefonts
-    iosevka
     libertine
   ];
 

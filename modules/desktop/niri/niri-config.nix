@@ -7,6 +7,19 @@
     numlock = true;
   };
 
+  animations.window-open = {
+    enable = true;
+
+    custom-shader = builtins.readFile ./window-open.glsl;
+
+    kind.spring = {
+      # weight is always 1, tweak using stiffness instead
+      damping-ratio = 0.7;
+      epsilon = 0.01;
+      stiffness = 700;
+    };
+  };
+
   spawn-at-startup = [
     { argv = [ "waybar" ]; }
     { argv = [ "swaybg" "--image" config.stylix.image "--mode" "fill" ]; }

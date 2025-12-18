@@ -273,6 +273,8 @@ in
         diverged = "⇕⇡\${ahead_count}⇣\${behind_count}";
         behind = "⇣\${count}";
       };
+      gradle.symbol = " ";
+      kotlin.symbol = " ";
     };
   };
 

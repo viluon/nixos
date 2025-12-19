@@ -248,6 +248,10 @@ in
       # Expose packaged git-* scripts as git subcommands for completion.
       # Automatically generated from ./scripts (git-*.nix) at build time.
       zstyle ':completion:*:*:git:*' user-commands ${gitUserCommandsZstyle}
+
+      _git-ready() {
+        _values 'git ready arguments' auto
+      }
     '';
   };
 

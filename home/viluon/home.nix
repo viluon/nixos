@@ -312,6 +312,15 @@ in
         "insert-current-time" = [{ modifiers = [ "Mod" ]; key = " "; }];
         "insert-current-date" = [{ modifiers = [ "Mod" "Shift" ]; key = " "; }];
       };
+      corePlugins = [
+        {
+          name = "templates";
+          settings = {
+            folder = "templates";
+            timeFormat = "";
+          };
+        }
+      ];
     };
   };
 

@@ -162,6 +162,15 @@
     "Mod+Shift+Ctrl+K".action = move-column-to-monitor-up;
     "Mod+Shift+Ctrl+L".action = move-column-to-monitor-right;
 
+    "Mod+Shift+Alt+Left".action = move-workspace-to-monitor-left;
+    "Mod+Shift+Alt+Down".action = move-workspace-to-monitor-down;
+    "Mod+Shift+Alt+Up".action = move-workspace-to-monitor-up;
+    "Mod+Shift+Alt+Right".action = move-workspace-to-monitor-right;
+    "Mod+Shift+Alt+H".action = move-workspace-to-monitor-left;
+    "Mod+Shift+Alt+J".action = move-workspace-to-monitor-down;
+    "Mod+Shift+Alt+K".action = move-workspace-to-monitor-up;
+    "Mod+Shift+Alt+L".action = move-workspace-to-monitor-right;
+
     "Mod+V".action = toggle-window-floating;
     "Mod+Shift+V".action = switch-focus-between-floating-and-tiling;
     "Mod+BracketLeft".action = consume-or-expel-window-left;

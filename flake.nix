@@ -25,7 +25,7 @@
     };
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs-unstable";
-    nix4vscode.inputs.nixpkgs.follows = "nixpkgs";
+    nix4vscode.inputs.nixpkgs.follows = "nixpkgs-unstable";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };

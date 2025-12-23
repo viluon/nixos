@@ -338,16 +338,16 @@
     "nix4vscode": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-unstable"
         ],
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1765937210,
-        "narHash": "sha256-v80XfHrfF9EthPEtSckld+E3dVFKRxiA7QheCCKH6q8=",
+        "lastModified": 1766455800,
+        "narHash": "sha256-yaUzQCGh75d7SUsVR/tCMUVAA25wQQhvJ3SpMyBF0Ag=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "e5950334e94df57bbd8eb53cff10e3320f7cb6e7",
+        "rev": "049cdeceb8d2d195e70218540b1ecec9575a7449",
         "type": "github"
       },
       "original": {

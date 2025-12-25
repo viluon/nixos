@@ -8,7 +8,7 @@
   {
     app-id = "jetbrains-idea";
     workspace = "idea";
-    command = [ "idea-ultimate" ];
+    command = [ "idea" ];
     maximized = true;
   }
   {

@@ -47,6 +47,16 @@
     in
     [
       {
+        matches = [{ is-floating = true; }];
+        shadow = {
+          enable = true;
+          color = config.lib.stylix.colors.base00-hex;
+          offset = { x = 4.0; y = 4.0; };
+          spread = 6.0;
+          softness = 8.0;
+        };
+      }
+      {
         geometry-corner-radius = fully-rounded 14.0;
         clip-to-geometry = true;
       }

@@ -156,7 +156,7 @@
         format = "{icon} {capacity}%";
         format-warning = "{icon} {capacity}%";
         format-critical = "{icon} {capacity}%";
-        format-charging = "<span font-family='Font Awesome 6 Free'></span> {capacity}%";
+        format-charging = " {capacity}%";
         format-plugged = " {capacity}%";
         format-alt = "{icon} {time}";
         format-full = " {capacity}%";

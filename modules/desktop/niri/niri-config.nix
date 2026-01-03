@@ -125,8 +125,17 @@
     "Mod+D".action = spawn "fuzzel";
     "Super+Alt+L".action = spawn "lock";
 
+    "XF86AudioMute".action = spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
     "XF86AudioRaiseVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
     "XF86AudioLowerVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
+    "XF86AudioPrev".action = spawn "playerctl" "previous";
+    "XF86AudioPlay".action = spawn "playerctl" "play-pause";
+    "XF86AudioNext".action = spawn "playerctl" "next";
+
+    "XF86MonBrightnessUp".action = spawn "brightnessctl" "set" "5%+";
+    "XF86MonBrightnessDown".action = spawn "brightnessctl" "set" "5%-";
+
+    "XF86AudioMedia".action = focus-workspace "vs-code";
 
     "Mod+Q".action = close-window;
     "Mod+W".action = toggle-column-tabbed-display;

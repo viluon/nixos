@@ -15,6 +15,9 @@ build:
 boot:
     sudo nice -n 19 ionice -c 3 nixos-rebuild boot -L --flake .
 
+diff: build
+    nvd diff /run/booted-system result
+
 # build & apply now and on the next boot
 switch:
     sudo nice -n 19 ionice -c 3 nixos-rebuild switch -L --flake .

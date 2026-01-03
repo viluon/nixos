@@ -137,6 +137,7 @@
             packages = [
               config.treefmt.build.wrapper
               pkgs.just
+              pkgs.nvd
             ] ++ (builtins.attrValues config.treefmt.build.programs);
 
             shellHook = ''

@@ -1,8 +1,5 @@
 localFlake:
-{ self
-, inputs
-, lib
-, config
+{ lib
 , ...
 }:
 {

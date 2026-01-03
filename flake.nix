@@ -48,7 +48,7 @@
       { withSystem, flake-parts-lib, ... }:
       let
         inherit (flake-parts-lib) importApply;
-        amd-epp-tool-module = importApply ./amd-epp-tool.nix { inherit withSystem; };
+        amd-epp-tool-module = importApply ./packages/amd-epp-tool.nix { inherit withSystem; };
         idea-module = importApply ./modules/editors/idea.nix { inherit withSystem; };
 
         buildNixosSystem = hostname: config:

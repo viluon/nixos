@@ -112,9 +112,11 @@
     "DP-1" = {
       focus-at-startup = true;
       position = { x = 1707; y = 0; };
+      scale = 1.0;
     };
     "eDP-1" = {
       position = { x = 0; y = 700; };
+      scale = 1.5;
     };
   };
 

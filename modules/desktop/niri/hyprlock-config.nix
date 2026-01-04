@@ -5,7 +5,7 @@
   general = {
     disable_loading_bar = false;
     grace = 0;
-    hide_cursor = false;
+    hide_cursor = true;
   };
 
   auth = {

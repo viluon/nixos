@@ -276,4 +276,6 @@
     "Mod+Shift+P".action = power-off-monitors;
     "Mod+Escape".action = toggle-overview;
   };
+
+  debug.honor-xdg-activation-with-invalid-serial = [ ];
 }

@@ -316,7 +316,7 @@ in
         "insert-current-time" = [{ modifiers = [ "Mod" ]; key = " "; }];
         "insert-current-date" = [{ modifiers = [ "Mod" "Shift" ]; key = " "; }];
       };
-      corePlugins = [
+      corePlugins = config.programs.obsidian.defaultSettings.corePlugins ++ [
         {
           name = "templates";
           settings = {

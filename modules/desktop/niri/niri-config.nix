@@ -106,6 +106,24 @@
         relative-to = "window";
       };
     };
+
+    tab-indicator = {
+      active.gradient = {
+        from = config.lib.stylix.colors.base09-hex;
+        to = config.lib.stylix.colors.base0D-hex;
+        angle = 135;
+        in' = "oklch shorter hue";
+        relative-to = "window";
+      };
+
+      urgent.gradient = {
+        from = config.lib.stylix.colors.base0E-hex;
+        to = config.lib.stylix.colors.base0A-hex;
+        angle = 135;
+        in' = "oklch shorter hue";
+        relative-to = "window";
+      };
+    };
   };
 
   outputs = {

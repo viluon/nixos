@@ -15,12 +15,7 @@ let
     starship
     steam
     vivid
-
-    # Hyprland ecosystem
     waybar
-    dunst
-    rofi
-    wlogout
 
     # System utilities
     blueman

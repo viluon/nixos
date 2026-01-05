@@ -54,6 +54,19 @@ inputs@{ niri
 
         services.gnome-keyring.enable = true;
 
+        services.dunst = {
+          enable = true;
+
+          settings.global = {
+            corner_radius = 8;
+            follow = "mouse";
+            gap_size = 12;
+            mouse_left_click = "open_url,close_current";
+            mouse_middle_click = "context";
+            mouse_right_click = "close_current";
+          };
+        };
+
         # niri-flake would enable the KDE agent by default
         systemd.user.services.niri-flake-polkit.Service.Enable = false;
 

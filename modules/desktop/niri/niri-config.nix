@@ -142,7 +142,7 @@
     "Mod+Shift+Slash".action = show-hotkey-overlay;
 
     "Mod+Return".action = spawn "kitty";
-    "Mod+D".action = spawn "fuzzel";
+    "Mod+D".action = spawn "vicinae" "open";
     "Super+Alt+L".action = spawn "lock";
 
     "XF86AudioMute".action = spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";

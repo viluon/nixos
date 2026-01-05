@@ -39,7 +39,11 @@ inputs@{ niri
         programs.niri.settings = import ./niri-config.nix inputs;
 
         programs.btop.enable = true;
-        programs.fuzzel.enable = true;
+        programs.vicinae = {
+          enable = true;
+          systemd.enable = true;
+          settings.keybinds.toggle-action-panel = "control+.";
+        };
 
         programs.hyprlock = {
           enable = true;

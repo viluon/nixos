@@ -19,5 +19,11 @@
         name = "Inter Nerd Font";
       };
     };
+
+    icons = {
+      enable = true;
+      dark = "Papirus-Dark";
+      package = pkgs.papirus-icon-theme;
+    };
   };
 }

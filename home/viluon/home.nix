@@ -286,8 +286,6 @@ in
     };
     themeFile = "Catppuccin-Mocha";
     settings = {
-      # override stylix default
-      background_opacity = lib.mkForce "0.75";
       confirm_os_window_close = 0;
       cursor_trail = 1;
       dynamic_background_opacity = true;

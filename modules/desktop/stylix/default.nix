@@ -25,5 +25,10 @@
       dark = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;
     };
+
+    opacity = {
+      popups = 0.85;
+      terminal = 0.75;
+    };
   };
 }

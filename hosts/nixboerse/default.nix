@@ -190,6 +190,7 @@ in
     virtualisation = {
       cores = 2;
       memorySize = 4096;
+      resolution = { x = 1920; y = 1080; };
       forwardPorts = [
         { from = "host"; host.port = 2222; guest.port = 22; }
       ];

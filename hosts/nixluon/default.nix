@@ -48,7 +48,7 @@
   services.joycond.enable = true;
 
   # btrfs dedupe
-  services.beesd.filesystems.root = {
+  services.beesd.filesystems.root = lib.mkIf (config.fileSystems ? "/partition-root") {
     spec = config.fileSystems."/partition-root".device;
     hashTableSizeMB = 4 * 1024;
     extraOptions = [
@@ -156,12 +156,57 @@
   };
 
   # List services that you want to enable:
-  virtualisation.containerd.enable = true;
-  virtualisation.podman = {
-    enable = true;
-    # Create a `docker` alias for podman, to use it as a drop-in replacement
-    dockerCompat = true;
-    defaultNetwork.settings.dns_enabled = true;
+  virtualisation = {
+    containerd.enable = true;
+
+    podman = {
+      enable = true;
+      # Create a `docker` alias for podman, to use it as a drop-in replacement
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+    };
+
+    libvirtd = {
+      enable = true;
+      qemu.package = pkgs.qemu_kvm;
+    };
+
+    vmVariant = {
+      virtualisation = {
+        cores = 2;
+        memorySize = 4096;
+        forwardPorts = [
+          { from = "host"; host.port = 2222; guest.port = 22; }
+        ];
+        qemu = {
+          options = [
+            "-enable-kvm"
+            "-display gtk,grab-on-hover=on"
+          ];
+          package = pkgs.qemu_kvm;
+        };
+      };
+
+      services.qemuGuest.enable = true;
+
+      # Ensure virtio modules are loaded
+      boot.kernelModules = [ "virtio_pci" "virtio_net" "virtio_blk" "virtio_scsi" "virtio_balloon" ];
+
+      # Enable passwordless login
+      users.users.viluon = {
+        initialHashedPassword = lib.mkForce null;
+        password = "";
+      };
+
+      services.displayManager = {
+        autoLogin = {
+          enable = true;
+          user = "viluon";
+        };
+
+        defaultSession = lib.mkForce "gnome";
+      };
+    };
   };
 
   # Open ports in the firewall.

@@ -30,5 +30,11 @@
       popups = 0.85;
       terminal = 0.75;
     };
+
+    cursor = {
+      name = "breeze_cursors";
+      size = 24;
+      package = pkgs.kdePackages.breeze;
+    };
   };
 }

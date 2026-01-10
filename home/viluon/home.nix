@@ -247,6 +247,9 @@ in
       _git-ready() {
         _values 'git ready arguments' auto
       }
+
+      # VS Code shell integration
+      [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
     '';
   };
 

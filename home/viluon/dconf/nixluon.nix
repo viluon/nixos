@@ -11,9 +11,4 @@ with lib.hm.gvariant;
     sources = [ (mkTuple [ "xkb" "us" ]) ];
     xkb-options = [ "lv3:ralt_switch" "compose:rctrl" ];
   };
-
-  "org/gnome/desktop/interface" = {
-    scaling-factor = mkUint32 2;
-    text-scaling-factor = 1;
-  };
 }

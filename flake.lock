@@ -249,11 +249,11 @@
         "xwayland-satellite-unstable": "xwayland-satellite-unstable"
       },
       "locked": {
-        "lastModified": 1768056313,
-        "narHash": "sha256-2jx5DeIZ4jsOtBGZEopeY3nqbDhnSyBVy6BKV5YO7yE=",
+        "lastModified": 1768108972,
+        "narHash": "sha256-HT452ERmYf1waHs3wtwIPiOPiHtKQTKL8MuFPLwlUfE=",
         "owner": "sodiboo",
         "repo": "niri-flake",
-        "rev": "07882a2c8130ce0addb6c1388f907780855e8eac",
+        "rev": "8e3a300ecdb65c71355c4ea1589badf2b47e1ae9",
         "type": "github"
       },
       "original": {
@@ -322,11 +322,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1768025207,
-        "narHash": "sha256-+32x+zJ1ys2VJ1SUiwnImgsaHZdlPCMdlzz09kt5v9I=",
+        "lastModified": 1768098596,
+        "narHash": "sha256-JhWzhdyTsklpfC1JLO1PQpNxkDOtokJfWlcZ19M9sYQ=",
         "owner": "nix-community",
         "repo": "nix-vscode-extensions",
-        "rev": "6ec1985c13c5ea9ee5ae0a4971df04ac798682e0",
+        "rev": "7a428cfb1382518591c31bb6cf39796e04160aac",
         "type": "github"
       },
       "original": {
@@ -343,11 +343,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1768011069,
-        "narHash": "sha256-n2mL0Mzc7cc4CBpAZNLoEpi0O7xzv9bFFAF31YtW7XA=",
+        "lastModified": 1768098534,
+        "narHash": "sha256-lLoqj9+HGw0i6kXEw5nqgYf740UWxv0rhsLN7D5yLvs=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "6c8e10292b702380b55fb0f83e10d7360dae5680",
+        "rev": "a413a3b404a9cb9370560fb0013d5bba37998f84",
         "type": "github"
       },
       "original": {
@@ -665,11 +665,11 @@
     "xwayland-satellite-unstable": {
       "flake": false,
       "locked": {
-        "lastModified": 1767932953,
-        "narHash": "sha256-V8+DrPOp940J6icERAaGuDQTKyEyZzFuRw363XwDKXg=",
+        "lastModified": 1768106915,
+        "narHash": "sha256-HlLo9zH4ULRXlmlIK948cHmdVhxyHgTHxGaoCRlW4k8=",
         "owner": "Supreeeme",
         "repo": "xwayland-satellite",
-        "rev": "bc47ef59501556fc2584155ddef76493752dd727",
+        "rev": "72245e108f3b03c3c4474d2de9de2d1830849603",
         "type": "github"
       },
       "original": {

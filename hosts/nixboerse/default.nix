@@ -58,6 +58,17 @@ in
 
   virtualisation.libvirtd = {
     enable = true;
+
+    # work around the JSON parsing bug until the stable release lands
+    # see https://gitlab.com/libvirt/libvirt/-/commit/b49d41b7e9eb983fdfbf70c91c2a27a995af3987
+    package = pkgs.libvirt.overrideAttrs (old: {
+      version = "12.0.0-rc1";
+      src = old.src.override {
+        tag = "v12.0.0-rc1";
+        hash = "sha256-XQgGBuZ4fbEDeT/1OVF9GG4Q6JYZqPtxGkdLg1cG8Zc=";
+      };
+    });
+
     qemu.package = pkgs.qemu_kvm;
     hooks.qemu =
       let

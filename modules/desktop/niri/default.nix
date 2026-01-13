@@ -68,6 +68,7 @@ inputs@{ niri
             mouse_left_click = "do_action,open_url,close_current";
             mouse_middle_click = "context";
             mouse_right_click = "close_current";
+            timeout = 0;
           };
         };
 

@@ -112,6 +112,7 @@ let
     ];
 
     nixboerse = with pkgs; [
+      mill
       nodejs_24
     ];
   };

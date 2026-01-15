@@ -9,6 +9,7 @@
     isNormalUser = true;
     description = "Andrew Kvapil";
     extraGroups = [
+      "audio"
       "cdrom"
       "docker"
       "libvirtd"
@@ -58,12 +59,10 @@
   }];
 
   security.pam.loginLimits = [
-    {
-      domain = "viluon";
-      type = "-";
-      item = "memlock";
-      value = "unlimited";
-    }
+    { domain = "@audio"; item = "memlock"; type = "-"; value = "unlimited"; }
+    { domain = "@audio"; item = "rtprio"; type = "-"; value = "99"; }
+    { domain = "@audio"; item = "nofile"; type = "soft"; value = "99999"; }
+    { domain = "@audio"; item = "nofile"; type = "hard"; value = "99999"; }
   ];
 
   # Common programs

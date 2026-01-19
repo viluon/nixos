@@ -4,7 +4,7 @@ _:
   flake.homeModules.idea = { unstable-pkgs, ... }:
     let
       idea = unstable-pkgs.jetbrains.idea;
-      m = builtins.match "^(.*)\\.[^.]*$" idea.version;
+      m = builtins.match "^([^.]*\\.[^.]*).*$" idea.version;
       version-suffix = if m == null then idea.version else builtins.head m;
     in
     {

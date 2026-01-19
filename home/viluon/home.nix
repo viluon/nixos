@@ -7,6 +7,7 @@ let
     fd
     fzf
     gh
+    git-absorb
     grimblast
     nixd
     obsidian

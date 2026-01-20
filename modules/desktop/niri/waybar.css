@@ -76,6 +76,7 @@ window > box {
 .modules-center,
 .modules-right {
   background-color: @mantle;
+  margin-left: 10px;
   margin-right: 10px;
 }
 #workspaces {

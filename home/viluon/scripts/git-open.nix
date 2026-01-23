@@ -75,6 +75,8 @@ pkgs.writeShellApplication {
       merge_base=$(git merge-base HEAD origin/main)
 
       while IFS=$'\t' read -r add del _; do
+        # Skip binary files (numstat outputs "-" for binary)
+        [[ "$add" == "-" || "$del" == "-" ]] && continue
         additions=$((additions + add))
         deletions=$((deletions + del))
       done < <(git diff --numstat "$merge_base"..HEAD)

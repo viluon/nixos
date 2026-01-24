@@ -106,6 +106,22 @@ in
     config.virtualisation.libvirtd.hooks.qemu.libvirtd-network-hook
   ];
 
+  systemd.services.resume-ubuntu-vm = {
+    description = "Resume Ubuntu VM snapshot";
+    after = [ "libvirtd.service" ];
+    requires = [ "libvirtd.service" ];
+    wantedBy = [ "multi-user.target" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.writeShellScript "resume-ubuntu-vm" ''
+        set -euo pipefail
+        ${config.virtualisation.libvirtd.package}/bin/virsh snapshot-revert ubuntu --current
+        ${config.virtualisation.libvirtd.package}/bin/virsh resume ubuntu
+      ''}";
+    };
+  };
+
   # fix routing from Docker interfaces to virbr0
   networking.firewall = {
     extraCommands = lib.mkAfter ''

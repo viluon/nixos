@@ -79,8 +79,12 @@
   # boot a rescue shell on kernel panic
   # boot.crashDump.enable = true; # TODO: enable once we find a good cache
 
-  # enable sysrq
-  boot.kernel.sysctl."kernel.sysrq" = 502;
+  boot.kernel.sysctl = {
+    # enable sysrq
+    "kernel.sysrq" = 502;
+    "kernel.perf_event_paranoid" = 1;
+    "kernel.kptr_restrict" = 0;
+  };
 
   # boot animation
   boot.plymouth.enable = true;

@@ -28,12 +28,6 @@
       ../../modules/users/common.nix
     ];
 
-  nix.gc = {
-    automatic = true;
-    randomizedDelaySec = "15min";
-    options = "--delete-older-than 60d";
-  };
-
   # firmware upgrades
   services.fwupd.enable = true;
 

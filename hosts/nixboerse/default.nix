@@ -216,6 +216,7 @@ in
   virtualisation.vmVariant = {
     virtualisation = {
       cores = 2;
+      diskSize = 4096;
       memorySize = 4096;
       resolution = { x = 1920; y = 1080; };
       forwardPorts = [

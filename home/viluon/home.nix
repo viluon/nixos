@@ -240,6 +240,9 @@ in
         source <(just --completions zsh)
       fi
 
+      # Mill completion
+      source ${./completions/mill.sh}
+
       # completion for aliases
       unsetopt completealiases
       # Expose packaged git-* scripts as git subcommands for completion.

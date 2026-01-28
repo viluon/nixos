@@ -175,6 +175,7 @@ in
   };
 
   services.ddccontrol.enable = true;
+  services.thinkfan.enable = true;
 
   programs.wireshark = {
     enable = true;

@@ -9,6 +9,7 @@ let
     gh
     git-absorb
     grimblast
+    manix
     nixd
     obsidian
     ripgrep

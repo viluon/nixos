@@ -11,7 +11,7 @@
 
 let
   minikube-subnet = "192.168.49.0/24";
-  kind-subnet = "172.19.0.0/16";
+  kind-subnet = "172.18.0.0/16";
 in
 {
   imports =
@@ -175,7 +175,26 @@ in
   };
 
   services.ddccontrol.enable = true;
-  services.thinkfan.enable = true;
+
+  services.thinkfan =
+    let
+      low = 1;
+      medium = 3;
+      medium-high = 5;
+      high = 7;
+      max = "level full-speed";
+    in
+    {
+      enable = true;
+      levels = [
+        [ 0 0 56 ]
+        [ low 51 71 ]
+        [ medium 70 81 ]
+        [ medium-high 79 91 ]
+        [ high 87 101 ]
+        [ max 96 255 ]
+      ];
+    };
 
   programs.wireshark = {
     enable = true;

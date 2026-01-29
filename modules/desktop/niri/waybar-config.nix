@@ -129,7 +129,7 @@
 
       temperature = {
         format = "{icon} {temperatureC}${unicode "00b0"}C";
-        thermal-zone = 5; # TODO: split for nixluon
+        thermal-zone = 8; # TODO: split for nixluon
         warning-threshold = 95;
         critical-threshold = 100;
         format-icons = [ "${unicode "f2c9"}" "${unicode "f2c8"}" "${unicode "f2c7"}" ];

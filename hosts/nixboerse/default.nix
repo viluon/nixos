@@ -180,7 +180,7 @@ in
     let
       low = 1;
       medium = 3;
-      medium-high = 5;
+      medium-high = 4;
       high = 7;
       max = "level full-speed";
     in
@@ -191,7 +191,7 @@ in
         [ low 51 71 ]
         [ medium 70 81 ]
         [ medium-high 79 91 ]
-        [ high 87 101 ]
+        [ high 90 101 ]
         [ max 96 255 ]
       ];
     };

@@ -8,6 +8,7 @@ let
     fzf
     gh
     git-absorb
+    github-copilot-cli
     grimblast
     manix
     nixd

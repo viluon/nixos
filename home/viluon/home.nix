@@ -313,6 +313,7 @@ in
     enable = true;
     target = "projects/kb";
     settings = {
+      app.livePreview = false;
       # override Stylix default
       appearance.baseFontSize = lib.mkForce 17;
       hotkeys = config.programs.obsidian.defaultSettings.hotkeys // {

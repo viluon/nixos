@@ -1,4 +1,5 @@
-{ lib
+{ config
+, lib
 , pkgs
 , ...
 }:
@@ -38,6 +39,26 @@
     nvidia = {
       open = true;
       dynamicBoost.enable = true;
+      package =
+        # workaround for https://github.com/NixOS/nixpkgs/issues/489947
+        let
+          base = config.boot.kernelPackages.nvidiaPackages.mkDriver {
+            version = "590.48.01";
+            sha256_64bit = "sha256-ueL4BpN4FDHMh/TNKRCeEz3Oy1ClDWto1LO/LWlr1ok=";
+            openSha256 = "sha256-hECHfguzwduEfPo5pCDjWE/MjtRDhINVr4b1awFdP44=";
+            settingsSha256 = "sha256-4SfCWp3swUp+x+4cuIZ7SA5H7/NoizqgPJ6S9fm90fA=";
+            persistencedSha256 = "";
+          };
+          cachyos-nvidia-patch = pkgs.fetchpatch {
+            url = "https://raw.githubusercontent.com/CachyOS/CachyOS-PKGBUILDS/576f5c9e131607d4040b654ee68602c6b9e1e776/nvidia/nvidia-utils/kernel-6.19.patch";
+            sha256 = "sha256-YuJjSUXE6jYSuZySYGnWSNG5sfVei7vvxDcHx3K+IN4=";
+          };
+        in
+        base // {
+          open = base.open.overrideAttrs (oldAttrs: {
+            patches = (oldAttrs.patches or [ ]) ++ [ cachyos-nvidia-patch ];
+          });
+        };
       prime.offload.enable = true;
       powerManagement = {
         enable = true;

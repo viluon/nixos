@@ -5,7 +5,8 @@
     flake-root.url = "github:srid/flake-root";
     flake-utils.url = "github:numtide/flake-utils";
     home-manager.url = "github:nix-community/home-manager/release-25.11";
-    niri.url = "github:sodiboo/niri-flake";
+    niri.url = "github:sodiboo/niri-flake?ref=very-refactor";
+    niri-blur.url = "github:niri-wm/niri/wip/branch";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix4vscode.url = "github:nix-community/nix4vscode";
@@ -20,6 +21,7 @@
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     niri.inputs = {
+      niri-unstable.follows = "niri-blur";
       nixpkgs-stable.follows = "nixpkgs";
       nixpkgs.follows = "nixpkgs-unstable";
     };

@@ -5,7 +5,7 @@
     flake-root.url = "github:srid/flake-root";
     flake-utils.url = "github:numtide/flake-utils";
     home-manager.url = "github:nix-community/home-manager/release-25.11";
-    niri.url = "github:sodiboo/niri-flake?ref=very-refactor";
+    niri.url = "github:sodiboo/niri-flake/very-refactor";
     niri-blur.url = "github:niri-wm/niri/wip/branch";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
@@ -16,6 +16,7 @@
     stylix.url = "github:nix-community/stylix/release-25.11";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     xhmm.url = "github:schuelermine/xhmm";
+    xwayland-satellite-unstable.url = "github:Supreeeme/xwayland-satellite";
 
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -24,6 +25,7 @@
       niri-unstable.follows = "niri-blur";
       nixpkgs-stable.follows = "nixpkgs";
       nixpkgs.follows = "nixpkgs-unstable";
+      xwayland-satellite-unstable.follows = "xwayland-satellite-unstable";
     };
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs-unstable";

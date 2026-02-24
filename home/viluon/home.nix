@@ -301,6 +301,8 @@ in
       dynamic_background_opacity = true;
       enable_audio_bell = false;
       mouse_hide_wait = "-1.0";
+      scrollback_lines = 50000;
+      scrollback_pager_history_size = 128;
       shell = "${pkgs.zsh}/bin/zsh";
       window_padding_width = 10;
     };

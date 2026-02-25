@@ -15,6 +15,7 @@
       extensions = pkgs.nix4vscode.forVscodeVersion config.programs.vscode.package.version [
         "dbaeumer.vscode-eslint"
         "esbenp.prettier-vscode"
+        "eww-yuck.yuck"
         "github.codespaces"
         # "GitHub.copilot-chat"
         "GitHub.copilot"

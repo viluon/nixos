@@ -136,6 +136,7 @@ let
 in
 {
   imports = [
+    ./eww
     ./git
     ../../modules/desktop/input-methods.nix
     ../../modules/editors/neovim.nix

@@ -5,6 +5,7 @@
       enable = true;
       diffToolMode = true;
     };
+    options.override = "*.yuck:Emacs Lisp";
   };
 
   programs.git = {

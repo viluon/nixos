@@ -71,11 +71,6 @@
     package = pkgs.firefox-devedition;
   };
 
-  programs.git = {
-    enable = true;
-    lfs.enable = true;
-  };
-
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;

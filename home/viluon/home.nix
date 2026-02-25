@@ -136,6 +136,7 @@ let
 in
 {
   imports = [
+    ./git
     ../../modules/desktop/input-methods.nix
     ../../modules/editors/neovim.nix
     ../../modules/editors/vscode
@@ -193,12 +194,14 @@ in
     syntaxHighlighting.enable = true;
 
     shellAliases = {
+      cat = "bat";
+      find = "fd";
+      grep = "rg";
+      glr = "git pull --rebase";
+      gsh = "git show --ext-diff";
       lh = "eza --long --git --icons=auto --classify=always";
       ll = "eza --long --git --icons=auto --classify=always --all";
       ls = "eza";
-      cat = "bat";
-      grep = "rg";
-      find = "fd";
     };
 
     history = {

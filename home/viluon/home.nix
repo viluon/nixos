@@ -308,6 +308,7 @@ in
       scrollback_pager_history_size = 128;
       shell = "${pkgs.zsh}/bin/zsh";
       window_padding_width = 10;
+      notify_on_cmd_finish = "unfocused";
     };
   };
 

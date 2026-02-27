@@ -2,6 +2,10 @@
 , lib
 , ...
 }: with config.lib.niri.actions; {
+  includes = [
+    ./blur.kdl
+  ];
+
   input.keyboard = {
     xkb = { };
     numlock = true;
@@ -61,15 +65,12 @@
         clip-to-geometry = true;
       }
       {
-        matches = [{ app-id = "kitty"; }];
-        draw-border-with-background = false;
-      }
-      {
-        matches = [{ app-id = "nvitop"; }];
-        draw-border-with-background = false;
-      }
-      {
-        matches = [{ app-id = "nixos"; }];
+        matches = [
+          { app-id = "kitty"; }
+          { app-id = "nixos"; }
+          { app-id = "nvitop"; }
+          { title = "^Vicinae Launcher$"; }
+        ];
         draw-border-with-background = false;
       }
       {

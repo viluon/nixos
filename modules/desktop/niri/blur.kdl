@@ -1,0 +1,23 @@
+window-rule {
+    background-effect {
+        blur true
+    }
+}
+
+window-rule {
+    match title="^Vicinae Launcher$"
+
+    background-effect {
+        blur true
+        xray false
+    }
+}
+
+layer-rule {
+    match namespace="^vicinae$"
+
+    background-effect {
+        blur true
+        xray false
+    }
+}

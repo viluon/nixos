@@ -6,9 +6,15 @@
     ./blur.kdl
   ];
 
-  input.keyboard = {
-    xkb = { };
-    numlock = true;
+  input = {
+    touchpad = {
+      natural-scroll = true;
+      tap = true;
+    };
+    keyboard = {
+      xkb = { };
+      numlock = true;
+    };
   };
 
   animations.window-open = {

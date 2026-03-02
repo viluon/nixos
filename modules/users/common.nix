@@ -51,11 +51,17 @@
 
   security.sudo.extraRules = [{
     users = [ "viluon" ];
-    commands = [{
-      # FIXME: hardcoded home path
-      command = "/run/current-system/sw/bin/nixos-rebuild test -L --flake /home/viluon/nixos";
-      options = [ "NOPASSWD" ];
-    }];
+    commands = [
+      {
+        # FIXME: hardcoded home path
+        command = "/run/current-system/sw/bin/nixos-rebuild test -L --flake /home/viluon/nixos";
+        options = [ "NOPASSWD" ];
+      }
+      {
+        command = "/run/current-system/sw/bin/tee /proc/acpi/ibm/fan";
+        options = [ "NOPASSWD" ];
+      }
+    ];
   }];
 
   security.pam.loginLimits = [

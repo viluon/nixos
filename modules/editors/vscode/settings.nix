@@ -157,7 +157,7 @@
     "rust" = true;
     "github-actions-workflow" = true;
   };
-  "rust-analyzer.checkOnSave.command" = "clippy";
+  "rust-analyzer.check.command" = "clippy";
   "C_Cpp.default.cppStandard" = "c++11";
   "rust-analyzer.cargo.loadOutDirsFromCheck" = true;
   "files.exclude" = {

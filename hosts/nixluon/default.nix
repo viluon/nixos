@@ -215,6 +215,11 @@
       allowedUDPPortRanges = [ warcraft3Range { from = 27000; to = 27100; } ];
     };
 
+  # MagicDNS
+  networking.nameservers = [ "100.100.100.100" "8.8.8.8" "1.1.1.1" ];
+  networking.search = [ "werewolf-torino.ts.net" ];
+  services.tailscale.enable = true;
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

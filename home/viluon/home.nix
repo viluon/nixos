@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, hostname, ... }:
+{ config, pkgs, lib, inputs, hostname, unstable-pkgs, ... }:
 
 let
   commonPackages = with pkgs; [
@@ -8,7 +8,7 @@ let
     fzf
     gh
     git-absorb
-    github-copilot-cli
+    unstable-pkgs.github-copilot-cli
     grimblast
     manix
     nixd
@@ -107,8 +107,8 @@ let
       texlive.combined.scheme-full
 
       # Unstable packages
-      inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.galaxy-buds-client
-      inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.qbittorrent
+      unstable-pkgs.galaxy-buds-client
+      unstable-pkgs.qbittorrent
     ] ++ [
       # Host-specific packages that need special args
       inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.amd-epp-tool

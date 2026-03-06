@@ -5,7 +5,7 @@
       enable = true;
       diffToolMode = true;
     };
-    options.override = "*.yuck:Emacs Lisp";
+    options.override = "*.mill:Scala";
   };
 
   programs.git = {

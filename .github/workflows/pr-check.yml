@@ -132,7 +132,7 @@ jobs:
 
       - name: comment
         continue-on-error: true
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: ".#${{ matrix.host }}"
           path: ./comment.md

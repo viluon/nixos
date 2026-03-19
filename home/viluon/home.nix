@@ -8,7 +8,19 @@ let
     fzf
     gh
     git-absorb
-    unstable-pkgs.github-copilot-cli
+    (unstable-pkgs.github-copilot-cli.overrideAttrs (_old: {
+      postInstall = ''
+        # Workaround for https://github.com/github/copilot-cli/issues/1446
+        # wrapProgram renames the binary, but it checks its own name and breaks.
+        # Use makeWrapper (no rename) instead, preserving the filename "copilot".
+        mkdir -p $out/libexec
+        mv $out/bin/copilot $out/libexec/copilot
+        makeWrapper $out/libexec/copilot $out/bin/copilot \
+          --argv0 copilot \
+          --prefix PATH : ${pkgs.bashInteractive}/bin \
+          --add-flags "--no-auto-update"
+      '';
+    }))
     grimblast
     manix
     nixd

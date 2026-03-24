@@ -228,8 +228,9 @@ in
     };
 
     initContent = ''
-      # Better history search with fzf
-      source ${pkgs.fzf}/share/fzf/key-bindings.zsh
+      # Vendored fzf key-bindings with syntax-highlighted history widget
+      __FZF_ZSH_SH_DIR="${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting"
+      source ${./fzf-key-bindings.zsh}
       source ${pkgs.fzf}/share/fzf/completion.zsh
 
       # Case insensitive completion

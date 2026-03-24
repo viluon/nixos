@@ -136,6 +136,11 @@
   services.envfs.enable = true;
   programs.nix-ld.enable = true;
 
+  programs.java = {
+    package = pkgs.zulu25;
+    enable = true;
+  };
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [

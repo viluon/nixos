@@ -128,6 +128,8 @@
         systems = nixpkgs.lib.unique (nixpkgs.lib.mapAttrsToList (_: config: config.system) hostConfigs);
 
         perSystem = { config, pkgs, ... }: {
+          checks.fzf-history-highlight = import ./checks/fzf-history-highlight.nix { inherit pkgs; };
+
           treefmt.config = {
             inherit (config.flake-root) projectRootFile;
             programs.nixpkgs-fmt.enable = true;

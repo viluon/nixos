@@ -5,8 +5,8 @@
     flake-root.url = "github:srid/flake-root";
     flake-utils.url = "github:numtide/flake-utils";
     home-manager.url = "github:nix-community/home-manager/release-25.11";
-    niri.url = "github:sodiboo/niri-flake/very-refactor";
     niri-blur.url = "github:niri-wm/niri/wip/branch";
+    niri.url = "github:sodiboo/niri-flake/very-refactor";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix4vscode.url = "github:nix-community/nix4vscode";
@@ -15,6 +15,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     stylix.url = "github:nix-community/stylix/release-25.11";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    wayscriber.url = "github:devmobasa/wayscriber";
     xhmm.url = "github:schuelermine/xhmm";
     xwayland-satellite-unstable.url = "github:Supreeeme/xwayland-satellite";
 
@@ -32,6 +33,10 @@
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs-unstable";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+    wayscriber.inputs ={
+      flake-utils.follows = "flake-utils";
+      nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
 
   outputs =
@@ -91,8 +96,8 @@
             ];
             specialArgs = self.packages.${config.system} // {
               inherit unstable-pkgs hostname;
+              inherit (inputs) niri wayscriber;
               system = config.system;
-              niri = inputs.niri;
             };
           };
 

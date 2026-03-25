@@ -487,6 +487,7 @@
         "nixpkgs-unstable": "nixpkgs-unstable",
         "stylix": "stylix",
         "treefmt-nix": "treefmt-nix",
+        "wayscriber": "wayscriber",
         "xhmm": "xhmm",
         "xwayland-satellite-unstable": "xwayland-satellite-unstable"
       }
@@ -712,6 +713,29 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "wayscriber": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774344633,
+        "narHash": "sha256-5e+Qqy8SwRz3qOqcgwZtoVQ7j+nYski0Q8yj1PtDn14=",
+        "owner": "devmobasa",
+        "repo": "wayscriber",
+        "rev": "1d2799b97b08985cc01f6bd4646cea02da949e80",
+        "type": "github"
+      },
+      "original": {
+        "owner": "devmobasa",
+        "repo": "wayscriber",
         "type": "github"
       }
     },

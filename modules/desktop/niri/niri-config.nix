@@ -33,6 +33,7 @@
   spawn-at-startup = [
     { argv = [ "waybar" ]; }
     { argv = [ "swaybg" "--image" config.stylix.image "--mode" "fill" ]; }
+    { argv = [ "wayscriber" "--daemon" ]; }
   ] ++ lib.map (app: { argv = app.command; }) (import ./at-startup.nix);
 
   workspaces =
@@ -158,6 +159,8 @@
     "XF86AudioPrev".action = spawn "playerctl" "previous";
     "XF86AudioPlay".action = spawn "playerctl" "play-pause";
     "XF86AudioNext".action = spawn "playerctl" "next";
+
+    "Mod+Space".action = spawn "pkill" "-SIGUSR1" "wayscriber";
 
     "XF86MonBrightnessUp".action = spawn "brightnessctl" "set" "5%+";
     "XF86MonBrightnessDown".action = spawn "brightnessctl" "set" "5%-";

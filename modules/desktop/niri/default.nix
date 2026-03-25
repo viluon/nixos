@@ -15,6 +15,8 @@ inputs@{ niri
     playerctl
     slurp
     swaybg
+    inputs.wayscriber.packages.${pkgs.stdenv.hostPlatform.system}.default
+    inputs.wayscriber.packages.${pkgs.stdenv.hostPlatform.system}.wayscriber-configurator
     wireplumber
     wl-clipboard
     wlogout

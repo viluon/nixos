@@ -257,6 +257,7 @@ fzf-history-widget() {
 
   local alias_defs="$(alias -L 2>/dev/null)"
   local func_names="${(j: :)${(k)functions[(I)[^_]*]}}"
+  local parent_setopts="$(setopt)"
 
   selected="$(
     {
@@ -269,6 +270,7 @@ fzf-history-widget() {
       done
     } |
     zsh -c "
+      for __opt in \${(f)5}; do setopt \$__opt 2>/dev/null; done
       $(functions __fzf_style_to_ansi __fzf_highlight_cmd)
       source \"\$1/zsh-syntax-highlighting.zsh\" 2>/dev/null || true
       source \"\$1/highlighters/main/main-highlighter.zsh\"
@@ -289,7 +291,7 @@ fzf-history-widget() {
         highlighted=\"\${highlighted//\$nl/\$nltab}\"
         printf '%s\\t%s\\000' \"\$num\" \"\$highlighted\"
       done
-    " -- "$__FZF_ZSH_SH_DIR" "$alias_defs" "$func_names" "$highlight_limit" |
+    " -- "$__FZF_ZSH_SH_DIR" "$alias_defs" "$func_names" "$highlight_limit" "$parent_setopts" |
     FZF_DEFAULT_OPTS=$(__fzf_defaults "" "-n2..,.. --scheme=history --bind=ctrl-r:toggle-sort,alt-r:toggle-raw --wrap-sign '\t↳ ' --highlight-line --ansi ${FZF_CTRL_R_OPTS-} --query=${(qqq)LBUFFER} +m --read0") \
     FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd))"
   local ret=$?

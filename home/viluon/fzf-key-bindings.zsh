@@ -278,19 +278,38 @@ fzf-history-widget() {
       for fn in \${=3}; do
         eval \"\$fn() { :; }\" 2>/dev/null
       done
+      local __cf=\"\${XDG_CACHE_HOME:-\$HOME/.cache}/fzf-history-highlights\"
+      local -A __cache __used
+      if [[ -f \"\$__cf\" ]]; then
+        local __ck __cv
+        while IFS= read -r -d \$'\\0' __ck && IFS= read -r -d \$'\\0' __cv; do
+          __cache[\$__ck]=\"\$__cv\"
+        done < \"\$__cf\"
+      fi
       nl=\$'\\n'
       nltab=\$'\\n\\t'
       i=0
       while IFS= read -r -d \$'\\0' num; do
         IFS= read -r -d \$'\\0' cmd || break
-        if (( i++ < \$4 )); then
+        if [[ -n \"\${__cache[\$cmd]+x}\" ]]; then
+          highlighted=\"\${__cache[\$cmd]}\"
+          __used[\$cmd]=\"\$highlighted\"
+        elif (( i++ < \$4 )); then
           highlighted=\"\$(__fzf_highlight_cmd \"\$cmd\")\"
+          __used[\$cmd]=\"\$highlighted\"
         else
           highlighted=\"\$cmd\"
         fi
         highlighted=\"\${highlighted//\$nl/\$nltab}\"
         printf '%s\\t%s\\000' \"\$num\" \"\$highlighted\"
       done
+      mkdir -p \"\${__cf:h}\" 2>/dev/null
+      {
+        local __k __v
+        for __k __v in \"\${(kv)__used[@]}\"; do
+          printf '%s\\0%s\\0' \"\$__k\" \"\$__v\"
+        done
+      } > \"\$__cf.tmp\" && mv \"\$__cf.tmp\" \"\$__cf\"
     " -- "$__FZF_ZSH_SH_DIR" "$alias_defs" "$func_names" "$highlight_limit" "$parent_setopts" |
     FZF_DEFAULT_OPTS=$(__fzf_defaults "" "-n2..,.. --scheme=history --bind=ctrl-r:toggle-sort,alt-r:toggle-raw --wrap-sign '\t↳ ' --highlight-line --ansi ${FZF_CTRL_R_OPTS-} --query=${(qqq)LBUFFER} +m --read0") \
     FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd))"

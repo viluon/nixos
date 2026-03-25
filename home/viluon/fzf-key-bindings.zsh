@@ -253,7 +253,7 @@ fzf-history-widget() {
 
   zmodload -F zsh/parameter p:{commands,history}
 
-  local -i highlight_limit=256
+  local -i highlight_limit=128
 
   local alias_defs="$(alias -L 2>/dev/null)"
   local func_names="${(j: :)${(k)functions[(I)[^_]*]}}"
@@ -304,6 +304,8 @@ fzf-history-widget() {
         printf '%s\\t%s\\000' \"\$num\" \"\$highlighted\"
       done
       mkdir -p \"\${__cf:h}\" 2>/dev/null
+      touch \"\$__cf.tmp\"
+      btrfs property set \"\$__cf.tmp\" compression zstd
       {
         local __k __v
         for __k __v in \"\${(kv)__used[@]}\"; do

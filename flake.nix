@@ -33,7 +33,7 @@
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs-unstable";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    wayscriber.inputs ={
+    wayscriber.inputs = {
       flake-utils.follows = "flake-utils";
       nixpkgs.follows = "nixpkgs-unstable";
     };

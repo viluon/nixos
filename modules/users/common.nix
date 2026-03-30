@@ -61,6 +61,10 @@
         command = "/run/current-system/sw/bin/tee /proc/acpi/ibm/fan";
         options = [ "NOPASSWD" ];
       }
+      {
+        command = "/run/current-system/sw/bin/compsize";
+        options = [ "NOPASSWD" ];
+      }
     ];
   }];
 

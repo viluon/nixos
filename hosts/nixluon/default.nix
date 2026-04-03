@@ -205,6 +205,8 @@
         defaultSession = lib.mkForce "gnome";
       };
     };
+
+    waydroid.enable = true;
   };
 
   # Open ports in the firewall.

@@ -2,7 +2,6 @@
 
 let
   commonPackages = with pkgs; [
-    bat
     fd
     fzf
     gh
@@ -293,6 +292,8 @@ in
     enable = true;
     enableZshIntegration = true;
   };
+
+  programs.bat.enable = true;
 
   programs.eza = {
     enable = true;

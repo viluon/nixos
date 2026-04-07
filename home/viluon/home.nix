@@ -3,7 +3,6 @@
 let
   commonPackages = with pkgs; [
     bat
-    eza
     fd
     fzf
     gh
@@ -63,7 +62,6 @@ let
       cloc
       compsize
       coreutils
-      eza
       kotlin
       (lib.hiPrio lua5_1)
       (lib.lowPrio luajit)
@@ -294,6 +292,13 @@ in
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  programs.eza = {
+    enable = true;
+    enableZshIntegration = true;
+    git = true;
+    icons = "auto";
   };
 
   # Kitty terminal emulator

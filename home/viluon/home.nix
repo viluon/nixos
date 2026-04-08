@@ -71,6 +71,7 @@ let
 
       # Media and graphics
       ffmpeg
+      galaxy-buds-client
       gifski
       gimp
       gthumb
@@ -101,11 +102,8 @@ let
       gnumake
       openssl
       pkg-config
+      qbittorrent
       texlive.combined.scheme-full
-
-      # Unstable packages
-      unstable-pkgs.galaxy-buds-client
-      unstable-pkgs.qbittorrent
     ] ++ [
       # Host-specific packages that need special args
       inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.amd-epp-tool

@@ -84,6 +84,13 @@
         matches = [{ app-id = "^jetbrains-idea$"; is-floating = true; title = "..*"; }];
         geometry-corner-radius = rounded-top 4.0;
       }
+      {
+        matches = [
+          { title = "Bitwarden"; }
+          { app-id = "obsidian"; }
+        ];
+        block-out-from = "screencast";
+      }
     ] ++ lib.map
       (app: {
         matches = [{ app-id = app.app-id; at-startup = true; }];

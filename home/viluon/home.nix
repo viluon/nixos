@@ -308,6 +308,9 @@ in
       size = lib.mkForce 12;
     };
     themeFile = "Catppuccin-Mocha";
+    keybindings = {
+      "ctrl+shift+t" = "new_tab_with_cwd";
+    };
     settings = {
       confirm_os_window_close = 0;
       cursor_trail = 1;

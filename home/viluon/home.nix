@@ -197,6 +197,7 @@ in
       gsh = "git show --ext-diff";
       lh = "eza --long --git --icons=auto --classify=always";
       ll = "eza --long --git --icons=auto --classify=always --all";
+      lt = "eza --long --git --icons=auto --classify=always --git-ignore --tree";
       ls = "eza";
     };
 

@@ -257,7 +257,11 @@ fzf-history-widget() {
 
   local alias_defs="$(alias -L 2>/dev/null)"
   local func_names="${(j: :)${(k)functions[(I)[^_]*]}}"
-  local parent_setopts="$(setopt)"
+  # Filter monitor: the zsh -c subprocess inherits the pipeline's TTY.
+  # With monitor, it opens /dev/tty and saves/restores terminal state,
+  # racing with fzf's MakeRaw() and sometimes resetting icrnl — which
+  # makes Enter (CR) arrive as LF, i.e. ctrl-j (= move down).
+  local parent_setopts="$(setopt | command grep -vxF monitor)"
 
   selected="$(
     {

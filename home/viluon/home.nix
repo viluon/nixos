@@ -381,6 +381,7 @@ in
   #  /etc/profiles/per-user/viluon/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
+    DFT_PARSE_ERROR_LIMIT = "300";
     EDITOR = "nvim";
     NIXD_FLAGS = "-log=error";
     REPORTMEMORY = "1000";

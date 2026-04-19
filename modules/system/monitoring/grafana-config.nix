@@ -144,6 +144,11 @@ let
         http_port = 2342;
         http_addr = "127.0.0.1";
       };
+      "auth.anonymous" = {
+        enabled = true;
+        org_name = "Main Org.";
+        org_role = "Viewer";
+      };
     };
     provision =
       let

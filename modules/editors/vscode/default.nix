@@ -1,4 +1,5 @@
 { pkgs
+, unstable-pkgs
 , config
 , ...
 }:
@@ -7,7 +8,7 @@
 
   programs.vscode = {
     enable = true;
-    package = pkgs.vscode;
+    package = unstable-pkgs.vscode;
 
     profiles.default = {
       userSettings = import ./settings.nix;

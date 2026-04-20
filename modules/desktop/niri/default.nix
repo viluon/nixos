@@ -37,15 +37,24 @@ inputs@{ niri
   # FIXME: shouldn't hardcode username
   home-manager.users.viluon.imports = [
     (
-      inputs: {
+      { config, ... }@inputs: {
         programs.niri.settings = import ./niri-config.nix inputs;
 
         programs.btop.enable = true;
-        programs.vicinae = {
-          enable = true;
-          systemd.enable = true;
-          settings.keybinds.toggle-action-panel = "control+.";
-        };
+        programs.vicinae =
+          let
+            extension-names = [ "test-extension" ];
+            mk-local-extension = name: config.lib.vicinae.mkExtension {
+              inherit name;
+              src = ./vicinae-extensions/${name};
+            };
+          in
+          {
+            enable = true;
+            systemd.enable = true;
+            settings.keybinds.toggle-action-panel = "control+.";
+            extensions = builtins.map mk-local-extension extension-names;
+          };
 
         programs.hyprlock = {
           enable = true;

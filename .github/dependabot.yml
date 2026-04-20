@@ -13,3 +13,12 @@ updates:
           - '*'
     schedule:
       interval: daily
+  - package-ecosystem: npm
+    directories:
+      - /modules/desktop/niri/vicinae-extensions/*/
+    groups:
+      npm:
+        patterns:
+          - '*'
+    schedule:
+      interval: daily

@@ -138,6 +138,13 @@
           treefmt.config = {
             inherit (config.flake-root) projectRootFile;
             programs.nixpkgs-fmt.enable = true;
+            programs.prettier = {
+              enable = true;
+              includes = [
+                "*.ts"
+                "*.tsx"
+              ];
+            };
             programs.clang-format = {
               enable = true;
               includes = [ "*.glsl" ];

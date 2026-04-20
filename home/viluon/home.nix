@@ -215,6 +215,7 @@ in
       # Vendored fzf key-bindings with syntax-highlighted history widget
       __FZF_ZSH_SH_DIR="${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting"
       source ${./fzf-key-bindings.zsh}
+      source ${inputs.fzf-git-sh}/fzf-git.sh
 
       # Case insensitive completion
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'

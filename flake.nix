@@ -4,6 +4,10 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
     flake-utils.url = "github:numtide/flake-utils";
+    fzf-git-sh = {
+      url = "github:junegunn/fzf-git.sh";
+      flake = false;
+    };
     home-manager.url = "github:nix-community/home-manager/release-25.11";
     niri-blur.url = "github:niri-wm/niri";
     niri.url = "github:sodiboo/niri-flake/very-refactor";

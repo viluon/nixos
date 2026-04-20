@@ -195,6 +195,22 @@
         "type": "github"
       }
     },
+    "fzf-git-sh": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773882568,
+        "narHash": "sha256-fV4RtYL+ksbl5SMVZMoRyo6YUWP/KFvFPgfIbecIOO4=",
+        "owner": "junegunn",
+        "repo": "fzf-git.sh",
+        "rev": "0f0488331a060cf45aaecb6705a2cf394fb20293",
+        "type": "github"
+      },
+      "original": {
+        "owner": "junegunn",
+        "repo": "fzf-git.sh",
+        "type": "github"
+      }
+    },
     "gnome-shell": {
       "flake": false,
       "locked": {
@@ -475,6 +491,7 @@
         "flake-parts": "flake-parts",
         "flake-root": "flake-root",
         "flake-utils": "flake-utils",
+        "fzf-git-sh": "fzf-git-sh",
         "home-manager": "home-manager",
         "niri": "niri",
         "niri-blur": "niri-blur",

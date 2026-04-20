@@ -37,13 +37,15 @@ inputs@{ niri
   # FIXME: shouldn't hardcode username
   home-manager.users.viluon.imports = [
     (
-      { config, ... }@inputs: {
+      { config, lib, ... }@inputs: {
         programs.niri.settings = import ./niri-config.nix inputs;
 
         programs.btop.enable = true;
         programs.vicinae =
           let
-            extension-names = [ "clipboard-helpers" ];
+            extension-names = builtins.attrNames (
+              lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./vicinae-extensions)
+            );
             mk-local-extension = name: config.lib.vicinae.mkExtension {
               inherit name;
               src = ./vicinae-extensions/${name};

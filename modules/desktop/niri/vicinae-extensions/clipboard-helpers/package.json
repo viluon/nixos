@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/vicinaehq/vicinae/refs/heads/main/extra/schemas/extension.json",
-  "name": "test-extension",
-  "title": "test-extension",
-  "description": "testextensiontestextensiontestextensiontestextensiontestextensiontestextensiontestextensiontestextensiontestextensiontestextensiontestextension",
+  "name": "clipboard-helpers",
+  "title": "Clipboard Helpers",
+  "description": "Format GitHub pull request links and throwable JSON logs from clipboard",
   "categories": [],
   "license": "MIT",
   "author": "schromp",
@@ -11,11 +11,11 @@
   "icon": "extension_icon.png",
   "commands": [
     {
-      "name": "test",
-      "title": "test",
-      "subtitle": "test",
-      "description": "test",
-      "mode": "view"
+      "name": "format-clipboard",
+      "title": "Format Clipboard",
+      "subtitle": "Format GitHub PR URLs and throwable logs",
+      "description": "Convert clipboard content into a markdown PR link or Java stack trace",
+      "mode": "no-view"
     }
   ],
   "preferences": [],

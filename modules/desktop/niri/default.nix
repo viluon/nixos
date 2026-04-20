@@ -43,7 +43,7 @@ inputs@{ niri
         programs.btop.enable = true;
         programs.vicinae =
           let
-            extension-names = [ "test-extension" ];
+            extension-names = [ "clipboard-helpers" ];
             mk-local-extension = name: config.lib.vicinae.mkExtension {
               inherit name;
               src = ./vicinae-extensions/${name};

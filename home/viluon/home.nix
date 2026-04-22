@@ -86,7 +86,6 @@ let
 
       # Applications
       calibre
-      cdemu-client
       (pkgs.symlinkJoin {
         name = "craftos-pc-no-lua";
         paths = [ pkgs.craftos-pc ];

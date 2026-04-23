@@ -78,6 +78,7 @@ inputs@{ niri
             corner_radius = 8;
             follow = "mouse";
             gap_size = 12;
+            history_length = 5000;
             mouse_left_click = "do_action,open_url,close_current";
             mouse_middle_click = "context";
             mouse_right_click = "close_current";

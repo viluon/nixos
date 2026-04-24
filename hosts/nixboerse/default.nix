@@ -10,6 +10,8 @@
 }:
 
 let
+  docker-bridge-dns = "172.17.0.1";
+  docker-subnet = "172.17.0.0/16";
   minikube-subnet = "192.168.49.0/24";
   kind-subnet = "172.18.0.0/16";
 in
@@ -106,6 +108,10 @@ in
     config.virtualisation.libvirtd.hooks.qemu.libvirtd-network-hook
   ];
 
+  services.resolved.extraConfig = ''
+    DNSStubListenerExtra=${docker-bridge-dns}
+  '';
+
   systemd.services.resume-ubuntu-vm = {
     description = "Resume Ubuntu VM snapshot";
     after = [ "libvirtd.service" ];
@@ -125,19 +131,38 @@ in
   # fix routing from Docker interfaces to virbr0
   networking.firewall = {
     extraCommands = lib.mkAfter ''
-      # Allow traffic from minikube & kind to virbr0
+      # Allow traffic from Docker, minikube and kind to virbr0
+      iptables -I FORWARD -s ${docker-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
       iptables -I FORWARD -s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
       iptables -I FORWARD -s ${kind-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
 
       # More restricted established connection handling
       iptables -I FORWARD -i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+      # Allow Docker/kind containers to reach host's resolved stub on docker0
+      iptables -I nixos-fw -d ${docker-bridge-dns} -p udp --dport 53 -j nixos-fw-accept
+      iptables -I nixos-fw -d ${docker-bridge-dns} -p tcp --dport 53 -j nixos-fw-accept
     '';
 
     extraStopCommands = ''
+      iptables -D FORWARD -s ${docker-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT || true
       iptables -D FORWARD -s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT || true
       iptables -D FORWARD -s ${kind-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT || true
       iptables -D FORWARD -i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || true
+
+      iptables -D nixos-fw -d ${docker-bridge-dns} -p udp --dport 53 -j nixos-fw-accept || true
+      iptables -D nixos-fw -d ${docker-bridge-dns} -p tcp --dport 53 -j nixos-fw-accept || true
     '';
+  };
+
+  # kind cross-node pod-to-pod traffic uses bridged frames between kind node
+  # containers on the kind Docker network. With bridge-nf-call-iptables=1 (default),
+  # those frames traverse the host iptables FORWARD chain, where the host has no
+  # route for the pod CIDR and they get dropped. Disable bridge-nf so kindnet
+  # bridged traffic forwards purely at L2.
+  boot.kernel.sysctl = {
+    "net.bridge.bridge-nf-call-iptables" = 0;
+    "net.bridge.bridge-nf-call-ip6tables" = 0;
   };
 
   # better legacy OS compatibility
@@ -172,6 +197,9 @@ in
 
   virtualisation.docker = {
     enable = true;
+    daemon.settings = {
+      dns = [ docker-bridge-dns ];
+    };
   };
 
   services.ddccontrol.enable = true;

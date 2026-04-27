@@ -128,30 +128,57 @@ in
     };
   };
 
-  # fix routing from Docker interfaces to virbr0
+  # FORWARD ACCEPT rules for routing through libvirt are managed by
+  # firewall-virbr0-bypass.service (see below) so they sit above libvirt's
+  # REJECT and Docker's chain jumps regardless of unit start order.
   networking.firewall = {
     extraCommands = lib.mkAfter ''
-      # Allow traffic from Docker, minikube and kind to virbr0
-      iptables -I FORWARD -s ${docker-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
-      iptables -I FORWARD -s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
-      iptables -I FORWARD -s ${kind-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT
-
-      # More restricted established connection handling
-      iptables -I FORWARD -i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-
       # Allow Docker/kind containers to reach host's resolved stub on docker0
       iptables -I nixos-fw -d ${docker-bridge-dns} -p udp --dport 53 -j nixos-fw-accept
       iptables -I nixos-fw -d ${docker-bridge-dns} -p tcp --dport 53 -j nixos-fw-accept
     '';
 
     extraStopCommands = ''
-      iptables -D FORWARD -s ${docker-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT || true
-      iptables -D FORWARD -s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT || true
-      iptables -D FORWARD -s ${kind-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT || true
-      iptables -D FORWARD -i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || true
-
       iptables -D nixos-fw -d ${docker-bridge-dns} -p udp --dport 53 -j nixos-fw-accept || true
       iptables -D nixos-fw -d ${docker-bridge-dns} -p tcp --dport 53 -j nixos-fw-accept || true
+    '';
+  };
+
+  # The NixOS firewall, libvirtd and dockerd race to install FORWARD-chain
+  # jumps at boot. Whoever runs last wins (top of FORWARD). When dockerd or
+  # libvirtd win, our ACCEPT rules end up below LIBVIRT_FWI's REJECT and kind
+  # containers can no longer reach virbr0.
+  # Re-insert the rules after both are up so they sit above LIBVIRT_FWI.
+  systemd.services.firewall-virbr0-bypass = {
+    description = "Re-insert FORWARD ACCEPT rules above libvirt/docker chains";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "docker.service" "libvirtd.service" "firewall.service" ];
+    requires = [ "firewall.service" ];
+    partOf = [ "firewall.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      ${lib.concatMapStringsSep "\n" (rule: ''
+        ${pkgs.iptables}/bin/iptables -D FORWARD ${rule} 2>/dev/null || true
+        ${pkgs.iptables}/bin/iptables -I FORWARD 1 ${rule}
+      '') [
+        "-s ${docker-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
+        "-s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
+        "-s ${kind-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
+        "-i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT"
+      ]}
+    '';
+    preStop = ''
+      ${lib.concatMapStringsSep "\n" (rule: ''
+        ${pkgs.iptables}/bin/iptables -D FORWARD ${rule} 2>/dev/null || true
+      '') [
+        "-s ${docker-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
+        "-s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
+        "-s ${kind-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
+        "-i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT"
+      ]}
     '';
   };
 

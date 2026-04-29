@@ -196,6 +196,8 @@ in
   services.envfs.enable = true;
   programs.nix-ld.enable = true;
 
+  environment.memoryAllocator.provider = "jemalloc";
+
   # Host-specific packages
   environment.systemPackages = with pkgs; [
     chromium

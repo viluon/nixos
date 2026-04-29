@@ -30,7 +30,6 @@ let
     gamescope
     just
     networkmanager
-    nvitop
     pavucontrol
     playerctl
     polkit_gnome

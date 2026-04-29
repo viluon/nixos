@@ -29,9 +29,9 @@
     maximized = true;
   }
   {
-    app-id = "nvitop";
-    workspace = "nvitop";
-    command = [ "kitty" "--app-id=nvitop" "nvitop" ];
+    app-id = "btop";
+    workspace = "btop";
+    command = [ "kitty" "--app-id=btop" "btop" ];
     maximized = true;
   }
   {

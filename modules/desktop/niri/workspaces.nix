@@ -25,7 +25,7 @@
     output = "DP-3";
   }
   {
-    name = "nvitop";
+    name = "btop";
     icon = ""; # pulse
     output = "eDP-1";
   }

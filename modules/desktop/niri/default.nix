@@ -40,7 +40,15 @@ inputs@{ niri
       { config, lib, ... }@inputs: {
         programs.niri.settings = import ./niri-config.nix inputs;
 
-        programs.btop.enable = true;
+        programs.btop = {
+          enable = true;
+          package = pkgs.btop-cuda;
+          settings = {
+            freq_mode = "range";
+            io_mode = true;
+          };
+        };
+
         programs.vicinae =
           let
             extension-names = builtins.attrNames (

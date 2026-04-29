@@ -75,7 +75,7 @@
         matches = [
           { app-id = "kitty"; }
           { app-id = "nixos"; }
-          { app-id = "nvitop"; }
+          { app-id = "btop"; }
           { title = "^Vicinae Launcher$"; }
         ];
         draw-border-with-background = false;

@@ -91,6 +91,12 @@
         ];
         block-out-from = "screencast";
       }
+      {
+        # workaround for obsidian not setting the app ID
+        matches = [{ title = "Obsidian v"; at-startup = true; }];
+        open-on-workspace = "obsidian";
+        open-maximized = true;
+      }
     ] ++ lib.map
       (app: {
         matches = [{ app-id = app.app-id; at-startup = true; }];

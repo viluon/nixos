@@ -7,7 +7,6 @@ inputs@{ niri
   programs.niri = import ./tuned.nix inputs;
 
   environment.systemPackages = with pkgs; [
-    btop
     grim
     libsecret
     networkmanagerapplet

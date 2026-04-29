@@ -9,9 +9,6 @@ in
 {
   boot.kernelPackages = kernelPackages;
 
-  # eBPF-based scheduler
-  services.scx.enable = true;
-
   boot.kernelPatches = [
     {
       name = "cgroups-v1-for-jvm";

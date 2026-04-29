@@ -10,7 +10,4 @@ in
 
   # extra modules
   boot.extraModulePackages = with kernelPackages; [ acpi_call ];
-
-  # eBPF-based scheduler
-  services.scx.enable = true;
 }

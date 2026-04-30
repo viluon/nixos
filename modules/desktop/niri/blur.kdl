@@ -2,6 +2,14 @@ window-rule {
     background-effect {
         blur true
     }
+
+    popups {
+        geometry-corner-radius 15
+
+        background-effect {
+            blur true
+        }
+    }
 }
 
 window-rule {

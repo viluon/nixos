@@ -325,6 +325,12 @@ in
     };
   };
 
+  stylix.targets.gtk.extraCss = ''
+    popover > contents {
+      background-color: rgba(24, 24, 37, 0.5);
+    }
+  '';
+
   # configure Obsidian
   stylix.targets.obsidian.vaultNames = [ "kb" ];
   programs.obsidian.enable = true;

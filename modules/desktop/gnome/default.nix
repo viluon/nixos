@@ -40,6 +40,11 @@
     '';
   };
 
+  systemd.services.kanata-framework.serviceConfig = {
+    Restart = "on-failure";
+    RestartSec = 2;
+  };
+
   # GNOME-specific packages
   environment.systemPackages = with pkgs; [
     gnome-tweaks

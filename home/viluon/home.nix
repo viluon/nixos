@@ -108,7 +108,7 @@ let
     ];
 
     nixboerse = with pkgs; [
-      mill
+      unstable-pkgs.mill
       nodejs_24
     ];
   };

@@ -79,6 +79,9 @@
   programs.firefox = {
     enable = true;
     package = pkgs.firefox-devedition;
+    preferences = {
+      "browser.tabs.allow_transparent_browser" = true;
+    };
   };
 
   programs.gnupg.agent = {

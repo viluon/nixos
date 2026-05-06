@@ -316,12 +316,14 @@ in
       cursor_trail = 1;
       dynamic_background_opacity = true;
       enable_audio_bell = false;
+      momentum_scroll = 0.96;
       mouse_hide_wait = "-1.0";
+      notify_on_cmd_finish = "unfocused";
+      pixel_scroll = true;
       scrollback_lines = 50000;
       scrollback_pager_history_size = 128;
       shell = "${pkgs.zsh}/bin/zsh";
       window_padding_width = 10;
-      notify_on_cmd_finish = "unfocused";
     };
   };
 

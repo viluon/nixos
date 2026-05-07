@@ -12,7 +12,7 @@
     enable = true;
     enableUserSlices = true;
     settings.OOM = {
-      SwapUsedLimitPercent = "90%";
+      SwapUsedLimit = "90%";
       DefaultMemoryPressureDurationSec = "20s";
     };
   };

@@ -289,11 +289,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1778182593,
-        "narHash": "sha256-gR61WP2SBNu1EQ8Rkqw2VD8Ec1oLJHFrwgll2N/xJD4=",
+        "lastModified": 1778221858,
+        "narHash": "sha256-+nZlx8MKCs973N9Bm0hNzFHjY+2lmBrBOQeTALeCRhI=",
         "owner": "niri-wm",
         "repo": "niri",
-        "rev": "90366886b268ddb2b32779422fa0dce379dca312",
+        "rev": "0200670d9ee8cfbdb154e3e14d92b5ff61aedd59",
         "type": "github"
       },
       "original": {
@@ -346,11 +346,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778125288,
-        "narHash": "sha256-9lGRdVNkM+WwoaX5s+LYqueMv+60A2vgY5KFfwIEj9M=",
+        "lastModified": 1778211356,
+        "narHash": "sha256-89oSA+XtcMfaQ0n2qkiQd5rgr3S5NTvw8eDkUaVL/6E=",
         "owner": "nix-community",
         "repo": "nix-vscode-extensions",
-        "rev": "6238192bab51fd87cc76819dc47da95cfe2bba8c",
+        "rev": "017db59f664db24d8e24367b72ca76cdb706586c",
         "type": "github"
       },
       "original": {
@@ -367,11 +367,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1778125841,
-        "narHash": "sha256-q+eVmnqxTajZdAC9OwJl7pZ7g0cyXMdNOHg8w5wHb8o=",
+        "lastModified": 1778211911,
+        "narHash": "sha256-HoOpHFJyKpqPihkBL5cB1uM5p9pqbRPlvtG+NY3cdaU=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "0cb4690e8efd700c972f0fe944ae96b7a5c2293e",
+        "rev": "4fd32a1723acf6087b7e1fa77cdbe6eca6b10c4a",
         "type": "github"
       },
       "original": {

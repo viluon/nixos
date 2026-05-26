@@ -31,7 +31,7 @@
 
           outputHashMode = "flat";
           outputHashAlgo = "sha256";
-          outputHash = "sha256-ZE8AAmneHgQsePxbCChIok0ODEKH9oSvz2d3JOPKuWU=";
+          outputHash = "sha256-6B7ekehtpxetj3N4f9Q+SyDyoXe2meTts15s7DBIzfQ=";
 
           buildPhase = ''
             curl "https://api.github.com/users/viluon/keys" | \

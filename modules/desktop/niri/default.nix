@@ -93,6 +93,11 @@ inputs@{ niri
           };
         };
 
+        systemd.user.services.dunst.Service = {
+          Restart = "on-failure";
+          RestartSec = 1;
+        };
+
         # niri-flake would enable the KDE agent by default
         systemd.user.services.niri-flake-polkit.Service.Enable = false;
 

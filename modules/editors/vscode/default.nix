@@ -21,6 +21,7 @@
         "GitHub.copilot"
         "github.vscode-github-actions"
         "github.vscode-pull-request-github"
+        "iliazeus.vscode-ansi"
         "jackmacwindows.craftos-pc"
         "jnoortheen.nix-ide"
         "ms-azuretools.vscode-docker"

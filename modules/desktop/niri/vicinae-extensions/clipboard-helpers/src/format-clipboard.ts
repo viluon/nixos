@@ -16,18 +16,17 @@ type Throwable = {
   cause: Throwable | undefined;
 };
 
-type PullRequestLink = {
+type ClipboardLink = {
   markdown: string;
-  repository: string;
-  number: string;
-  url: string;
+  toastTitle: string;
+  toastMessage: string;
 };
 
 function isJsonObject(value: unknown): value is JsonObject {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function parseGithubPullRequestUrl(raw: string): PullRequestLink | undefined {
+function parseHttpsUrl(raw: string): URL | undefined {
   let parsedUrl: URL;
   try {
     parsedUrl = new URL(raw);
@@ -39,14 +38,27 @@ function parseGithubPullRequestUrl(raw: string): PullRequestLink | undefined {
     return undefined;
   }
 
+  return parsedUrl;
+}
+
+function getPathSegments(parsedUrl: URL): string[] {
+  return parsedUrl.pathname
+    .split("/")
+    .map((segment) => segment.trim())
+    .filter((segment) => segment.length > 0);
+}
+
+function parseGithubPullRequestUrl(raw: string): ClipboardLink | undefined {
+  const parsedUrl = parseHttpsUrl(raw);
+  if (parsedUrl === undefined) {
+    return undefined;
+  }
+
   if (!parsedUrl.hostname.toLowerCase().includes("github")) {
     return undefined;
   }
 
-  const segments = parsedUrl.pathname
-    .split("/")
-    .map((segment) => segment.trim())
-    .filter((segment) => segment.length > 0);
+  const segments = getPathSegments(parsedUrl);
   const pullIndex = segments.findIndex((segment) => segment === "pull");
 
   if (pullIndex < 2 || pullIndex + 1 >= segments.length) {
@@ -62,10 +74,43 @@ function parseGithubPullRequestUrl(raw: string): PullRequestLink | undefined {
 
   return {
     markdown: `[${repository}#${pullNumber}](${raw})`,
-    repository,
-    number: pullNumber,
-    url: raw,
+    toastTitle: "Copied markdown pull link",
+    toastMessage: `${repository}#${pullNumber}`,
   };
+}
+
+function parseYouTrackIssueUrl(raw: string): ClipboardLink | undefined {
+  const parsedUrl = parseHttpsUrl(raw);
+  if (parsedUrl === undefined) {
+    return undefined;
+  }
+
+  if (!parsedUrl.hostname.toLowerCase().includes("youtrack")) {
+    return undefined;
+  }
+
+  const segments = getPathSegments(parsedUrl);
+  if (
+    segments[0] !== "issue" ||
+    (segments.length !== 2 && segments.length !== 3)
+  ) {
+    return undefined;
+  }
+
+  const issueId = segments[1];
+  if (!/^[A-Za-z][A-Za-z0-9]*-\d+$/.test(issueId)) {
+    return undefined;
+  }
+
+  return {
+    markdown: `[${issueId}](${raw})`,
+    toastTitle: "Copied markdown issue link",
+    toastMessage: issueId,
+  };
+}
+
+function parseClipboardLink(raw: string): ClipboardLink | undefined {
+  return parseGithubPullRequestUrl(raw) ?? parseYouTrackIssueUrl(raw);
 }
 
 function parseThrowableStep(value: unknown): ThrowableStep | undefined {
@@ -249,13 +294,13 @@ export default async function formatClipboard(): Promise<void> {
     return;
   }
 
-  const pullRequestLink = parseGithubPullRequestUrl(trimmedText);
-  if (pullRequestLink !== undefined) {
-    await Clipboard.copy(pullRequestLink.markdown);
+  const clipboardLink = parseClipboardLink(trimmedText);
+  if (clipboardLink !== undefined) {
+    await Clipboard.copy(clipboardLink.markdown);
     await showToast({
       style: Toast.Style.Success,
-      title: "Copied markdown pull link",
-      message: `${pullRequestLink.repository}#${pullRequestLink.number}`,
+      title: clipboardLink.toastTitle,
+      message: clipboardLink.toastMessage,
     });
     return;
   }
@@ -273,6 +318,7 @@ export default async function formatClipboard(): Promise<void> {
   await showToast({
     style: Toast.Style.Failure,
     title: "Clipboard format unsupported",
-    message: "Need GitHub pull URL or JSON payload with throwable",
+    message:
+      "Need GitHub pull URL, YouTrack issue URL, or JSON payload with throwable",
   });
 }

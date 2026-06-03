@@ -48,7 +48,7 @@ let
     gum
     matugen
     wallust
-    swww
+    awww
     xdg-user-dirs
   ];
 
@@ -147,6 +147,8 @@ in
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home.stateVersion = "25.05"; # Please read the comment before changing.
+
+  gtk.gtk4.theme = config.gtk.theme;
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -343,11 +345,27 @@ in
       app.livePreview = false;
       # override Stylix default
       appearance.baseFontSize = lib.mkForce 17;
-      hotkeys = config.programs.obsidian.defaultSettings.hotkeys // {
+      hotkeys = {
         "insert-current-time" = [{ modifiers = [ "Mod" ]; key = " "; }];
         "insert-current-date" = [{ modifiers = [ "Mod" "Shift" ]; key = " "; }];
       };
-      corePlugins = config.programs.obsidian.defaultSettings.corePlugins ++ [
+      corePlugins = [
+        "backlink"
+        "bookmarks"
+        "canvas"
+        "command-palette"
+        "daily-notes"
+        "editor-status"
+        "file-explorer"
+        "file-recovery"
+        "global-search"
+        "graph"
+        "note-composer"
+        "outgoing-link"
+        "outline"
+        "page-preview"
+        "switcher"
+        "tag-pane"
         {
           name = "templates";
           settings = {
@@ -355,6 +373,7 @@ in
             timeFormat = "";
           };
         }
+        "word-count"
       ];
     };
   };

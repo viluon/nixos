@@ -1,4 +1,5 @@
 { config
+, pkgs
 , ...
 }:
 
@@ -62,6 +63,7 @@ let
 
   lokiPort = 3100;
   lokiGrpcPort = 9095;
+  grafanaSecretKeyPath = "${config.services.grafana.dataDir}/secret_key";
 
   grpc_client_config = {
     max_recv_msg_size = 100 * 1024 * 1024;
@@ -144,6 +146,7 @@ let
         http_port = 2342;
         http_addr = "127.0.0.1";
       };
+      security.secret_key = "$__file{${grafanaSecretKeyPath}}";
       "auth.anonymous" = {
         enabled = true;
         org_name = "Main Org.";
@@ -193,6 +196,13 @@ let
         };
       };
   };
+  systemd.services.grafana.preStart = ''
+    if [ ! -s ${grafanaSecretKeyPath} ]; then
+      umask 077
+      ${pkgs.coreutils}/bin/tr -dc 'A-Za-z0-9' < /dev/urandom | ${pkgs.coreutils}/bin/head -c 64 > ${grafanaSecretKeyPath}
+    fi
+    ${pkgs.coreutils}/bin/chmod 600 ${grafanaSecretKeyPath}
+  '';
 
   # nginx reverse proxy
   services.nginx.virtualHosts.${config.services.grafana.domain} = {

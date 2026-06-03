@@ -8,7 +8,7 @@
       url = "github:junegunn/fzf-git.sh";
       flake = false;
     };
-    home-manager.url = "github:nix-community/home-manager/release-25.11";
+    home-manager.url = "github:nix-community/home-manager/release-26.05";
     niri-blur.url = "github:niri-wm/niri";
     niri.url = "github:sodiboo/niri-flake/very-refactor";
     nix-index-database.url = "github:nix-community/nix-index-database";
@@ -16,8 +16,8 @@
     nix4vscode.url = "github:nix-community/nix4vscode";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    stylix.url = "github:nix-community/stylix/release-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    stylix.url = "github:nix-community/stylix/release-26.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     wayscriber.url = "github:devmobasa/wayscriber";
     xhmm.url = "github:schuelermine/xhmm";
@@ -41,6 +41,7 @@
       flake-utils.follows = "flake-utils";
       nixpkgs.follows = "nixpkgs-unstable";
     };
+    xwayland-satellite-unstable.inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
   outputs =

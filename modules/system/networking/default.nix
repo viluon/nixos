@@ -17,7 +17,7 @@
   # systemd-resolved
   services.resolved = {
     enable = true;
-    dnsovertls = "false";
+    settings.Resolve.DNSOverTLS = false;
   };
 
   # Enable CUPS printing

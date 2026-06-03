@@ -6,8 +6,10 @@
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
+    withPython3 = true;
+    withRuby = true;
 
-    extraLuaConfig = ''
+    initLua = ''
       vim.opt.number = true
       vim.opt.relativenumber = true
     '';

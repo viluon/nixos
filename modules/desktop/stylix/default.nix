@@ -1,4 +1,5 @@
 { pkgs
+, lib
 , ...
 }:
 {
@@ -37,5 +38,7 @@
       size = 24;
       package = pkgs.kdePackages.breeze;
     };
+
+    targets.qt.platform = lib.mkForce "qtct";
   };
 }

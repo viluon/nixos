@@ -46,7 +46,7 @@ Each host in `hosts/*/`: `default.nix`, `hardware.nix`, `kernel.nix`, `disko.nix
 - `home/`: Auto-discovered, scripts in `home/viluon/scripts/` become PATH commands
 
 ### Key Details
-- **Flake inputs**: nixpkgs 25.11, nixpkgs-unstable, nixos-hardware, stylix, niri
+- **Flake inputs**: nixpkgs 26.05, nixpkgs-unstable, nixos-hardware, stylix, niri
 - **Binary caches**: cache.nixos.org, nix-community.cachix.org, viluon.cachix.org
 - **Git scripts**: `git-*.nix` in `home/viluon/scripts/` exposed as git subcommands with completion
 

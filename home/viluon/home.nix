@@ -408,7 +408,7 @@ in
     DFT_PARSE_ERROR_LIMIT = "300";
     EDITOR = "nvim";
     NIXD_FLAGS = "-log=error";
-    REPORTMEMORY = "1000";
+    REPORTMEMORY = "1000000";
   };
 
   # Let Home Manager install and manage itself.

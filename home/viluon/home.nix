@@ -409,6 +409,7 @@ in
     EDITOR = "nvim";
     NIXD_FLAGS = "-log=error";
     REPORTMEMORY = "1000000";
+    TIMEFMT = "real: %E | user: %U | sys: %S | cpu: %P | %*E total | max rss: %M kB";
   };
 
   # Let Home Manager install and manage itself.

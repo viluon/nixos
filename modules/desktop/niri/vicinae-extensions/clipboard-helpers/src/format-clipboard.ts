@@ -48,69 +48,93 @@ function getPathSegments(parsedUrl: URL): string[] {
     .filter((segment) => segment.length > 0);
 }
 
-function parseGithubPullRequestUrl(raw: string): ClipboardLink | undefined {
-  const parsedUrl = parseHttpsUrl(raw);
-  if (parsedUrl === undefined) {
-    return undefined;
-  }
+const issueKeyPattern = /^[A-Za-z][A-Za-z0-9]*-\d+$/;
 
-  if (!parsedUrl.hostname.toLowerCase().includes("github")) {
+type LinkParser = (parsedUrl: URL, raw: string) => ClipboardLink | undefined;
+
+function hostIncludes(parsedUrl: URL, keyword: string): boolean {
+  return parsedUrl.hostname.toLowerCase().includes(keyword);
+}
+
+function makeLink(raw: string, label: string, kind: string): ClipboardLink {
+  return {
+    markdown: `[${label}](${raw})`,
+    toastTitle: `Copied markdown ${kind} link`,
+    toastMessage: label,
+  };
+}
+
+function parseGithubRepoRef(
+  parsedUrl: URL,
+  raw: string,
+): ClipboardLink | undefined {
+  if (!hostIncludes(parsedUrl, "github")) {
     return undefined;
   }
 
   const segments = getPathSegments(parsedUrl);
-  const pullIndex = segments.findIndex((segment) => segment === "pull");
+  const refIndex = segments.findIndex(
+    (segment) => segment === "pull" || segment === "issues",
+  );
 
-  if (pullIndex < 2 || pullIndex + 1 >= segments.length) {
+  if (refIndex < 2 || refIndex + 1 >= segments.length) {
     return undefined;
   }
 
-  const pullNumber = segments[pullIndex + 1];
-  if (!/^\d+$/.test(pullNumber)) {
+  const number = segments[refIndex + 1];
+  if (!/^\d+$/.test(number)) {
     return undefined;
   }
 
-  const repository = segments[pullIndex - 1];
+  const repository = segments[refIndex - 1];
+  const kind = segments[refIndex] === "pull" ? "pull" : "issue";
 
-  return {
-    markdown: `[${repository}#${pullNumber}](${raw})`,
-    toastTitle: "Copied markdown pull link",
-    toastMessage: `${repository}#${pullNumber}`,
+  return makeLink(raw, `${repository}#${number}`, kind);
+}
+
+function makeIssueTrackerParser(
+  hostKeyword: string,
+  pathKeyword: string,
+): LinkParser {
+  return (parsedUrl, raw) => {
+    if (!hostIncludes(parsedUrl, hostKeyword)) {
+      return undefined;
+    }
+
+    const segments = getPathSegments(parsedUrl);
+    if (segments[0] !== pathKeyword) {
+      return undefined;
+    }
+
+    const issueId = segments[1];
+    if (issueId === undefined || !issueKeyPattern.test(issueId)) {
+      return undefined;
+    }
+
+    return makeLink(raw, issueId, "issue");
   };
 }
 
-function parseYouTrackIssueUrl(raw: string): ClipboardLink | undefined {
-  const parsedUrl = parseHttpsUrl(raw);
-  if (parsedUrl === undefined) {
-    return undefined;
-  }
-
-  if (!parsedUrl.hostname.toLowerCase().includes("youtrack")) {
-    return undefined;
-  }
-
-  const segments = getPathSegments(parsedUrl);
-  if (
-    segments[0] !== "issue" ||
-    (segments.length !== 2 && segments.length !== 3)
-  ) {
-    return undefined;
-  }
-
-  const issueId = segments[1];
-  if (!/^[A-Za-z][A-Za-z0-9]*-\d+$/.test(issueId)) {
-    return undefined;
-  }
-
-  return {
-    markdown: `[${issueId}](${raw})`,
-    toastTitle: "Copied markdown issue link",
-    toastMessage: issueId,
-  };
-}
+const linkParsers: LinkParser[] = [
+  parseGithubRepoRef,
+  makeIssueTrackerParser("youtrack", "issue"),
+  makeIssueTrackerParser("jira", "browse"),
+];
 
 function parseClipboardLink(raw: string): ClipboardLink | undefined {
-  return parseGithubPullRequestUrl(raw) ?? parseYouTrackIssueUrl(raw);
+  const parsedUrl = parseHttpsUrl(raw);
+  if (parsedUrl === undefined) {
+    return undefined;
+  }
+
+  for (const parser of linkParsers) {
+    const link = parser(parsedUrl, raw);
+    if (link !== undefined) {
+      return link;
+    }
+  }
+
+  return undefined;
 }
 
 function parseThrowableStep(value: unknown): ThrowableStep | undefined {
@@ -319,6 +343,6 @@ export default async function formatClipboard(): Promise<void> {
     style: Toast.Style.Failure,
     title: "Clipboard format unsupported",
     message:
-      "Need GitHub pull URL, YouTrack issue URL, or JSON payload with throwable",
+      "Need GitHub, YouTrack, or Jira URL, or JSON payload with throwable",
   });
 }

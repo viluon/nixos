@@ -92,22 +92,16 @@ function parseGithubRepoRef(
   return makeLink(raw, `${repository}#${number}`, kind);
 }
 
-function makeIssueTrackerParser(
-  hostKeyword: string,
-  pathKeyword: string,
-): LinkParser {
+function makeIssueTrackerParser(hostKeyword: string): LinkParser {
   return (parsedUrl, raw) => {
     if (!hostIncludes(parsedUrl, hostKeyword)) {
       return undefined;
     }
 
-    const segments = getPathSegments(parsedUrl);
-    if (segments[0] !== pathKeyword) {
-      return undefined;
-    }
-
-    const issueId = segments[1];
-    if (issueId === undefined || !issueKeyPattern.test(issueId)) {
+    const issueId = getPathSegments(parsedUrl)
+      .reverse()
+      .find((segment) => issueKeyPattern.test(segment));
+    if (issueId === undefined) {
       return undefined;
     }
 
@@ -117,8 +111,8 @@ function makeIssueTrackerParser(
 
 const linkParsers: LinkParser[] = [
   parseGithubRepoRef,
-  makeIssueTrackerParser("youtrack", "issue"),
-  makeIssueTrackerParser("jira", "browse"),
+  makeIssueTrackerParser("youtrack"),
+  makeIssueTrackerParser("jira"),
 ];
 
 function parseClipboardLink(raw: string): ClipboardLink | undefined {

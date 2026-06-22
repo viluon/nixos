@@ -34,6 +34,7 @@
     { argv = [ "waybar" ]; }
     { argv = [ "swaybg" "--image" config.stylix.image "--mode" "fill" ]; }
     { argv = [ "wayscriber" "--daemon" ]; }
+    { argv = [ "idea-terminals" ]; }
   ] ++ lib.map (app: { argv = app.command; }) (import ./at-startup.nix);
 
   workspaces =
@@ -74,11 +75,17 @@
       {
         matches = [
           { app-id = "kitty"; }
+          { app-id = "idea-terminal"; }
           { app-id = "nixos"; }
           { app-id = "btop"; }
           { title = "^Vicinae Launcher$"; }
         ];
         draw-border-with-background = false;
+      }
+      {
+        matches = [{ app-id = "^idea-terminal$"; }];
+        open-on-workspace = "idea";
+        default-column-width.proportion = 2.0 / 3.0;
       }
       {
         matches = [{ app-id = "^jetbrains-idea$"; is-floating = true; title = "..*"; }];

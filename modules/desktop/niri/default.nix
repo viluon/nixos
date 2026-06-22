@@ -7,6 +7,7 @@ inputs@{ niri
   programs.niri = import ./tuned.nix inputs;
 
   environment.systemPackages = with pkgs; [
+    (import ./idea-terminals.nix inputs)
     grim
     libsecret
     networkmanagerapplet

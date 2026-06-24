@@ -1,7 +1,7 @@
 { pkgs, ... }:
 pkgs.writeShellApplication {
   name = "idea-terminals";
-  runtimeInputs = with pkgs; [ jq ];
+  runtimeInputs = with pkgs; [ coreutils jq ];
   text = ''
     declare -A workspace_name
     declare -A spawned_for
@@ -16,7 +16,7 @@ pkgs.writeShellApplication {
       else empty end
     '
 
-    niri msg -j event-stream \
+    timeout 60 niri msg -j event-stream \
       | jq --unbuffered -rc "$classify" \
       | while IFS=$'\t' read -r event id app workspace floating title; do
           case "$event" in
@@ -31,9 +31,7 @@ pkgs.writeShellApplication {
               [[ -z "''${spawned_for[$id]:-}" ]] || continue
 
               spawned_for["$id"]=1
-              niri msg action focus-window --id "$id"
               niri msg action spawn -- kitty --app-id=idea-terminal
-              sleep 1
               ;;
           esac
         done

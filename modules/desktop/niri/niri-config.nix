@@ -83,8 +83,13 @@
         draw-border-with-background = false;
       }
       {
+        matches = [{ app-id = "^jetbrains-idea$"; }];
+        default-column-width.proportion = 0.9;
+      }
+      {
         matches = [{ app-id = "^idea-terminal$"; }];
         open-on-workspace = "idea";
+        open-focused = false;
         default-column-width.proportion = 2.0 / 3.0;
       }
       {

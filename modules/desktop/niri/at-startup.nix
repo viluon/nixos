@@ -9,7 +9,6 @@
     app-id = "jetbrains-idea";
     workspace = "idea";
     command = [ "idea" ];
-    maximized = true;
   }
   {
     app-id = "obsidian";

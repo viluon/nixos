@@ -244,6 +244,10 @@ in
       # Mill completion
       source ${./completions/mill.sh}
 
+      # comma-rs completion
+      source <(, --print-completions zsh 2>/dev/null)
+      compdef _comma ,
+
       # completion for aliases
       unsetopt completealiases
       # Expose packaged git-* scripts as git subcommands for completion.

@@ -169,12 +169,18 @@ in
     '';
   };
 
-  # kind cross-node pod-to-pod traffic uses bridged frames between kind node
-  # containers on the kind Docker network. With bridge-nf-call-iptables=1 (default),
-  # those frames traverse the host iptables FORWARD chain, where the host has no
-  # route for the pod CIDR and they get dropped. Disable bridge-nf so kindnet
-  # bridged traffic forwards purely at L2.
   boot.kernel.sysctl = {
+    # enable sysrq
+    "kernel.sysrq" = 502;
+    "kernel.perf_event_paranoid" = 1;
+    "kernel.kptr_restrict" = 0;
+    "fs.inotify.max_user_watches" = 1048576;
+
+    # kind cross-node pod-to-pod traffic uses bridged frames between kind node
+    # containers on the kind Docker network. With bridge-nf-call-iptables=1 (default),
+    # those frames traverse the host iptables FORWARD chain, where the host has no
+    # route for the pod CIDR and they get dropped. Disable bridge-nf so kindnet
+    # bridged traffic forwards purely at L2.
     "net.bridge.bridge-nf-call-iptables" = 0;
     "net.bridge.bridge-nf-call-ip6tables" = 0;
   };
@@ -297,14 +303,6 @@ in
 
     # Ensure virtio modules are loaded
     boot.kernelModules = [ "virtio_pci" "virtio_net" "virtio_blk" "virtio_scsi" "virtio_balloon" ];
-
-    boot.kernel.sysctl = {
-      # enable sysrq
-      "kernel.sysrq" = 502;
-      "kernel.perf_event_paranoid" = 1;
-      "kernel.kptr_restrict" = 0;
-      "fs.inotify.max_user_watches" = 1048576;
-    };
 
     # Enable passwordless login
     users.users.viluon = {

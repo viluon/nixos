@@ -103,19 +103,27 @@ in
 
   systemd.services.resume-ubuntu-vm = {
     description = "Resume Ubuntu VM snapshot";
-    after = [ "libvirtd.service" ];
+    after = [ "libvirtd.service" "libvirt-guests.service" ];
     requires = [ "libvirtd.service" ];
     wantedBy = [ "multi-user.target" ];
 
+    restartIfChanged = false;
+
     serviceConfig = {
       Type = "oneshot";
+      RemainAfterExit = true;
       ExecStart = "${pkgs.writeShellScript "resume-ubuntu-vm" ''
         set -euo pipefail
         ${config.virtualisation.libvirtd.package}/bin/virsh snapshot-revert ubuntu --current
         ${config.virtualisation.libvirtd.package}/bin/virsh resume ubuntu
       ''}";
+      ExecStop = "${pkgs.writeShellScript "destroy-ubuntu-vm" ''
+        ${config.virtualisation.libvirtd.package}/bin/virsh destroy ubuntu || true
+      ''}";
     };
   };
+
+  systemd.services.libvirtd.serviceConfig.TimeoutStopSec = 8;
 
   # FORWARD ACCEPT rules for routing through libvirt are managed by
   # firewall-virbr0-bypass.service (see below) so they sit above libvirt's

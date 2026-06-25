@@ -70,6 +70,16 @@ pkgs.writeShellApplication {
 
     current_pr_state() { gh pr view --state all --json state --jq '.state'; }
 
+    gh_host() {
+      local branch remote url host
+      branch=$(current_branch)
+      remote=$(branch_remote "$branch")
+      url=$(git remote get-url "$remote")
+      host=$(printf '%s' "$url" | sed -E 's#^[a-z]+://##; s#^[^@]+@##; s#[:/].*$##')
+      [ -n "$host" ] || fail "could not determine git host from remote '$remote'"
+      printf '%s\n' "$host"
+    }
+
     get_diff_stats() {
       local merge_base additions=0 deletions=0
       merge_base=$(git merge-base HEAD origin/main)
@@ -85,7 +95,7 @@ pkgs.writeShellApplication {
     }
 
     get_grug_reply() {
-      gh api graphql -f query='
+      gh api graphql --hostname "$(gh_host)" -f query='
         query {
           viewer {
             savedReplies(first: 10) {

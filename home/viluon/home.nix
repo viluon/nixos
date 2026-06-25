@@ -254,6 +254,14 @@ in
         _values 'git ready arguments' auto
       }
 
+      _git-open() {
+        if (( CURRENT == 2 )); then
+          _values 'git open arguments' ready
+        elif (( CURRENT == 3 )) && [[ "''${words[2]}" == "ready" ]]; then
+          _values 'git open arguments' auto
+        fi
+      }
+
       # VS Code shell integration
       [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
     '';

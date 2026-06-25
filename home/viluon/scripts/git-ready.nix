@@ -67,7 +67,9 @@ pkgs.writeShellApplication {
         change_scale=$(( additions > deletions ? additions : deletions ))
         fail "auto merge only available for :smol: changes (<43 lines). current change scale: $change_scale"
       fi
-      gh pr merge "$number" --auto --merge >/dev/null 2>&1 || fail "failed to enable auto merge"
+      gh pr merge "$number" --auto --merge >/dev/null 2>&1 \
+        || gh pr merge "$number" --auto --squash >/dev/null 2>&1 \
+        || fail "failed to enable auto merge"
     }
 
     auto_merge_requested=0

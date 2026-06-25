@@ -108,23 +108,45 @@ pkgs.writeShellApplication {
         }' --jq '.data.viewer.savedReplies.nodes[] | select(.title == "grug") | .body'
     }
 
+    mark_ready() { gh pr ready >/dev/null 2>&1 || fail "failed to mark pr ready"; }
+
+    enable_auto_merge() {
+      gh pr merge --auto --merge >/dev/null 2>&1 \
+        || gh pr merge --auto --squash >/dev/null 2>&1 \
+        || fail "failed to enable auto merge"
+    }
+
     create_pr() {
       local stats additions deletions grug_body
       stats=$(get_diff_stats)
       additions=$(echo "$stats" | cut -d' ' -f1)
       deletions=$(echo "$stats" | cut -d' ' -f2)
 
-      # Always create with --fill-first to get proper title
-      gh pr new -d --fill-first
+      if [ "$ready_requested" -eq 1 ]; then
+        gh pr new --fill-first
+      else
+        gh pr new -d --fill-first
+      fi
 
       if [ "$deletions" -gt "$additions" ]; then
         grug_body=$(get_grug_reply)
         if [ -n "$grug_body" ]; then
-          # Update body with grug reply while keeping the --fill-first title
           gh pr edit --body "$grug_body"
         fi
       fi
+
+      if [ "$auto_merge_requested" -eq 1 ]; then
+        enable_auto_merge
+      fi
     }
+
+    usage() { fail "usage: git open [ready [auto]]"; }
+
+    ready_requested=0
+    auto_merge_requested=0
+    if [ "$#" -gt 2 ]; then usage; fi
+    if [ "$#" -ge 1 ]; then [ "$1" = "ready" ] || usage; ready_requested=1; fi
+    if [ "$#" -ge 2 ]; then [ "$2" = "auto" ] || usage; auto_merge_requested=1; fi
 
     ensure_repo_root
     ensure_branch
@@ -140,6 +162,8 @@ pkgs.writeShellApplication {
     case "$pr_state" in
       OPEN)
         push_branch
+        if [ "$ready_requested" -eq 1 ]; then mark_ready; fi
+        if [ "$auto_merge_requested" -eq 1 ]; then enable_auto_merge; fi
         echo "pull request already exists for $(current_branch)"
         exit 0
         ;;

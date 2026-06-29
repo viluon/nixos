@@ -73,6 +73,7 @@ inputs@{ niri
 
         programs.waybar = {
           enable = true;
+          systemd.enable = true;
           settings = import ./waybar-config.nix inputs;
           style = builtins.readFile ./waybar.css;
         };

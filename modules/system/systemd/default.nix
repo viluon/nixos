@@ -8,6 +8,10 @@
     DefaultTasksAccounting = true;
   };
 
+  systemd.user.extraConfig = ''
+    DefaultTimeoutStopSec=20s
+  '';
+
   systemd.oomd = {
     enable = true;
     enableUserSlices = true;

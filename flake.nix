@@ -12,7 +12,6 @@
     niri-blur.url = "github:niri-wm/niri";
     niri.url = "github:sodiboo/niri-flake/very-refactor";
     nix-index-database.url = "github:nix-community/nix-index-database";
-    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix4vscode.url = "github:nix-community/nix4vscode";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -33,7 +32,6 @@
       xwayland-satellite-unstable.follows = "xwayland-satellite-unstable";
     };
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
-    nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs-unstable";
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs-unstable";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";

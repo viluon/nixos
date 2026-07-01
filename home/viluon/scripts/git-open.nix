@@ -1,7 +1,10 @@
 { pkgs }:
+let
+  slackReview = import ../slack-review.nix;
+in
 pkgs.writeShellApplication {
   name = "git-open";
-  runtimeInputs = with pkgs; [ gh git coreutils ];
+  runtimeInputs = with pkgs; [ gh git coreutils jq wl-clipboard ];
   text = ''
     set -euo pipefail
 
@@ -110,6 +113,26 @@ pkgs.writeShellApplication {
 
     mark_ready() { gh pr ready >/dev/null 2>&1 || fail "failed to mark pr ready"; }
 
+    ${slackReview}
+
+    copy_result() {
+      local json number url additions deletions key message
+      json=$(gh pr view --json number,url,additions,deletions) || fail "failed to read pull request"
+      number=$(printf '%s' "$json" | jq -r '.number')
+      url=$(printf '%s' "$json" | jq -r '.url')
+      additions=$(printf '%s' "$json" | jq -r '.additions')
+      deletions=$(printf '%s' "$json" | jq -r '.deletions')
+      if [ "$ready_requested" -eq 1 ]; then
+        key=$(repo_key "$url")
+        message=$(build_message "$key" "$url" "$additions" "$deletions")
+        send_clipboard "$message"
+        echo "copied review request for pr #$number ($key) to clipboard (additions=$additions deletions=$deletions)"
+      else
+        send_clipboard "$url"
+        echo "copied pr url for #$number to clipboard: $url"
+      fi
+    }
+
     enable_auto_merge() {
       gh pr merge --auto --merge >/dev/null 2>&1 \
         || gh pr merge --auto --squash >/dev/null 2>&1 \
@@ -165,6 +188,7 @@ pkgs.writeShellApplication {
         if [ "$ready_requested" -eq 1 ]; then mark_ready; fi
         if [ "$auto_merge_requested" -eq 1 ]; then enable_auto_merge; fi
         echo "pull request already exists for $(current_branch)"
+        copy_result
         exit 0
         ;;
       CLOSED|MERGED)
@@ -174,5 +198,6 @@ pkgs.writeShellApplication {
 
     push_branch
     create_pr
+    copy_result
   '';
 }

@@ -125,6 +125,7 @@ tooltip label {
 #pulseaudio,
 #network,
 #battery,
+#custom-phone_battery,
 #custom-powermenu {
   padding-left: 10px;
   padding-right: 10px;
@@ -164,6 +165,15 @@ tooltip label {
 }
 #custom-wall {
   color: @sky;
+}
+#custom-phone_battery {
+  color: @lavender;
+}
+#custom-phone_battery.warning {
+  color: @peach;
+}
+#custom-phone_battery.critical {
+  color: @red;
 }
 #temperature {
   color: @sapphire;

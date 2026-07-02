@@ -18,6 +18,7 @@
         "memory"
         "cpu"
         "network"
+        "custom/phone_battery"
         "battery"
         "idle_inhibitor"
         "custom/powermenu"
@@ -161,6 +162,15 @@
         format-alt = "{icon} {time}";
         format-full = " {capacity}%";
         format-icons = [ " " " " " " " " " " ];
+      };
+
+      "custom/phone_battery" = {
+        format = "{}";
+        return-type = "json";
+        interval = 30;
+        max-length = 20;
+        exec = "phone-battery";
+        tooltip = true;
       };
 
       idle_inhibitor = {

@@ -112,11 +112,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778716662,
-        "narHash": "sha256-m1Yf0wZ8j1OHjTc2UwHwyQRSnNeSgLJOd7q5Y45hzi4=",
+        "lastModified": 1782949081,
+        "narHash": "sha256-vp6Y/Grm98ESt6ceOkWiHWyZRDV3J1RID4w+6NWK9yA=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "f7c1a2d347e4c52d5fb8d10cb4d94b5884e546fb",
+        "rev": "17c9d6cdfc60c64f4ee8d306f9bc0b4ccb51481e",
         "type": "github"
       },
       "original": {
@@ -344,11 +344,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1782880431,
-        "narHash": "sha256-62UWlqPjEafBwvv+FuCdDhovZ/pyayEQzKaXw/C7UcY=",
+        "lastModified": 1782960404,
+        "narHash": "sha256-rgsc4xlYgrOq4HfDh9rWcKiL1v7gjDMsvKHg5s8b3ww=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "28a431fcd9c8055d9123cc59906f6743473f8a09",
+        "rev": "6f93063a9c5c88e4b3fe674b8605ce9cce9db54c",
         "type": "github"
       },
       "original": {
@@ -679,11 +679,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782819771,
-        "narHash": "sha256-hj5DHVznTQGy3n9zvSUhlGOGA4wQGidb+JZtU7VHk14=",
+        "lastModified": 1782943897,
+        "narHash": "sha256-HeXyV8/OqrAd0MVEa/gcJfxCiTD8RkUi5BsVckLS8VY=",
         "owner": "devmobasa",
         "repo": "wayscriber",
-        "rev": "410409335f97ce83127ab4321da565bc94d7b750",
+        "rev": "a3fbf7f2b5a427d79bdf028f986d820ec99f24b6",
         "type": "github"
       },
       "original": {

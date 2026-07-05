@@ -25,7 +25,6 @@
       ../../modules/system/networking
       ../../modules/system/nix
       ../../modules/system/systemd
-      ../../modules/users/common.nix
     ];
 
   # firmware upgrades

@@ -36,20 +36,11 @@ let
       modules = [ homeModules.${user} ];
     }
   );
-
-  # Provide users attrset for NixOS integration
-  users = lib.genAttrs userDirs (user: homeModules.${user});
 in
 {
   imports = [ inputs.home-manager.flakeModules.home-manager ];
 
   flake = {
     inherit homeModules homeConfigurations;
-
-    # Export users for NixOS home-manager integration
-    homeUsers = users;
-
-    # Export function to create users for a specific host
-    mkHomeUsers = hostname: users;
   };
 }

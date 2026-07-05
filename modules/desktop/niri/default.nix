@@ -1,10 +1,11 @@
 inputs@{ niri
 , pkgs
+, config
 , ...
 }: {
   nixpkgs.overlays = [ niri.overlays.niri ];
 
-  programs.niri = import ./tuned.nix inputs;
+  programs.niri = import ./tuned.nix (inputs // { hostname = config.networking.hostName; });
 
   environment.systemPackages = with pkgs; [
     (import ./idea-terminals.nix inputs)

@@ -1,5 +1,6 @@
 {
   inputs = {
+    denix.url = "github:yunfachi/denix";
     disko.url = "github:nix-community/disko/latest";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
@@ -22,6 +23,8 @@
     xhmm.url = "github:schuelermine/xhmm";
     xwayland-satellite-unstable.url = "github:Supreeeme/xwayland-satellite";
 
+    denix.inputs.nixpkgs.follows = "nixpkgs";
+    denix.inputs.home-manager.follows = "home-manager";
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -114,6 +117,28 @@
             hardware = "lenovo-thinkpad-p1-gen3";
           };
         };
+
+        unstable-pkgs = import nixpkgs-unstable {
+          system = "x86_64-linux";
+          config = { allowUnfree = true; };
+        };
+
+        denixConfigurations = inputs.denix.lib.configurations {
+          moduleSystem = "nixos";
+          homeManagerUser = "viluon";
+
+          paths = [ ./denix ];
+
+          extensions = with inputs.denix.lib.extensions; [
+            args
+            (base.withConfig { args.enable = true; })
+          ];
+
+          specialArgs = {
+            inherit inputs unstable-pkgs;
+            inherit (inputs) niri wayscriber;
+          };
+        };
       in
       {
         imports = [
@@ -124,7 +149,9 @@
           inputs.treefmt-nix.flakeModule
         ];
 
-        flake.nixosConfigurations = nixpkgs.lib.mapAttrs buildNixosSystem hostConfigs;
+        flake.nixosConfigurations =
+          (nixpkgs.lib.mapAttrs buildNixosSystem hostConfigs)
+          // (nixpkgs.lib.mapAttrs' (name: nixpkgs.lib.nameValuePair "${name}-denix") denixConfigurations);
 
         flake.packages = nixpkgs.lib.genAttrs (nixpkgs.lib.unique (nixpkgs.lib.mapAttrsToList (_: config: config.system) hostConfigs)) (system:
           let pkgs = nixpkgs.legacyPackages.${system}.extend (import ./packages);

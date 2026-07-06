@@ -18,8 +18,6 @@
       ../../modules/desktop/gnome
       ../../modules/desktop/niri
       ../../modules/desktop/stylix
-      ../../modules/system/monitoring/governor-control.nix
-      ../../modules/system/monitoring/grafana-config.nix
     ];
 
   # firmware upgrades

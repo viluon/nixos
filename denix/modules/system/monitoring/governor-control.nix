@@ -42,8 +42,6 @@ delib.module {
             ProtectSystem = "strict";
             ProtectHome = true;
             ReadWritePaths = [ "/sys/devices/system/cpu" ];
-
-            SupplementaryGroups = [ "wheel" ];
           };
 
           environment = {

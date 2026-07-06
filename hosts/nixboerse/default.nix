@@ -18,15 +18,6 @@
       ./nvidia.nix
     ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  # boot animation
-  boot.plymouth.enable = true;
-
-  # firmware upgrades
-  services.fwupd.enable = true;
 
   # access to i2c for monitor control
   hardware.i2c.enable = true;
@@ -48,10 +39,6 @@
     "kernel.kptr_restrict" = 0;
     "fs.inotify.max_user_watches" = 1048576;
   };
-
-  # better legacy OS compatibility
-  services.envfs.enable = true;
-  programs.nix-ld.enable = true;
 
   # Host-specific packages
   environment.systemPackages = with pkgs; [

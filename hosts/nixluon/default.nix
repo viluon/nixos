@@ -17,9 +17,6 @@
       ./kernel.nix
     ];
 
-  # firmware upgrades
-  services.fwupd.enable = true;
-
   # bluetooth
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
@@ -55,8 +52,6 @@
   '';
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot";
 
   # boot a rescue shell on kernel panic
@@ -69,9 +64,6 @@
     "kernel.kptr_restrict" = 0;
     "fs.inotify.max_user_watches" = 1048576;
   };
-
-  # boot animation
-  boot.plymouth.enable = true;
 
   console = {
     earlySetup = true;
@@ -122,9 +114,6 @@
 
   services.fstrim.enable = true;
 
-  # better legacy OS compatibility
-  services.envfs.enable = true;
-  programs.nix-ld.enable = true;
 
   programs.java = {
     package = pkgs.zulu25;

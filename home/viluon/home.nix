@@ -1,57 +1,6 @@
 { config, pkgs, lib, inputs, hostname, unstable-pkgs, ... }:
 
 let
-  commonPackages = with pkgs; [
-    fd
-    fzf
-    gh
-    git-absorb
-    grimblast
-    manix
-    nixd
-    obsidian
-    ripgrep
-    shellcheck
-    starship
-    steam
-    unstable-pkgs.github-copilot-cli
-    vivid
-    waybar
-
-    # System utilities
-    blueman
-    brightnessctl
-    btrfs-assistant
-    cachix
-    cliphist
-    compsize
-    ddcui
-    file
-    gamescope
-    just
-    networkmanager
-    pavucontrol
-    playerctl
-    polkit_gnome
-    wl-clipboard
-    xwayland-run
-    xwayland-satellite
-
-    # Fonts
-    noto-fonts
-    noto-fonts-color-emoji
-    noto-fonts-cjk-sans
-    font-awesome
-
-    # ML4W specific tools
-    figlet
-    gum
-    matugen
-    wallust
-    awww
-    xdg-user-dirs
-  ];
-
   # Host-specific packages
   hostPackages = {
     nixluon = with pkgs; [
@@ -139,18 +88,7 @@ in
     (getGnomeExtensions hostname)
   ];
 
-  # This value determines the Home Manager release that your configuration is
-  # compatible with. This helps avoid breakage when a new Home Manager release
-  # introduces backwards incompatible changes.
-  #
-  # You should not change this value, even if you update Home Manager. If you do
-  # want to update the value, then make sure to first check the Home Manager
-  # release notes.
-  home.stateVersion = "25.05"; # Please read the comment before changing.
-
-  # The home.packages option allows you to install Nix packages into your
-  # environment.
-  home.packages = commonPackages ++ (getHostPackages hostname) ++ scripts;
+  home.packages = (getHostPackages hostname) ++ scripts;
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -423,9 +361,6 @@ in
     REPORTMEMORY = "1000000";
     TIMEFMT = "real: %E | user: %U | sys: %S | cpu: %P | %*E total | max rss: %M kB";
   };
-
-  # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
 
   # GNOME dconf settings
   dconf.settings = lib.mkMerge [

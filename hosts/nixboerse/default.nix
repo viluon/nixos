@@ -9,12 +9,6 @@
 , ...
 }:
 
-let
-  docker-bridge-dns = "172.17.0.1";
-  docker-subnet = "172.17.0.0/16";
-  minikube-subnet = "192.168.49.0/24";
-  kind-subnet = "172.18.0.0/16";
-in
 {
   imports =
     [
@@ -22,9 +16,6 @@ in
       ./hardware.nix
       ./kernel.nix
       ./nvidia.nix
-      ../../modules/desktop/gnome
-      ../../modules/desktop/niri
-      ../../modules/desktop/stylix
     ];
 
   # Bootloader.
@@ -50,141 +41,12 @@ in
   # Intel-specific configuration
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
 
-  programs.virt-manager.enable = true;
-
-  virtualisation.libvirtd = {
-    enable = true;
-    qemu.package = pkgs.qemu_kvm;
-    hooks.qemu =
-      let
-        domains = builtins.concatStringsSep " " [
-          "cedelgroup.com"
-          "cloudconsole-pa.clients6.google.com"
-          "cloudusersettings-pa.clients6.google.com"
-          "dbgcloud.io"
-          "deutsche-boerse.de"
-          "gke.goog"
-          "googleapis.com"
-          "oa.pnrad.net"
-        ];
-
-        resolvectl = "${pkgs.systemd}/bin/resolvectl";
-        VM = "ubuntu";
-      in
-      {
-        libvirtd-network-hook = pkgs.writeShellScript "libvirtd-network-hook" ''
-          set -euo pipefail
-
-          case $1:$2 in
-            ${VM}:start)
-              ${resolvectl} dns virbr0 100.64.0.2
-              ${resolvectl} domain virbr0 ${domains}
-              ${resolvectl} default-route virbr0 no
-              ${resolvectl} dnsovertls virbr0 no
-              ;;
-          esac
-        '';
-      };
-  };
-
-  systemd.services.libvirtd.restartTriggers = [
-    config.virtualisation.libvirtd.hooks.qemu.libvirtd-network-hook
-  ];
-
-  services.resolved.settings.Resolve.DNSStubListenerExtra = docker-bridge-dns;
-
-  systemd.services.resume-ubuntu-vm = {
-    description = "Resume Ubuntu VM snapshot";
-    after = [ "libvirtd.service" "libvirt-guests.service" ];
-    requires = [ "libvirtd.service" ];
-    wantedBy = [ "multi-user.target" ];
-
-    restartIfChanged = false;
-
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.writeShellScript "resume-ubuntu-vm" ''
-        set -euo pipefail
-        ${config.virtualisation.libvirtd.package}/bin/virsh snapshot-revert ubuntu --current
-        ${config.virtualisation.libvirtd.package}/bin/virsh resume ubuntu
-      ''}";
-      ExecStop = "${pkgs.writeShellScript "destroy-ubuntu-vm" ''
-        ${config.virtualisation.libvirtd.package}/bin/virsh destroy ubuntu || true
-      ''}";
-    };
-  };
-
-  systemd.services.libvirtd.serviceConfig.TimeoutStopSec = 8;
-
-  # FORWARD ACCEPT rules for routing through libvirt are managed by
-  # firewall-virbr0-bypass.service (see below) so they sit above libvirt's
-  # REJECT and Docker's chain jumps regardless of unit start order.
-  networking.firewall = {
-    extraCommands = lib.mkAfter ''
-      # Allow Docker/kind containers to reach host's resolved stub on docker0
-      iptables -I nixos-fw -d ${docker-bridge-dns} -p udp --dport 53 -j nixos-fw-accept
-      iptables -I nixos-fw -d ${docker-bridge-dns} -p tcp --dport 53 -j nixos-fw-accept
-    '';
-
-    extraStopCommands = ''
-      iptables -D nixos-fw -d ${docker-bridge-dns} -p udp --dport 53 -j nixos-fw-accept || true
-      iptables -D nixos-fw -d ${docker-bridge-dns} -p tcp --dport 53 -j nixos-fw-accept || true
-    '';
-  };
-
-  # The NixOS firewall, libvirtd and dockerd race to install FORWARD-chain
-  # jumps at boot. Whoever runs last wins (top of FORWARD). When dockerd or
-  # libvirtd win, our ACCEPT rules end up below LIBVIRT_FWI's REJECT and kind
-  # containers can no longer reach virbr0.
-  # Re-insert the rules after both are up so they sit above LIBVIRT_FWI.
-  systemd.services.firewall-virbr0-bypass = {
-    description = "Re-insert FORWARD ACCEPT rules above libvirt/docker chains";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "docker.service" "libvirtd.service" "firewall.service" ];
-    requires = [ "firewall.service" ];
-    partOf = [ "firewall.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      ${lib.concatMapStringsSep "\n" (rule: ''
-        ${pkgs.iptables}/bin/iptables -D FORWARD ${rule} 2>/dev/null || true
-        ${pkgs.iptables}/bin/iptables -I FORWARD 1 ${rule}
-      '') [
-        "-s ${docker-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
-        "-s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
-        "-s ${kind-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
-        "-i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT"
-      ]}
-    '';
-    preStop = ''
-      ${lib.concatMapStringsSep "\n" (rule: ''
-        ${pkgs.iptables}/bin/iptables -D FORWARD ${rule} 2>/dev/null || true
-      '') [
-        "-s ${docker-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
-        "-s ${minikube-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
-        "-s ${kind-subnet} ! -i wlp9s0 -o virbr0 -j ACCEPT"
-        "-i virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT"
-      ]}
-    '';
-  };
-
   boot.kernel.sysctl = {
     # enable sysrq
     "kernel.sysrq" = 502;
     "kernel.perf_event_paranoid" = 1;
     "kernel.kptr_restrict" = 0;
     "fs.inotify.max_user_watches" = 1048576;
-
-    # kind cross-node pod-to-pod traffic uses bridged frames between kind node
-    # containers on the kind Docker network. With bridge-nf-call-iptables=1 (default),
-    # those frames traverse the host iptables FORWARD chain, where the host has no
-    # route for the pod CIDR and they get dropped. Disable bridge-nf so kindnet
-    # bridged traffic forwards purely at L2.
-    "net.bridge.bridge-nf-call-iptables" = 0;
-    "net.bridge.bridge-nf-call-ip6tables" = 0;
   };
 
   # better legacy OS compatibility
@@ -215,13 +77,6 @@ in
   programs.java = {
     package = unstable-pkgs.zulu25;
     enable = true;
-  };
-
-  virtualisation.docker = {
-    enable = true;
-    daemon.settings = {
-      dns = [ docker-bridge-dns ];
-    };
   };
 
   services.ddccontrol.enable = true;

@@ -70,7 +70,11 @@
           homeManagerUser = "viluon";
 
           paths = [ ./denix ];
-          exclude = [ ./denix/modules/editors/vscode-settings.nix ];
+          exclude = [
+            ./denix/modules/editors/vscode-settings.nix
+            ./denix/modules/home/scripts
+            ./denix/modules/home/slack-review.nix
+          ];
 
           extensions = with inputs.denix.lib.extensions; [
             args
@@ -85,7 +89,6 @@
       in
       {
         imports = [
-          ./home
           amd-epp-tool-module
           inputs.flake-root.flakeModule
           inputs.treefmt-nix.flakeModule

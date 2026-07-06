@@ -24,10 +24,8 @@ delib.module {
 
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
-    home-manager.users.viluon = import ../../../home/viluon/home.nix;
     home-manager.extraSpecialArgs = {
       inherit inputs unstable-pkgs;
-      hostname = myconfig.host.name;
     };
   };
 }

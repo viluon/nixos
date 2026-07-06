@@ -15,9 +15,6 @@
       # Include the results of the hardware scan.
       ./hardware.nix
       ./kernel.nix
-      ../../modules/desktop/gnome
-      ../../modules/desktop/niri
-      ../../modules/desktop/stylix
     ];
 
   # firmware upgrades

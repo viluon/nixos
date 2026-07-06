@@ -57,14 +57,6 @@
   # boot a rescue shell on kernel panic
   # boot.crashDump.enable = true; # TODO: enable once we find a good cache
 
-  boot.kernel.sysctl = {
-    # enable sysrq
-    "kernel.sysrq" = 502;
-    "kernel.perf_event_paranoid" = 1;
-    "kernel.kptr_restrict" = 0;
-    "fs.inotify.max_user_watches" = 1048576;
-  };
-
   console = {
     earlySetup = true;
     font = "${pkgs.terminus_font}/share/consolefonts/ter-132n.psf.gz";
@@ -115,10 +107,7 @@
   services.fstrim.enable = true;
 
 
-  programs.java = {
-    package = pkgs.zulu25;
-    enable = true;
-  };
+  programs.java.package = pkgs.zulu25;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -146,43 +135,6 @@
     libvirtd = {
       enable = true;
       qemu.package = pkgs.qemu_kvm;
-    };
-
-    vmVariant = {
-      virtualisation = {
-        cores = 2;
-        memorySize = 4096;
-        forwardPorts = [
-          { from = "host"; host.port = 2222; guest.port = 22; }
-        ];
-        qemu = {
-          options = [
-            "-enable-kvm"
-            "-display gtk,grab-on-hover=on"
-          ];
-          package = pkgs.qemu_kvm;
-        };
-      };
-
-      services.qemuGuest.enable = true;
-
-      # Ensure virtio modules are loaded
-      boot.kernelModules = [ "virtio_pci" "virtio_net" "virtio_blk" "virtio_scsi" "virtio_balloon" ];
-
-      # Enable passwordless login
-      users.users.viluon = {
-        initialHashedPassword = lib.mkForce null;
-        password = "";
-      };
-
-      services.displayManager = {
-        autoLogin = {
-          enable = true;
-          user = "viluon";
-        };
-
-        defaultSession = lib.mkForce "gnome";
-      };
     };
 
     waydroid.enable = true;

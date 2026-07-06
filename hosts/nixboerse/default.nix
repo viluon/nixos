@@ -32,14 +32,6 @@
   # Intel-specific configuration
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
 
-  boot.kernel.sysctl = {
-    # enable sysrq
-    "kernel.sysrq" = 502;
-    "kernel.perf_event_paranoid" = 1;
-    "kernel.kptr_restrict" = 0;
-    "fs.inotify.max_user_watches" = 1048576;
-  };
-
   # Host-specific packages
   environment.systemPackages = with pkgs; [
     chromium
@@ -61,10 +53,7 @@
     "chromium/native-messaging-hosts/linux_entra_sso.json".source = "${pkgs.linux-entra-sso}/etc/chromium/native-messaging-hosts/linux_entra_sso.json";
   };
 
-  programs.java = {
-    package = unstable-pkgs.zulu25;
-    enable = true;
-  };
+  programs.java.package = unstable-pkgs.zulu25;
 
   services.ddccontrol.enable = true;
 
@@ -125,42 +114,11 @@
     };
   };
 
-  virtualisation.vmVariant = {
-    virtualisation = {
-      cores = 2;
-      diskSize = 4096;
-      memorySize = 4096;
-      resolution = { x = 1920; y = 1080; };
-      forwardPorts = [
-        { from = "host"; host.port = 2222; guest.port = 22; }
-      ];
-      qemu = {
-        options = [
-          "-enable-kvm"
-          "-display gtk,grab-on-hover=on"
-        ];
-        package = pkgs.qemu_kvm;
-      };
-    };
-
-    services.qemuGuest.enable = true;
-
-    # Ensure virtio modules are loaded
-    boot.kernelModules = [ "virtio_pci" "virtio_net" "virtio_blk" "virtio_scsi" "virtio_balloon" ];
-
-    # Enable passwordless login
-    users.users.viluon = {
-      initialHashedPassword = lib.mkForce null;
-      password = "";
-    };
-
-    services.displayManager = {
-      autoLogin = {
-        enable = true;
-        user = "viluon";
-      };
-
-      defaultSession = lib.mkForce "gnome";
+  virtualisation.vmVariant.virtualisation = {
+    diskSize = 4096;
+    resolution = {
+      x = 1920;
+      y = 1080;
     };
   };
 

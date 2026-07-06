@@ -78,8 +78,6 @@ let
 in
 {
   imports = [
-    ./eww
-    ./git
     ../../modules/desktop/input-methods.nix
     "${inputs.xhmm}/desktop/gnome/extensions.nix"
     (getGnomeExtensions hostname)

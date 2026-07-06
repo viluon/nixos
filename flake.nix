@@ -1,5 +1,6 @@
 {
   inputs = {
+    denix.url = "github:yunfachi/denix";
     disko.url = "github:nix-community/disko/latest";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-root.url = "github:srid/flake-root";
@@ -22,6 +23,8 @@
     xhmm.url = "github:schuelermine/xhmm";
     xwayland-satellite-unstable.url = "github:Supreeeme/xwayland-satellite";
 
+    denix.inputs.nixpkgs.follows = "nixpkgs";
+    denix.inputs.home-manager.follows = "home-manager";
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -44,16 +47,9 @@
 
   outputs =
     inputs@
-    { self
-    , disko
-    , flake-parts
-    , home-manager
-    , niri
-    , nix-index-database
-    , nixos-hardware
+    { flake-parts
     , nixpkgs
     , nixpkgs-unstable
-    , stylix
     , ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } (
@@ -61,79 +57,53 @@
       let
         inherit (flake-parts-lib) importApply;
         amd-epp-tool-module = importApply ./packages/amd-epp-tool.nix { inherit withSystem; };
-        idea-module = importApply ./modules/editors/idea.nix { inherit withSystem; };
 
-        buildNixosSystem = hostname: config:
-          let
-            unstable-pkgs = import nixpkgs-unstable {
-              system = config.system;
-              config = { allowUnfree = true; };
-            };
-          in
-          nixpkgs.lib.nixosSystem {
-            system = config.system;
-            modules = [
-              ./hosts/${hostname}
-              niri.nixosModules.niri
-              stylix.nixosModules.stylix
-              nixos-hardware.nixosModules.${config.hardware}
-              disko.nixosModules.disko
-              { networking.hostName = hostname; }
-              nix-index-database.nixosModules.nix-index
-              { programs.nix-index-database.comma.enable = true; }
-              home-manager.nixosModules.home-manager
-              {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.users = self.mkHomeUsers hostname;
-                home-manager.extraSpecialArgs = {
-                  inherit inputs hostname unstable-pkgs;
-                };
-              }
-              {
-                nixpkgs.overlays = [
-                  (import ./packages)
-                  inputs.nix4vscode.overlays.default
-                ];
-              }
-            ];
-            specialArgs = self.packages.${config.system} // {
-              inherit unstable-pkgs hostname;
-              inherit (inputs) niri wayscriber;
-              system = config.system;
-            };
-          };
+        systems = [ "x86_64-linux" ];
 
-        hostConfigs = {
-          nixluon = {
-            system = "x86_64-linux";
-            hardware = "framework-amd-ai-300-series";
-          };
-          nixboerse = {
-            system = "x86_64-linux";
-            hardware = "lenovo-thinkpad-p1-gen3";
+        unstable-pkgs = import nixpkgs-unstable {
+          system = "x86_64-linux";
+          config = { allowUnfree = true; };
+        };
+
+        denixConfigurations = inputs.denix.lib.configurations {
+          moduleSystem = "nixos";
+          homeManagerUser = "viluon";
+
+          paths = [ ./denix ];
+          exclude = [
+            ./denix/modules/editors/vscode-settings.nix
+            ./denix/modules/home/scripts
+            ./denix/modules/home/slack-review.nix
+          ];
+
+          extensions = with inputs.denix.lib.extensions; [
+            args
+            (base.withConfig { args.enable = true; })
+          ];
+
+          specialArgs = {
+            inherit inputs unstable-pkgs;
+            inherit (inputs) niri wayscriber;
           };
         };
       in
       {
         imports = [
-          ./home
           amd-epp-tool-module
-          idea-module
           inputs.flake-root.flakeModule
           inputs.treefmt-nix.flakeModule
         ];
 
-        flake.nixosConfigurations = nixpkgs.lib.mapAttrs buildNixosSystem hostConfigs;
+        flake.nixosConfigurations = denixConfigurations;
 
-        flake.packages = nixpkgs.lib.genAttrs (nixpkgs.lib.unique (nixpkgs.lib.mapAttrsToList (_: config: config.system) hostConfigs)) (system:
+        flake.packages = nixpkgs.lib.genAttrs systems (system:
           let pkgs = nixpkgs.legacyPackages.${system}.extend (import ./packages);
           in {
             linux-entra-sso = pkgs.linux-entra-sso;
           }
         );
 
-        systems = nixpkgs.lib.unique (nixpkgs.lib.mapAttrsToList (_: config: config.system) hostConfigs);
+        inherit systems;
 
         perSystem = { config, pkgs, ... }: {
           checks.fzf-history-highlight = import ./checks/fzf-history-highlight.nix { inherit pkgs; };

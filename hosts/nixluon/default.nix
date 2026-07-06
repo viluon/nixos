@@ -15,21 +15,7 @@
       # Include the results of the hardware scan.
       ./hardware.nix
       ./kernel.nix
-      ../../modules/desktop/gnome
-      ../../modules/desktop/niri
-      ../../modules/desktop/stylix
-      ../../modules/hardware/audio.nix
-      ../../modules/hardware/graphics.nix
-      ../../modules/system/monitoring/governor-control.nix
-      ../../modules/system/monitoring/grafana-config.nix
-      ../../modules/system/networking
-      ../../modules/system/nix
-      ../../modules/system/systemd
-      ../../modules/users/common.nix
     ];
-
-  # firmware upgrades
-  services.fwupd.enable = true;
 
   # bluetooth
   hardware.bluetooth.enable = true;
@@ -42,15 +28,10 @@
   services.joycond.enable = true;
 
   # btrfs dedupe
-  services.beesd.filesystems.root = lib.mkIf (config.fileSystems ? "/partition-root") {
+  myconfig.system.btrfsDedupe = {
+    enable = config.fileSystems ? "/partition-root";
     spec = config.fileSystems."/partition-root".device;
-    hashTableSizeMB = 4 * 1024;
-    extraOptions = [
-      "--thread-min"
-      "1"
-      "--loadavg-target"
-      "4.0"
-    ];
+    loadavgTarget = "4.0";
   };
 
   # new xbox controller support
@@ -66,23 +47,10 @@
   '';
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot";
 
   # boot a rescue shell on kernel panic
   # boot.crashDump.enable = true; # TODO: enable once we find a good cache
-
-  boot.kernel.sysctl = {
-    # enable sysrq
-    "kernel.sysrq" = 502;
-    "kernel.perf_event_paranoid" = 1;
-    "kernel.kptr_restrict" = 0;
-    "fs.inotify.max_user_watches" = 1048576;
-  };
-
-  # boot animation
-  boot.plymouth.enable = true;
 
   console = {
     earlySetup = true;
@@ -133,14 +101,8 @@
 
   services.fstrim.enable = true;
 
-  # better legacy OS compatibility
-  services.envfs.enable = true;
-  programs.nix-ld.enable = true;
 
-  programs.java = {
-    package = pkgs.zulu25;
-    enable = true;
-  };
+  programs.java.package = pkgs.zulu25;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -168,43 +130,6 @@
     libvirtd = {
       enable = true;
       qemu.package = pkgs.qemu_kvm;
-    };
-
-    vmVariant = {
-      virtualisation = {
-        cores = 2;
-        memorySize = 4096;
-        forwardPorts = [
-          { from = "host"; host.port = 2222; guest.port = 22; }
-        ];
-        qemu = {
-          options = [
-            "-enable-kvm"
-            "-display gtk,grab-on-hover=on"
-          ];
-          package = pkgs.qemu_kvm;
-        };
-      };
-
-      services.qemuGuest.enable = true;
-
-      # Ensure virtio modules are loaded
-      boot.kernelModules = [ "virtio_pci" "virtio_net" "virtio_blk" "virtio_scsi" "virtio_balloon" ];
-
-      # Enable passwordless login
-      users.users.viluon = {
-        initialHashedPassword = lib.mkForce null;
-        password = "";
-      };
-
-      services.displayManager = {
-        autoLogin = {
-          enable = true;
-          user = "viluon";
-        };
-
-        defaultSession = lib.mkForce "gnome";
-      };
     };
 
     waydroid.enable = true;

@@ -2,7 +2,7 @@
 
 let
   zshSyntaxHighlighting = pkgs.zsh-syntax-highlighting;
-  fzfKeyBindings = ../home/viluon/fzf-key-bindings.zsh;
+  fzfKeyBindings = ../denix/modules/home/fzf-key-bindings.zsh;
 
   testScript = pkgs.writeText "fzf-highlight-test.zsh" ''
     emulate zsh

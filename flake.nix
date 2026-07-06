@@ -57,7 +57,6 @@
       let
         inherit (flake-parts-lib) importApply;
         amd-epp-tool-module = importApply ./packages/amd-epp-tool.nix { inherit withSystem; };
-        idea-module = importApply ./modules/editors/idea.nix { inherit withSystem; };
 
         systems = [ "x86_64-linux" ];
 
@@ -71,6 +70,7 @@
           homeManagerUser = "viluon";
 
           paths = [ ./denix ];
+          exclude = [ ./denix/modules/editors/vscode-settings.nix ];
 
           extensions = with inputs.denix.lib.extensions; [
             args
@@ -87,7 +87,6 @@
         imports = [
           ./home
           amd-epp-tool-module
-          idea-module
           inputs.flake-root.flakeModule
           inputs.treefmt-nix.flakeModule
         ];

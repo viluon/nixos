@@ -1,7 +1,8 @@
-_:
-_:
-{
-  flake.homeModules.idea = { unstable-pkgs, ... }:
+{ delib, unstable-pkgs, ... }:
+delib.module {
+  name = "editors.idea";
+
+  home.always =
     let
       idea = unstable-pkgs.jetbrains.idea;
 
@@ -11,7 +12,6 @@ _:
     {
       home.packages = [ idea ];
 
-      # run on Wayland
       xdg.configFile."JetBrains/IntelliJIdea${version-suffix}/idea64.vmoptions".text = ''
         -Xmx6144m
         -Dawt.toolkit.name=WLToolkit

@@ -28,15 +28,10 @@
   services.joycond.enable = true;
 
   # btrfs dedupe
-  services.beesd.filesystems.root = lib.mkIf (config.fileSystems ? "/partition-root") {
+  myconfig.system.btrfsDedupe = {
+    enable = config.fileSystems ? "/partition-root";
     spec = config.fileSystems."/partition-root".device;
-    hashTableSizeMB = 4 * 1024;
-    extraOptions = [
-      "--thread-min"
-      "1"
-      "--loadavg-target"
-      "4.0"
-    ];
+    loadavgTarget = "4.0";
   };
 
   # new xbox controller support

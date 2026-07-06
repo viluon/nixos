@@ -123,15 +123,10 @@
   };
 
   # btrfs dedupe
-  services.beesd.filesystems.root = {
+  myconfig.system.btrfsDedupe = {
+    enable = true;
     spec = config.fileSystems."/".device;
-    hashTableSizeMB = 4 * 1024;
-    extraOptions = [
-      "--thread-min"
-      "1"
-      "--loadavg-target"
-      "2.0"
-    ];
+    loadavgTarget = "2.0";
   };
 
   # give Alsa more headroom to fix audio stuttering

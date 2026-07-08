@@ -142,6 +142,26 @@ delib.module {
             };
             gradle.symbol = " ";
             kotlin.symbol = " ";
+            custom.pr_ci_success = {
+              when = "starship-pr-ci is success";
+              symbol = "";
+              style = "bold green";
+              format = "[$symbol]($style) ";
+            };
+            custom.pr_ci_failure = {
+              when = "starship-pr-ci is failure";
+              symbol = "";
+              style = "bold red";
+              command = "starship-pr-ci detail";
+              format = "[$output $symbol]($style) ";
+            };
+            custom.pr_ci_pending = {
+              when = "starship-pr-ci is pending";
+              symbol = "";
+              style = "bold yellow";
+              command = "starship-pr-ci detail";
+              format = "[$output $symbol]($style) ";
+            };
           };
         };
 

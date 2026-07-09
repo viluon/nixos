@@ -20,7 +20,7 @@ delib.module {
 
               outputHashMode = "flat";
               outputHashAlgo = "sha256";
-              outputHash = "sha256-6B7ekehtpxetj3N4f9Q+SyDyoXe2meTts15s7DBIzfQ=";
+              outputHash = "sha256-yTZogYWwpAJVONDLOmwU1v1TrN4XxBJd88p0PaVco+M=";
 
               buildPhase = ''
                 curl "https://api.github.com/users/${username}/keys" | \

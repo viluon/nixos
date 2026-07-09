@@ -211,7 +211,11 @@ delib.module {
               "$env_var"
               "$mise"
               "$crystal"
-              "$custom"
+              "\${custom.pr_link}"
+              "\${custom.pr_unresolved}"
+              "\${custom.pr_ci_success}"
+              "\${custom.pr_ci_failure}"
+              "\${custom.pr_ci_pending}"
               "$sudo"
               "$cmd_duration"
               "$line_break"
@@ -268,7 +272,13 @@ delib.module {
             custom.pr_link = {
               when = "starship-pr-ci is-pr";
               command = "starship-pr-ci link";
-              style = "bold blue";
+              style = "blue";
+              format = "[$output]($style) ";
+            };
+            custom.pr_unresolved = {
+              when = "starship-pr-ci has-unresolved";
+              command = "starship-pr-ci unresolved";
+              style = "bold magenta";
               format = "[$output]($style) ";
             };
           };

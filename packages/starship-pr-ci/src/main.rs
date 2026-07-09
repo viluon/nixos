@@ -1,5 +1,5 @@
 // Async prompt backend: reads a cache and spawns a detached refresh, never blocking
-// on the network. Cache line is tab-separated: sha, state, detail, detail_url, pr_url.
+// on the network. Cache line is tab-separated: sha, state, detail, detail_url, pr_url, unresolved.
 
 use std::collections::hash_map::DefaultHasher;
 use std::env;
@@ -15,6 +15,17 @@ const TTL: Duration = Duration::from_secs(15);
 const PRUNE_AGE: Duration = Duration::from_secs(30 * 24 * 60 * 60);
 const LOCK_STALE: Duration = Duration::from_secs(60);
 const PR_ICON: &str = "\u{f407}";
+const UNRESOLVED_ICON: &str = "\u{f41f}";
+
+const THREADS_QUERY: &str = r#"
+query($owner:String!,$name:String!,$number:Int!){
+  repository(owner:$owner,name:$name){
+    pullRequest(number:$number){
+      reviewThreads(first:100){ nodes { isResolved } }
+    }
+  }
+}
+"#;
 
 const GRAPHQL_QUERY: &str = r#"
 query($owner:String!,$name:String!,$oid:GitObjectID!){
@@ -36,6 +47,7 @@ struct Status {
     detail: String,
     detail_url: String,
     pr_url: String,
+    unresolved: String,
 }
 
 impl Status {
@@ -176,12 +188,52 @@ fn verdict(nodes: &[Value]) -> Status {
         detail,
         detail_url,
         pr_url: String::new(),
+        unresolved: String::new(),
     }
 }
 
-fn query_pr(host: &str) -> Option<Status> {
+fn query_unresolved(host: &str, owner: &str, name: &str, number: i64) -> String {
     let out = Command::new("gh")
-        .args(["pr", "view", "--json", "state,statusCheckRollup,url"])
+        .args(["api", "graphql"])
+        .args([
+            "-F",
+            &format!("owner={owner}"),
+            "-F",
+            &format!("name={name}"),
+            "-F",
+            &format!("number={number}"),
+        ])
+        .args(["-f", &format!("query={THREADS_QUERY}")])
+        .env("GH_HOST", host)
+        .stderr(Stdio::null())
+        .output();
+    let out = match out {
+        Ok(o) if o.status.success() => o,
+        _ => return String::new(),
+    };
+    let v: Value = match serde_json::from_slice(&out.stdout) {
+        Ok(v) => v,
+        Err(_) => return String::new(),
+    };
+    let nodes =
+        match v["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"].as_array() {
+            Some(n) => n,
+            None => return String::new(),
+        };
+    let count = nodes
+        .iter()
+        .filter(|t| t["isResolved"].as_bool() == Some(false))
+        .count();
+    if count == 0 {
+        String::new()
+    } else {
+        count.to_string()
+    }
+}
+
+fn query_pr(host: &str, slug: &str) -> Option<Status> {
+    let out = Command::new("gh")
+        .args(["pr", "view", "--json", "state,statusCheckRollup,url,number"])
         .env("GH_HOST", host)
         .stderr(Stdio::null())
         .output()
@@ -195,6 +247,9 @@ fn query_pr(host: &str) -> Option<Status> {
     }
     let mut st = verdict(v["statusCheckRollup"].as_array()?);
     st.pr_url = v["url"].as_str().unwrap_or("").to_string();
+    if let (Some((owner, name)), Some(number)) = (slug.split_once('/'), v["number"].as_i64()) {
+        st.unresolved = query_unresolved(host, owner, name, number);
+    }
     Some(st)
 }
 
@@ -254,7 +309,7 @@ fn query_ci() -> Status {
     if host.is_empty() || !gh_authed(&host) {
         return Status::none();
     }
-    query_pr(&host).unwrap_or_else(|| query_head(&host, &slug))
+    query_pr(&host, &slug).unwrap_or_else(|| query_head(&host, &slug))
 }
 
 fn refresh(repo_root: &str, head_sha: &str, cache_file: &Path) {
@@ -275,8 +330,8 @@ fn refresh(repo_root: &str, head_sha: &str, cache_file: &Path) {
     let _ = env::set_current_dir(repo_root);
     let st = query_ci();
     let line = format!(
-        "{head_sha}\t{}\t{}\t{}\t{}\n",
-        st.state, st.detail, st.detail_url, st.pr_url
+        "{head_sha}\t{}\t{}\t{}\t{}\t{}\n",
+        st.state, st.detail, st.detail_url, st.pr_url, st.unresolved
     );
     let tmp = cache_file.with_extension("tmp");
     if fs::write(&tmp, line).is_ok() {
@@ -354,6 +409,7 @@ fn resolve() -> Status {
                     detail: get(2),
                     detail_url: get(3),
                     pr_url: get(4),
+                    unresolved: get(5),
                 },
             )
         }
@@ -408,6 +464,22 @@ fn main() {
                 std::process::exit(1);
             }
         }
+        "has-unresolved" => {
+            if resolve().unresolved.is_empty() {
+                std::process::exit(1);
+            }
+        }
+        "unresolved" => {
+            let st = resolve();
+            if !st.unresolved.is_empty() {
+                let url = if st.pr_url.is_empty() {
+                    String::new()
+                } else {
+                    format!("{}/files", st.pr_url)
+                };
+                osc8(&url, &format!("{UNRESOLVED_ICON} {}", st.unresolved));
+            }
+        }
         "is" => {
             let want = args.get(2).map(String::as_str).unwrap_or("");
             if resolve().state != want {
@@ -415,7 +487,9 @@ fn main() {
             }
         }
         _ => {
-            eprintln!("usage: starship-pr-ci [read|detail|link|is-pr|is <state>]");
+            eprintln!(
+                "usage: starship-pr-ci [read|detail|link|is-pr|unresolved|has-unresolved|is <state>]"
+            );
             std::process::exit(2);
         }
     }

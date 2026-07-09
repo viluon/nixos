@@ -139,6 +139,7 @@ delib.module {
               "$git_commit"
               "$git_state"
               "$git_metrics"
+              "$git_status"
               "$hg_branch"
               "$hg_state"
               "$pijul_channel"
@@ -236,6 +237,8 @@ delib.module {
               symbol = "[](bold blue) ";
             };
             git_status = {
+              style = "dimmed white";
+              stashed = "";
               ahead = "⇡\${count}";
               diverged = "⇕⇡\${ahead_count}⇣\${behind_count}";
               behind = "⇣\${count}";
@@ -261,6 +264,12 @@ delib.module {
               style = "bold yellow";
               command = "starship-pr-ci detail";
               format = "[$output $symbol]($style) ";
+            };
+            custom.pr_link = {
+              when = "starship-pr-ci is-pr";
+              command = "starship-pr-ci link";
+              style = "bold blue";
+              format = "[$output]($style) ";
             };
           };
         };

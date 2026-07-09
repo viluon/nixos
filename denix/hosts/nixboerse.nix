@@ -55,6 +55,9 @@ delib.host {
         home.packages = [
           unstable-pkgs.mill
           pkgs.nodejs_24
+          (pkgs.google-cloud-sdk.withExtraComponents [
+            pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin
+          ])
         ];
       }
     )

@@ -111,6 +111,10 @@
           treefmt.config = {
             inherit (config.flake-root) projectRootFile;
             programs.nixpkgs-fmt.enable = true;
+            programs.rustfmt = {
+              enable = true;
+              edition = "2024";
+            };
             programs.prettier = {
               enable = true;
               includes = [

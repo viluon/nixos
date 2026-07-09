@@ -215,11 +215,10 @@ fn query_unresolved(host: &str, owner: &str, name: &str, number: i64) -> String 
         Ok(v) => v,
         Err(_) => return String::new(),
     };
-    let nodes =
-        match v["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"].as_array() {
-            Some(n) => n,
-            None => return String::new(),
-        };
+    let nodes = match v["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"].as_array() {
+        Some(n) => n,
+        None => return String::new(),
+    };
     let count = nodes
         .iter()
         .filter(|t| t["isResolved"].as_bool() == Some(false))

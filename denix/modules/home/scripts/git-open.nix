@@ -134,6 +134,11 @@ pkgs.writeShellApplication {
     }
 
     enable_auto_merge() {
+      local additions=$1 deletions=$2 change_scale
+      if ! is_smol "$additions" "$deletions"; then
+        change_scale=$(( additions > deletions ? additions : deletions ))
+        fail "auto merge only available for :smol: changes (<43 lines). current change scale: $change_scale"
+      fi
       gh pr merge --auto --merge >/dev/null 2>&1 \
         || gh pr merge --auto --squash >/dev/null 2>&1 \
         || fail "failed to enable auto merge"
@@ -159,7 +164,7 @@ pkgs.writeShellApplication {
       fi
 
       if [ "$auto_merge_requested" -eq 1 ]; then
-        enable_auto_merge
+        enable_auto_merge "$additions" "$deletions"
       fi
     }
 
@@ -186,7 +191,12 @@ pkgs.writeShellApplication {
       OPEN)
         push_branch
         if [ "$ready_requested" -eq 1 ]; then mark_ready; fi
-        if [ "$auto_merge_requested" -eq 1 ]; then enable_auto_merge; fi
+        if [ "$auto_merge_requested" -eq 1 ]; then
+          open_stats=$(gh pr view --json additions,deletions) || fail "failed to read pull request"
+          enable_auto_merge \
+            "$(printf '%s' "$open_stats" | jq -r '.additions')" \
+            "$(printf '%s' "$open_stats" | jq -r '.deletions')"
+        fi
         echo "pull request already exists for $(current_branch)"
         copy_result
         exit 0

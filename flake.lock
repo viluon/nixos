@@ -81,11 +81,11 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1770444703,
-        "narHash": "sha256-7hb/H1wGnq9O6+FTzSQFRdHnRbx6tENXj0hakmJwOOs=",
+        "lastModified": 1784653206,
+        "narHash": "sha256-WcQJkU630mgDjtSrnx5ni1nNKOUOaKmcVk6gOToJCuY=",
         "owner": "yunfachi",
         "repo": "denix",
-        "rev": "5aa95a9ab7cb641d9d8456b7c2a391dbb9b35e7a",
+        "rev": "271d76816ca215d80e6736ab24d8d22417b24773",
         "type": "github"
       },
       "original": {
@@ -816,11 +816,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784633741,
-        "narHash": "sha256-Dig6s5fPggTIDjj/q6DAGrtxN7ElvuK2iol0LTbfjjI=",
+        "lastModified": 1784658934,
+        "narHash": "sha256-+BU/ofdasVoyW8LCbfIRFyN+KeORCAqv/zV5D0it9a0=",
         "owner": "devmobasa",
         "repo": "wayscriber",
-        "rev": "11507b87c002f3ea357a52a017fd0b4b845c70bc",
+        "rev": "02871d2f1d3d3f27b9516bb0eecf77322cd959b1",
         "type": "github"
       },
       "original": {

@@ -50,6 +50,7 @@ delib.host {
           gimp
           gthumb
           mozjpeg
+          mpv
           vlc
 
           bottles

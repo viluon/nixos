@@ -816,11 +816,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785018212,
-        "narHash": "sha256-bFDwWC/ANHjl/tmC6jciJ/ysEbn5wg6CwuzfAR3YIUE=",
+        "lastModified": 1785071612,
+        "narHash": "sha256-QU10CNAPTU/+6e/7rb9XR5VZHMG56TgeEVmFbD0uJYA=",
         "owner": "devmobasa",
         "repo": "wayscriber",
-        "rev": "b06b60e2a231bd84566223a9e66461351ec3aafc",
+        "rev": "2b5109db73cd3e5a2f4ebd15cb468e945f435e96",
         "type": "github"
       },
       "original": {

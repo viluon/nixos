@@ -240,11 +240,11 @@
     "fzf-git-sh": {
       "flake": false,
       "locked": {
-        "lastModified": 1783337766,
-        "narHash": "sha256-3ho7Kn84q36bj9N+Nj+5XEdkXIN4xwYk7h7g/ou3TRM=",
+        "lastModified": 1785897583,
+        "narHash": "sha256-Mj0jD3si9JkyHERjpFd5gSm16/OLh4h+ylfWMncWwWs=",
         "owner": "junegunn",
         "repo": "fzf-git.sh",
-        "rev": "fdf632c53262dfcc44fc09d591e462e9f8fcae83",
+        "rev": "5a5a0ab8e95ef1497ab096244c8489422e2dad59",
         "type": "github"
       },
       "original": {
@@ -429,11 +429,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1785813169,
-        "narHash": "sha256-qVNOiWYSXXmbuHFEFabn3JjGmw4cts8okOVjTOmlGfw=",
+        "lastModified": 1785899662,
+        "narHash": "sha256-vQP7xd6IaM14anwzP0BqdsXdPWr3oIzVYGRgkL+sQGs=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "7cf2867d9dbdafeaca82fa668dc457ed463d2292",
+        "rev": "d841526d0ab542d878b6e84176897e1441574c88",
         "type": "github"
       },
       "original": {

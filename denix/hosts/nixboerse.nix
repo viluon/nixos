@@ -19,6 +19,8 @@ delib.host {
     splitDnsServer = "100.64.0.2";
     splitDnsDomains = [
       "cedelgroup.com"
+      "cloudconsole-pa.clients6.google.com"
+      "cloudusersettings-pa.clients6.google.com"
       "dbgcloud.io"
       "deutsche-boerse.de"
       "gke.goog"

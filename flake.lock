@@ -240,11 +240,11 @@
     "fzf-git-sh": {
       "flake": false,
       "locked": {
-        "lastModified": 1785897583,
-        "narHash": "sha256-Mj0jD3si9JkyHERjpFd5gSm16/OLh4h+ylfWMncWwWs=",
+        "lastModified": 1786002972,
+        "narHash": "sha256-j7co9UjWdSMC7Ojyhuz2bIALrucF94o+irF4pJ6hgG4=",
         "owner": "junegunn",
         "repo": "fzf-git.sh",
-        "rev": "5a5a0ab8e95ef1497ab096244c8489422e2dad59",
+        "rev": "d5b0a5dcd1e073b8bfca45338d5dfad3e5642471",
         "type": "github"
       },
       "original": {
@@ -429,11 +429,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1785899662,
-        "narHash": "sha256-vQP7xd6IaM14anwzP0BqdsXdPWr3oIzVYGRgkL+sQGs=",
+        "lastModified": 1785986576,
+        "narHash": "sha256-MfDVRxS8LIOkcTojj62dH38Lmw0LFNHPQdYDLBdwPJ0=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "d841526d0ab542d878b6e84176897e1441574c88",
+        "rev": "73081439229bac88846cd8aa35c2ab9a1daf7b06",
         "type": "github"
       },
       "original": {
@@ -494,11 +494,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1785828668,
-        "narHash": "sha256-8fsyqeO+mJqvIzeO4xIpgJe/f7MTbbVTEC6RT6WSXNs=",
+        "lastModified": 1785967620,
+        "narHash": "sha256-IItrdb7Puk05RqOBWZYFC5X6Wl1sJmCfh5MWVHw5iMM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e72e4f299401a3689d4b3d5fc6496b11db7064eb",
+        "rev": "b7c2ada94fe99c15b0dbcf4d11fd7850b957a436",
         "type": "github"
       },
       "original": {

@@ -2,65 +2,69 @@
 delib.module {
   name = "system.monitoring.governor-control";
 
-  nixos.always.imports = [
-    (
-      { config, lib, pkgs, ... }:
+  options.system.monitoring.governor-control.enable = delib.boolOption false;
 
-      let
-        governorServer = pkgs.replaceVars ./governor-server.py {
-          cpupowerPath = "${pkgs.linuxPackages.cpupower}/bin/cpupower";
-        };
-      in
-      {
-        environment.systemPackages = with pkgs; [
-          linuxPackages.cpupower
-        ];
+  nixos.always = { cfg, ... }: {
+    imports = [
+      (
+        { config, lib, pkgs, ... }:
 
-        users.users.cpugovernor = {
-          isSystemUser = true;
-          group = "cpugovernor";
-          description = "CPU Governor Control User";
-        };
+        let
+          governorServer = pkgs.replaceVars ./governor-server.py {
+            cpupowerPath = "${pkgs.linuxPackages.cpupower}/bin/cpupower";
+          };
+        in
+        lib.mkIf cfg.enable {
+          environment.systemPackages = with pkgs; [
+            linuxPackages.cpupower
+          ];
 
-        users.groups.cpugovernor = { };
-
-        systemd.services.cpu-governor-api = {
-          description = "CPU Governor Control API";
-          wantedBy = [ "multi-user.target" ];
-          after = [ "network.target" ];
-
-          serviceConfig = {
-            Type = "simple";
-            User = "cpugovernor";
-            Group = "cpugovernor";
-            ExecStart = "${pkgs.python3}/bin/python3 ${governorServer}";
-            Restart = "always";
-            RestartSec = 5;
-
-            NoNewPrivileges = false;
-            PrivateTmp = true;
-            ProtectSystem = "strict";
-            ProtectHome = true;
-            ReadWritePaths = [ "/sys/devices/system/cpu" ];
+          users.users.cpugovernor = {
+            isSystemUser = true;
+            group = "cpugovernor";
+            description = "CPU Governor Control User";
           };
 
-          environment = {
-            PYTHONUNBUFFERED = "1";
-          };
-        };
+          users.groups.cpugovernor = { };
 
-        security.sudo.extraRules = [
-          {
-            users = [ "cpugovernor" ];
-            commands = [
-              {
-                command = "${pkgs.linuxPackages.cpupower}/bin/cpupower";
-                options = [ "NOPASSWD" ];
-              }
-            ];
-          }
-        ];
-      }
-    )
-  ];
+          systemd.services.cpu-governor-api = {
+            description = "CPU Governor Control API";
+            wantedBy = [ "multi-user.target" ];
+            after = [ "network.target" ];
+
+            serviceConfig = {
+              Type = "simple";
+              User = "cpugovernor";
+              Group = "cpugovernor";
+              ExecStart = "${pkgs.python3}/bin/python3 ${governorServer}";
+              Restart = "always";
+              RestartSec = 5;
+
+              NoNewPrivileges = false;
+              PrivateTmp = true;
+              ProtectSystem = "strict";
+              ProtectHome = true;
+              ReadWritePaths = [ "/sys/devices/system/cpu" ];
+            };
+
+            environment = {
+              PYTHONUNBUFFERED = "1";
+            };
+          };
+
+          security.sudo.extraRules = [
+            {
+              users = [ "cpugovernor" ];
+              commands = [
+                {
+                  command = "${pkgs.linuxPackages.cpupower}/bin/cpupower";
+                  options = [ "NOPASSWD" ];
+                }
+              ];
+            }
+          ];
+        }
+      )
+    ];
+  };
 }

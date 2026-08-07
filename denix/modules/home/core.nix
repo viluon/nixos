@@ -22,6 +22,7 @@ delib.module {
           starship
           steam
           unstable-pkgs.github-copilot-cli
+          unzip
           vivid
           waybar
 

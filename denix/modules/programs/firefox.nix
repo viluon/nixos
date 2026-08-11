@@ -12,12 +12,7 @@ delib.module {
           preferences = {
             "browser.tabs.allow_transparent_browser" = true;
 
-            "network.lna.skip-domains" = lib.concatStringsSep "," [
-              "googleapis.com"
-              "*.googleapis.com"
-              "*.gstatic.com"
-              "*.clients6.google.com"
-            ];
+            "network.lna.blocking" = false;
           };
         };
       }

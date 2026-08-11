@@ -2,7 +2,11 @@ inputs@{ niri
 , pkgs
 , config
 , ...
-}: {
+}:
+let
+  wayscriber = inputs.wayscriber.packages.${pkgs.stdenv.hostPlatform.system}.default;
+in
+{
   nixpkgs.overlays = [ niri.overlays.niri ];
 
   programs.niri = import ./tuned.nix (inputs // { hostname = config.networking.hostName; });
@@ -16,7 +20,7 @@ inputs@{ niri
     playerctl
     slurp
     swaybg
-    inputs.wayscriber.packages.${pkgs.stdenv.hostPlatform.system}.default
+    wayscriber
     inputs.wayscriber.packages.${pkgs.stdenv.hostPlatform.system}.wayscriber-configurator
     wireplumber
     wl-clipboard
@@ -99,6 +103,23 @@ inputs@{ niri
         systemd.user.services.dunst.Service = {
           Restart = "on-failure";
           RestartSec = 1;
+        };
+
+        systemd.user.services.wayscriber = {
+          Unit = {
+            Description = "wayscriber screen annotation daemon";
+            After = [ "graphical-session.target" ];
+            PartOf = [ "graphical-session.target" ];
+          };
+
+          Service = {
+            Type = "simple";
+            ExecStart = "${wayscriber}/bin/wayscriber --daemon";
+            Restart = "on-failure";
+            RestartSec = 1;
+          };
+
+          Install.WantedBy = [ "graphical-session.target" ];
         };
 
         # niri-flake would enable the KDE agent by default

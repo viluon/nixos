@@ -32,7 +32,6 @@
 
   spawn-at-startup = [
     { argv = [ "swaybg" "--image" config.stylix.image "--mode" "fill" ]; }
-    { argv = [ "wayscriber" "--daemon" ]; }
     { argv = [ "idea-terminals" ]; }
   ] ++ lib.map (app: { argv = app.command; }) (import ./at-startup.nix);
 

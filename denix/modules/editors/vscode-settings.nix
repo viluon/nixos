@@ -24,111 +24,22 @@
   "search.showLineNumbers" = true;
   "search.smartCase" = true;
   "search.useReplacePreview" = false;
-  "todo-tree.tree.showScanModeButton" = false;
-  "todo-tree.highlights.enabled" = true;
-  "gitlens.hovers.currentLine.over" = "line";
   "editor.suggestSelection" = "first";
-  "vsintellicode.modify.editor.suggestSelection" = "automaticallyOverrodeDefaultValue";
   "update.mode" = "none";
-  "dimmer.enabled" = true;
-  "discord.removeDetails" = true;
   "files.hotExit" = "onExitAndWindowClose";
   "editor.minimap.showSlider" = "always";
-  "local-history.path" = "~/.histdb/vscode/";
   "cSpell.language" = "en-GB,cs";
   "editor.codeLensFontFamily" = "Iosevka Regular";
   "liveshare.showReadOnlyUsersInEditor" = "always";
   "workbench.tree.indent" = 12;
   "explorer.openEditors.visible" = 0;
-  "haskell.updateBehavior" = "prompt";
-  "haskell.plugin.tactics.config.timeout_duration" = 4;
-  "peacock.favoriteColors" = [
-    {
-      name = "Angular Red";
-      value = "#dd0531";
-    }
-    {
-      name = "Azure Blue";
-      value = "#007fff";
-    }
-    {
-      name = "JavaScript Yellow";
-      value = "#f9e64f";
-    }
-    {
-      name = "Mandalorian Blue";
-      value = "#1857a4";
-    }
-    {
-      name = "Node Green";
-      value = "#215732";
-    }
-    {
-      name = "React Blue";
-      value = "#61dafb";
-    }
-    {
-      name = "Something Different";
-      value = "#832561";
-    }
-    {
-      name = "Svelte Orange";
-      value = "#ff3d00";
-    }
-    {
-      name = "Vue Green";
-      value = "#42b883";
-    }
-    {
-      name = "Eye-watering Purple";
-      value = "#5a08f7";
-    }
-    {
-      name = "Awful blue";
-      value = "#1a1af7";
-    }
-    {
-      name = "Haskell Purple";
-      value = "#6b3b69";
-    }
-    {
-      name = "GRIN Green";
-      value = "#2aa77d";
-    }
-    {
-      name = "Skyward Blue";
-      value = "#49a3e6";
-    }
-    {
-      name = "Vivid Purple";
-      value = "#771b97";
-    }
-    {
-      name = "Luxygen Grey";
-      value = "#73949e";
-    }
-    {
-      name = "Lush Green";
-      value = "#197b14";
-    }
-    {
-      name = "random blue";
-      value = "#3f77d7";
-    }
-  ];
-  "peacock.surpriseMeOnStartup" = true;
   "keyboard.dispatch" = "keyCode";
   "outline.showModules" = false;
   "editor.matchBrackets" = "never";
   "editor.bracketPairColorization.enabled" = true;
-  "tabnine.experimentalAutoImports" = true;
-  "tabnine.disable_file_regex" = [
-    "\\.hs$"
-  ];
   "editor.cursorBlinking" = "smooth";
   "cSpell.diagnosticLevel" = "Hint";
   "editor.inlineSuggest.enabled" = true;
-  "Lua.color.mode" = "SemanticEnhanced";
   "cSpell.userWords" = [
     "analyzer"
     "Plugins"
@@ -158,52 +69,26 @@
     "github-actions-workflow" = true;
   };
   "rust-analyzer.check.command" = "clippy";
-  "C_Cpp.default.cppStandard" = "c++11";
-  "rust-analyzer.cargo.loadOutDirsFromCheck" = true;
+  "rust-analyzer.cargo.buildScripts.enable" = true;
   "files.exclude" = {
     "**/.classpath" = true;
     "**/.project" = true;
     "**/.settings" = true;
     "**/.factorypath" = true;
   };
-  "C_Cpp.clang_format_fallbackStyle" = "LLVM";
   "cSpell.maxNumberOfProblems" = 400;
-  "sync.gist" = "8a6dd71e1bd96068a4dd4ddfefbc9116";
   "remote.SSH.remotePlatform" = {
     "ghost-in-the-wires" = "linux";
     "master-yoda" = "linux";
   };
-  "remote.containers.executeInWSL" = true;
-  "cmake.configureOnOpen" = false;
-  "glassit.alpha" = 250;
-  "glassit.step" = 1;
   "telemetry.telemetryLevel" = "crash";
-  "vscode_vibrancy.type" = "acrylic";
-  "vscode_vibrancy.theme" = "Dark (Only Subbar)";
-  "gitlens.defaultDateShortFormat" = "YY-MM-DD";
-  "gitlens.blame.dateFormat" = "YY-MM-DD";
-  "gitlens.defaultTimeFormat" = "HH:mm";
-  "gitlens.currentLine.enabled" = false;
   "settingsSync.ignoredExtensions" = [
     "vittorioromeo.expand-selection-to-scope"
   ];
-  "gitlens.showWelcomeOnInstall" = false;
-  "gitlens.blame.format" = "\${message|25} \${date|8-}";
-  "redhat.telemetry.enabled" = false;
-  "c-cpp-flylint.clang.enable" = false;
-  "c-cpp-flylint.flawfinder.enable" = false;
-  "c-cpp-flylint.lizard.enable" = false;
-  "c-cpp-flylint.flexelint.enable" = false;
-  "C_Cpp.intelliSenseEngine" = "Disabled";
   "editor.foldingMaximumRegions" = 65000;
-  "p4Extension.useRemoteCompiler" = false;
   "workbench.list.smoothScrolling" = true;
   "editor.smoothScrolling" = true;
   "git.confirmSync" = false;
-  "haskell.manageHLS" = "GHCup";
-  "p4-analyzer.server.absoluteServerPath" = "/home/viluon/projects/p4-lang-server/target/release/p4analyzer";
-  "p4-analyzer.server.logLevel" = "trace";
-  "p4-analyzer.trace.server" = "verbose";
   "editor.accessibilitySupport" = "off";
   "typescript.updateImportsOnFileMove.enabled" = "always";
   "diffEditor.ignoreTrimWhitespace" = false;

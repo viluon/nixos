@@ -98,7 +98,7 @@
       {
         matches = [
           { title = "Bitwarden"; }
-          { app-id = "obsidian"; }
+          { app-id = "md.Obsidian"; }
         ];
         block-out-from = "screencast";
       }

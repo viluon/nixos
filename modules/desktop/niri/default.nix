@@ -4,7 +4,25 @@ inputs@{ niri
 , ...
 }:
 let
-  wayscriber = inputs.wayscriber.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  system = pkgs.stdenv.hostPlatform.system;
+  wayscriber = inputs.wayscriber.packages.${system}.default;
+
+  wayscriber-toggle = pkgs.writeShellApplication {
+    name = "wayscriber-toggle";
+    runtimeInputs = [ wayscriber pkgs.systemd pkgs.coreutils pkgs.gnugrep ];
+    text = ''
+      toggle() { wayscriber --daemon-toggle 2>&1 || true; }
+      broker-broken() { printf '%s' "$1" | grep -q "Unable to launch overlay process"; }
+
+      if broker-broken "$(toggle)"; then
+        systemctl --user restart wayscriber
+        for ((attempt = 0; attempt < 50; attempt++)); do
+          sleep 0.1
+          broker-broken "$(toggle)" || exit 0
+        done
+      fi
+    '';
+  };
 in
 {
   nixpkgs.overlays = [ niri.overlays.niri ];
@@ -21,7 +39,8 @@ in
     slurp
     swaybg
     wayscriber
-    inputs.wayscriber.packages.${pkgs.stdenv.hostPlatform.system}.wayscriber-configurator
+    wayscriber-toggle
+    inputs.wayscriber.packages.${system}.wayscriber-configurator
     wireplumber
     wl-clipboard
     wlogout

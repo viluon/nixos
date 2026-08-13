@@ -140,9 +140,10 @@
     let
       warcraft3Range = { from = 6112; to = 6119; };
       steamLocalTransferPort = 27040;
+      googleCastPort = 5000;
     in
     {
-      allowedTCPPorts = [ 80 443 steamLocalTransferPort ];
+      allowedTCPPorts = [ 80 443 steamLocalTransferPort googleCastPort ];
       allowedTCPPortRanges = [ warcraft3Range ];
       allowedUDPPorts = [ 16000 ];
       allowedUDPPortRanges = [ warcraft3Range { from = 27000; to = 27100; } ];

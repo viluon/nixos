@@ -114,6 +114,10 @@ delib.module {
               fi
             }
 
+            # Redraw prompt every 30s
+            TMOUT=30
+            TRAPALRM() { zle && zle reset-prompt }
+
             # VS Code shell integration
             [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
           '';

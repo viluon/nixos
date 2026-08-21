@@ -37,13 +37,14 @@ delib.module {
           shellAliases = {
             cat = "bat";
             find = "fd";
-            grep = "rg";
             glr = "git pull --rebase";
+            grep = "rg";
             gsh = "git show --ext-diff";
+            jb = "just build";
             lh = "eza --long --git --icons=auto --classify=always";
             ll = "eza --long --git --icons=auto --classify=always --all";
-            lt = "eza --long --git --icons=auto --classify=always --git-ignore --tree";
             ls = "eza";
+            lt = "eza --long --git --icons=auto --classify=always --git-ignore --tree";
           };
 
           history = {

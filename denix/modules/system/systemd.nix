@@ -21,6 +21,7 @@ delib.module {
         systemd.oomd = {
           enable = true;
           enableUserSlices = true;
+          enableSystemSlice = true;
           settings.OOM = {
             SwapUsedLimit = "90%";
             DefaultMemoryPressureDurationSec = "20s";
@@ -37,6 +38,10 @@ delib.module {
 
         systemd.slices.user.sliceConfig = {
           ManagedOOMSwap = "kill";
+        };
+
+        systemd.slices.system.sliceConfig = {
+          ManagedOOMMemoryPressureLimit = "50%";
         };
 
         systemd.user.services.oomd-notify = {

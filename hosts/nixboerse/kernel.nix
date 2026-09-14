@@ -1,10 +1,16 @@
 { lib
 , pkgs
+, unstable-pkgs
 , ...
 }:
 
 let
-  kernelPackages = pkgs.linuxPackages_latest;
+  kernelPackages = pkgs.linuxPackages_latest.extend (
+    finalKernelPackages: _: {
+      ddcci-driver =
+        (unstable-pkgs.linuxPackagesFor finalKernelPackages.kernel).ddcci-driver;
+    }
+  );
 in
 {
   boot.kernelPackages = kernelPackages;

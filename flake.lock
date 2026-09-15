@@ -350,11 +350,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1789409599,
-        "narHash": "sha256-IY4ARbRu56YLzJ+JLDORIOb+RrwkSut7y6jMBDcNa2g=",
+        "lastModified": 1789498232,
+        "narHash": "sha256-77MjtAjEiPCRH/CtChSU6IHclKkgQ3pI7s3c7N7iiiQ=",
         "owner": "niri-wm",
         "repo": "niri",
-        "rev": "2f87f3846bf9e6e7e02db398bee1b42dc24b106f",
+        "rev": "02fdd8e7586110d6aa79d94f388756a3479091b6",
         "type": "github"
       },
       "original": {
@@ -429,11 +429,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1789360310,
-        "narHash": "sha256-5rch60RDKobWtcCGRspH+i5RGmr/4M3kNZhaO2qrJv0=",
+        "lastModified": 1789446513,
+        "narHash": "sha256-/G9guv8+pYmz/aBNQO+qNJFo/aztq4jKWKyWYUgX3i8=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "e00ceb282e62d7f21aa8983cf271d494f611078c",
+        "rev": "57fb7ae9ef7cfbd009894c91cc954095541da904",
         "type": "github"
       },
       "original": {
@@ -622,6 +622,27 @@
       }
     },
     "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "wayscriber",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788505699,
+        "narHash": "sha256-PSPDCdbEBEbSDCWcqv5GkbyD2ACQ9Diz6vmEbWdy4dM=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "9eccf73c5b810052f08aa77ae0548c383259f17f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "rust-overlay_2": {
       "inputs": {
         "nixpkgs": [
           "xwayland-satellite-unstable",
@@ -813,14 +834,15 @@
         ],
         "nixpkgs": [
           "nixpkgs-unstable"
-        ]
+        ],
+        "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1787036805,
-        "narHash": "sha256-f4vKNDpI+pjwRP5IPDEbfq+SAcZBB0Z6i/tQqZUmLOo=",
+        "lastModified": 1789315181,
+        "narHash": "sha256-FZNEhZnf5NiGdirN2T326VuixKtr5vWEEJ0UT9FZ4nY=",
         "owner": "devmobasa",
         "repo": "wayscriber",
-        "rev": "36be6a5b2127a3f6e9fa90cac02c01a8de20d606",
+        "rev": "53d122a5ba9bd3c564178f05d1132fc581d9f64a",
         "type": "github"
       },
       "original": {
@@ -866,7 +888,7 @@
         "nixpkgs": [
           "nixpkgs-unstable"
         ],
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": "rust-overlay_2"
       },
       "locked": {
         "lastModified": 1788991189,

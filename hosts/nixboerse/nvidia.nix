@@ -1,6 +1,7 @@
 { config
 , lib
 , pkgs
+, unstable-pkgs
 , ...
 }:
 
@@ -39,7 +40,8 @@
     nvidia = {
       open = true;
       dynamicBoost.enable = true;
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
+      package =
+        (unstable-pkgs.linuxPackagesFor config.boot.kernelPackages.kernel).nvidiaPackages.stable;
       prime.offload.enable = true;
       powerManagement = {
         enable = true;

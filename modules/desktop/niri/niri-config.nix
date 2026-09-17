@@ -182,8 +182,6 @@
     "XF86AudioPlay".action = spawn "playerctl" "play-pause";
     "XF86AudioNext".action = spawn "playerctl" "next";
 
-    "Mod+Space".action = spawn "wayscriber-toggle";
-
     "XF86MonBrightnessUp".action = spawn "brightnessctl" "set" "5%+";
     "XF86MonBrightnessDown".action = spawn "brightnessctl" "set" "5%-";
 

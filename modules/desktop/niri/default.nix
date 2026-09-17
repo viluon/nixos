@@ -3,27 +3,6 @@ inputs@{ niri
 , config
 , ...
 }:
-let
-  system = pkgs.stdenv.hostPlatform.system;
-  wayscriber = inputs.wayscriber.packages.${system}.default;
-
-  wayscriber-toggle = pkgs.writeShellApplication {
-    name = "wayscriber-toggle";
-    runtimeInputs = [ wayscriber pkgs.systemd pkgs.coreutils pkgs.gnugrep ];
-    text = ''
-      toggle() { wayscriber --daemon-toggle 2>&1 || true; }
-      broker-broken() { printf '%s' "$1" | grep -q "Unable to launch overlay process"; }
-
-      if broker-broken "$(toggle)"; then
-        systemctl --user restart wayscriber
-        for ((attempt = 0; attempt < 50; attempt++)); do
-          sleep 0.1
-          broker-broken "$(toggle)" || exit 0
-        done
-      fi
-    '';
-  };
-in
 {
   nixpkgs.overlays = [ niri.overlays.niri ];
 
@@ -38,9 +17,6 @@ in
     playerctl
     slurp
     swaybg
-    wayscriber
-    wayscriber-toggle
-    inputs.wayscriber.packages.${system}.wayscriber-configurator
     wireplumber
     wl-clipboard
     wlogout
@@ -122,23 +98,6 @@ in
         systemd.user.services.dunst.Service = {
           Restart = "on-failure";
           RestartSec = 1;
-        };
-
-        systemd.user.services.wayscriber = {
-          Unit = {
-            Description = "wayscriber screen annotation daemon";
-            After = [ "graphical-session.target" ];
-            PartOf = [ "graphical-session.target" ];
-          };
-
-          Service = {
-            Type = "simple";
-            ExecStart = "${wayscriber}/bin/wayscriber --daemon";
-            Restart = "on-failure";
-            RestartSec = 1;
-          };
-
-          Install.WantedBy = [ "graphical-session.target" ];
         };
 
         # niri-flake would enable the KDE agent by default

@@ -19,7 +19,6 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     stylix.url = "github:nix-community/stylix/release-26.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
-    wayscriber.url = "github:devmobasa/wayscriber";
     xhmm.url = "github:schuelermine/xhmm";
     xwayland-satellite-unstable.url = "github:Supreeeme/xwayland-satellite";
 
@@ -38,10 +37,6 @@
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs-unstable";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    wayscriber.inputs = {
-      flake-utils.follows = "flake-utils";
-      nixpkgs.follows = "nixpkgs-unstable";
-    };
     xwayland-satellite-unstable.inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
@@ -83,7 +78,7 @@
 
           specialArgs = {
             inherit inputs unstable-pkgs;
-            inherit (inputs) niri wayscriber;
+            inherit (inputs) niri;
           };
         };
       in

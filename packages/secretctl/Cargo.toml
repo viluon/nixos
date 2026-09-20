@@ -1,0 +1,21 @@
+[package]
+name = "secretctl"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "=1.0.104"
+clap = { version = "=4.6.7", default-features = false, features = ["derive", "error-context", "help", "std", "usage"] }
+duct = { version = "=1.1.2", default-features = false }
+regex = { version = "=1.13.1", default-features = false, features = ["std"] }
+saphyr = { version = "=0.1.0", default-features = false }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+
+[dev-dependencies]
+tempfile = "=3.27.0"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true

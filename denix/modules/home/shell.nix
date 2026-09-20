@@ -18,7 +18,10 @@ delib.module {
         caseInsensitiveMatcher = "m:{a-z}={A-Za-z}";
       in
       {
-        home.packages = scripts ++ [ pkgs.starship-pr-ci ];
+        home.packages = scripts ++ [
+          pkgs.secretctl
+          pkgs.starship-pr-ci
+        ];
 
         programs.zsh = {
           # 1050: after shell-integration snippets (order 1000), before shellAliases (1100).

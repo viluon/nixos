@@ -17,6 +17,7 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    sops-nix.url = "github:Mic92/sops-nix";
     stylix.url = "github:nix-community/stylix/release-26.05";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     xhmm.url = "github:schuelermine/xhmm";
@@ -35,6 +36,7 @@
     };
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     xwayland-satellite-unstable.inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -92,50 +94,58 @@
 
         flake.nixosConfigurations = denixConfigurations;
 
-        flake.packages = nixpkgs.lib.genAttrs systems (system:
-          let pkgs = nixpkgs.legacyPackages.${system}.extend (import ./packages);
-          in {
-            linux-entra-sso = pkgs.linux-entra-sso;
-          }
-        );
-
         inherit systems;
 
-        perSystem = { config, pkgs, ... }: {
-          checks.fzf-history-highlight = import ./checks/fzf-history-highlight.nix { inherit pkgs; };
+        perSystem = { config, pkgs, ... }:
+          let
+            overlayPkgs = pkgs.extend (import ./packages);
+            secretctl = overlayPkgs.secretctl;
+          in
+          {
+            packages = {
+              inherit (overlayPkgs) linux-entra-sso secretctl;
+            };
 
-          treefmt.config = {
-            inherit (config.flake-root) projectRootFile;
-            programs.nixpkgs-fmt.enable = true;
-            programs.rustfmt = {
-              enable = true;
-              edition = "2024";
+            checks = {
+              fzf-history-highlight = import ./checks/fzf-history-highlight.nix { inherit pkgs; };
+              secrets = import ./checks/secrets.nix {
+                inherit pkgs secretctl;
+              };
             };
-            programs.prettier = {
-              enable = true;
-              includes = [
-                "*.ts"
-                "*.tsx"
-              ];
+
+            treefmt.config = {
+              inherit (config.flake-root) projectRootFile;
+              programs.nixpkgs-fmt.enable = true;
+              programs.rustfmt = {
+                enable = true;
+                edition = "2024";
+              };
+              programs.prettier = {
+                enable = true;
+                includes = [
+                  "*.ts"
+                  "*.tsx"
+                ];
+              };
+              programs.clang-format = {
+                enable = true;
+                includes = [ "*.glsl" ];
+              };
             };
-            programs.clang-format = {
-              enable = true;
-              includes = [ "*.glsl" ];
+
+            devShells.default = pkgs.mkShell {
+              packages = [
+                config.treefmt.build.wrapper
+                pkgs.just
+                pkgs.nvd
+                secretctl
+              ] ++ (builtins.attrValues config.treefmt.build.programs);
+
+              shellHook = ''
+                just --list
+              '';
             };
           };
-
-          devShells.default = pkgs.mkShell {
-            packages = [
-              config.treefmt.build.wrapper
-              pkgs.just
-              pkgs.nvd
-            ] ++ (builtins.attrValues config.treefmt.build.programs);
-
-            shellHook = ''
-              just --list
-            '';
-          };
-        };
       }
     );
 }

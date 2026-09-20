@@ -16,7 +16,10 @@ delib.module {
         gitUserCommandsZstyle = lib.concatStringsSep " " (map (v: "${v}:'Custom git command'") gitScriptVerbs);
       in
       {
-        home.packages = scripts ++ [ pkgs.starship-pr-ci ];
+        home.packages = scripts ++ [
+          pkgs.secretctl
+          pkgs.starship-pr-ci
+        ];
 
         programs.bash = {
           enable = true;

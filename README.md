@@ -22,6 +22,43 @@ Update with
 sudo nice -n 19 ionice -c 3 nixos-rebuild switch --flake .
 ```
 
+### Secrets
+
+Initialize once:
+
+```sh
+just secrets-init
+```
+
+Onboard with the device's SSH host Ed25519 public key:
+
+```sh
+just onboard nixluon /etc/ssh/ssh_host_ed25519_key.pub
+just onboard server ./server-host-key.pub shared servers
+```
+
+Scopes default to `shared,<device>`.
+
+Offboard:
+
+```sh
+just offboard
+```
+
+Create or edit:
+
+```sh
+just secret shared wifi-home
+```
+
+Remove:
+
+```sh
+just remove-secret
+```
+
+Use `config.sops.secrets."shared/wifi-home".path` from Nix.
+
 ### panic at the disko
 
 `disko-install` may fail with

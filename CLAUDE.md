@@ -46,7 +46,7 @@ Hosts defined in `hostConfigs` (flake.nix:95-104). Each host in `hosts/<hostname
 
 - `modules/system/`: nix, networking, systemd, monitoring
 - `modules/hardware/`: audio, graphics
-- `modules/desktop/`: GNOME, Niri, Stylix
+- `denix/modules/desktop/`: GNOME, Niri, Stylix
 - `modules/editors/`: Neovim, VSCode, IntelliJ
 - `modules/users/common.nix`: User config (SSH keys from GitHub API)
 - `home/`: Auto-discovered user configs, scripts in `home/viluon/scripts/` become PATH commands

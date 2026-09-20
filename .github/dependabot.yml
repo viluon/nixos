@@ -15,7 +15,7 @@ updates:
       interval: daily
   - package-ecosystem: npm
     directories:
-      - /modules/desktop/niri/vicinae-extensions/*/
+      - /denix/modules/desktop/niri/vicinae-extensions/*/
     groups:
       npm:
         patterns:

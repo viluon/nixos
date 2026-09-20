@@ -40,7 +40,7 @@ Each host in `hosts/*/`: `default.nix`, `hardware.nix`, `kernel.nix`, `disko.nix
 ### Module Organization
 - `modules/system/`: nix, networking, systemd, monitoring
 - `modules/hardware/`: audio, graphics
-- `modules/desktop/`: GNOME, Niri, Stylix
+- `denix/modules/desktop/`: GNOME, Niri, Stylix
 - `modules/editors/`: Neovim, VSCode, IntelliJ
 - `modules/users/common.nix`: User config (SSH keys from GitHub API)
 - `home/`: Auto-discovered, scripts in `home/viluon/scripts/` become PATH commands

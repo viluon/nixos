@@ -67,6 +67,7 @@
           paths = [ ./denix ];
           exclude = [
             ./denix/modules/editors/vscode-settings.nix
+            ./denix/modules/desktop/niri
             ./denix/modules/home/scripts
             ./denix/modules/home/slack-review.nix
           ];

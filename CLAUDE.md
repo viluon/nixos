@@ -29,13 +29,12 @@ Run `just` to see all available commands.
 The flake uses **flake-parts** to organize outputs. Key elements:
 
 - `flake.nix`: Main entry point, defines inputs, hosts, and orchestrates the build
-- `buildNixosSystem`: Function that constructs NixOS configurations with home-manager integration
-- `hostConfigs`: Defines hosts with their system architecture and hardware profiles
-- Custom modules are imported using `importApply` for modules that need `withSystem` access
+- Denix constructs NixOS and Home Manager configurations from `denix/`
+- Custom flake modules use `importApply` when they need `withSystem`
 
 ### Host Configurations
 
-Hosts defined in `hostConfigs` (flake.nix:95-104). Each host in `hosts/<hostname>/`:
+Each host in `denix/hosts/<hostname>/`:
 - `default.nix`: Main configuration
 - `hardware.nix`: Auto-generated hardware settings
 - `kernel.nix`: Custom kernel patches
@@ -44,12 +43,12 @@ Hosts defined in `hostConfigs` (flake.nix:95-104). Each host in `hosts/<hostname
 
 ### Module Organization
 
-- `modules/system/`: nix, networking, systemd, monitoring
-- `modules/hardware/`: audio, graphics
+- `denix/modules/system/`: nix, networking, systemd, monitoring
+- `denix/modules/hardware/`: audio, graphics
 - `denix/modules/desktop/`: GNOME, Niri, Stylix
-- `modules/editors/`: Neovim, VSCode, IntelliJ
-- `modules/users/common.nix`: User config (SSH keys from GitHub API)
-- `home/`: Auto-discovered user configs, scripts in `home/viluon/scripts/` become PATH commands
+- `denix/modules/editors/`: Neovim, VSCode, IntelliJ
+- `denix/modules/core/user.nix`: User config
+- `denix/modules/home/`: Home Manager config and scripts
 
 ### Package Overlays
 
@@ -69,9 +68,9 @@ Integrated at NixOS level (flake.nix:72-80). Users auto-generated from `home/` d
 
 **vmVariant**: Auto-login, SSH on 2222, passwordless, KVM+GTK, 2 cores/4GB RAM.
 
-**Git Scripts**: `home/viluon/scripts/git-*.nix` exposed as git subcommands with zsh completion.
+**Git Scripts**: `denix/modules/home/scripts/git-*.nix` exposed as git subcommands with zsh completion.
 
-**Binary Caches**: cache.nixos.org, nix-community.cachix.org, viluon.cachix.org (modules/system/nix/default.nix).
+**Binary Caches**: cache.nixos.org, nix-community.cachix.org, viluon.cachix.org (`denix/modules/system/nix.nix`).
 
 ## Development Environment
 
@@ -81,13 +80,13 @@ DevShell (flake.nix:136-146): `treefmt`, `just`, `nvd`. Enter with `nix develop`
 
 1. **Host-specific**: Use `hostname` arg in modules/home configs
 2. **Unstable packages**: `unstable-pkgs` in modules, `inputs.nixpkgs-unstable.legacyPackages.${system}` in home
-3. **Custom scripts**: `home/viluon/scripts/*.nix` → PATH commands
+3. **Custom scripts**: `denix/modules/home/scripts/*.nix` → PATH commands
 4. **Modules**: System in `modules/`, home in user `home.nix`
 5. **Before commit**: `just format`
 
 ## Important Details
 
-**SSH**: Passwordless auth with GitHub API keys (fixed hash for reproducibility), configured in `modules/system/networking`.
+**SSH**: Passwordless auth with GitHub API keys (fixed hash for reproducibility), configured in `denix/modules/core/user.nix`.
 
 **Virtualization** (nixboerse): libvirtd with DNS routing hooks, Docker+minikube/kind firewall rules.
 

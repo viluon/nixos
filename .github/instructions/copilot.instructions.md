@@ -35,24 +35,24 @@ Run `just` to see all available commands.
 ## NixOS-Specific Patterns
 
 ### Host Configuration Structure
-Each host in `hosts/*/`: `default.nix`, `hardware.nix`, `kernel.nix`, `disko.nix` (nixluon), `nvidia.nix` (nixboerse).
+Each host in `denix/hosts/*/`: `default.nix`, `hardware.nix`, `kernel.nix`, `disko.nix` (nixluon), `nvidia.nix` (nixboerse).
 
 ### Module Organization
-- `modules/system/`: nix, networking, systemd, monitoring
-- `modules/hardware/`: audio, graphics
+- `denix/modules/system/`: nix, networking, systemd, monitoring
+- `denix/modules/hardware/`: audio, graphics
 - `denix/modules/desktop/`: GNOME, Niri, Stylix
-- `modules/editors/`: Neovim, VSCode, IntelliJ
-- `modules/users/common.nix`: User config (SSH keys from GitHub API)
-- `home/`: Auto-discovered, scripts in `home/viluon/scripts/` become PATH commands
+- `denix/modules/editors/`: Neovim, VSCode, IntelliJ
+- `denix/modules/core/user.nix`: User config
+- `denix/modules/home/`: Home Manager config and scripts
 
 ### Key Details
 - **Flake inputs**: nixpkgs 26.05, nixpkgs-unstable, nixos-hardware, stylix, niri
 - **Binary caches**: cache.nixos.org, nix-community.cachix.org, viluon.cachix.org
-- **Git scripts**: `git-*.nix` in `home/viluon/scripts/` exposed as git subcommands with completion
+- **Git scripts**: `git-*.nix` in `denix/modules/home/scripts/` exposed as git subcommands with completion
 
 ## Important Details
 
-**SSH**: Passwordless auth with GitHub API keys (fixed hash), configured in `modules/system/networking`.
+**SSH**: Passwordless auth with GitHub API keys (fixed hash), configured in `denix/modules/core/user.nix`.
 
 **Virtualization** (nixboerse): libvirtd with DNS routing hooks, Docker+minikube/kind firewall rules.
 

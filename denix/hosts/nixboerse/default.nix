@@ -45,6 +45,7 @@ delib.host {
           efibootmgr
           kind
           kubectl
+          kubectx
           kubernetes-helm
           minikube
           openssl

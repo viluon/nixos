@@ -54,6 +54,13 @@
     let
       fully-rounded = radius: { top-left = radius; top-right = radius; bottom-left = radius; bottom-right = radius; };
       rounded-top = radius: { top-left = radius; top-right = radius; bottom-left = 0.0; bottom-right = 0.0; };
+      cast-gradient = {
+        from = config.lib.stylix.colors.base08-hex;
+        to = config.lib.stylix.colors.base09-hex;
+        angle = 135;
+        in' = "oklch shorter hue";
+        relative-to = "window";
+      };
     in
     [
       {
@@ -69,6 +76,19 @@
       {
         geometry-corner-radius = fully-rounded 14.0;
         clip-to-geometry = true;
+      }
+      {
+        matches = [{ is-window-cast-target = true; }];
+        focus-ring = {
+          enable = true;
+          active.gradient = cast-gradient;
+          inactive.gradient = cast-gradient;
+        };
+        border = {
+          enable = true;
+          active.gradient = cast-gradient;
+          inactive.gradient = cast-gradient;
+        };
       }
       {
         matches = [

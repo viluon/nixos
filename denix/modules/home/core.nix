@@ -33,7 +33,6 @@ delib.module {
           compsize
           ddcui
           file
-          gamescope
           just
           networkmanager
           pavucontrol

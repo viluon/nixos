@@ -20,7 +20,6 @@ delib.module {
           ripgrep
           shellcheck
           starship
-          steam
           unstable-pkgs.github-copilot-cli
           unzip
           vivid

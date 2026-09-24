@@ -8,6 +8,8 @@ delib.module {
       {
         nixpkgs.overlays = [ niri.overlays.niri ];
 
+        programs.steam.enable = true;
+
         programs.niri = import ./niri/tuned.nix (
           moduleArgs // { hostname = config.networking.hostName; inherit niri; }
         );

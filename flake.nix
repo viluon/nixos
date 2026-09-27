@@ -53,35 +53,92 @@
         inherit (flake-parts-lib) importApply;
         amd-epp-tool-module = importApply ./packages/amd-epp-tool.nix { inherit withSystem; };
 
-        systems = [ "x86_64-linux" ];
+        systems = [
+          "aarch64-linux"
+          "x86_64-linux"
+        ];
 
         unstable-pkgs = import nixpkgs-unstable {
           system = "x86_64-linux";
           config = { allowUnfree = true; };
         };
 
-        denixConfigurations = inputs.denix.lib.configurations {
+        denixExtensions = with inputs.denix.lib.extensions; [
+          args
+          (base.withConfig { args.enable = true; })
+        ];
+
+        desktopConfigurations = inputs.denix.lib.configurations {
           moduleSystem = "nixos";
           homeManagerUser = "viluon";
 
           paths = [ ./denix ];
           exclude = [
-            ./denix/modules/editors/vscode-settings.nix
+            ./denix/hosts/the-precise-nature-of-the-catastrophe
             ./denix/modules/desktop/niri
+            ./denix/modules/editors/vscode-settings.nix
             ./denix/modules/home/scripts
+            ./denix/modules/home/server-core.nix
+            ./denix/modules/home/server-git.nix
             ./denix/modules/home/slack-review.nix
+            ./denix/modules/core/nixpkgs.nix
+            ./denix/modules/core/server-home-integration.nix
           ];
 
-          extensions = with inputs.denix.lib.extensions; [
-            args
-            (base.withConfig { args.enable = true; })
-          ];
+          extensions = denixExtensions;
 
           specialArgs = {
             inherit inputs unstable-pkgs;
             inherit (inputs) niri;
           };
         };
+
+        raspberryPiConfigurations = inputs.denix.lib.configurations {
+          moduleSystem = "nixos";
+          homeManagerUser = "viluon";
+
+          paths = [
+            ./denix/hosts/the-precise-nature-of-the-catastrophe
+            ./denix/modules/core/constants.nix
+            ./denix/modules/core/locale.nix
+            ./denix/modules/core/nixpkgs.nix
+            ./denix/modules/core/server-home-integration.nix
+            ./denix/modules/core/user.nix
+            ./denix/modules/home/basic-shell.nix
+            ./denix/modules/home/server-core.nix
+            ./denix/modules/home/server-git.nix
+            ./denix/modules/programs/gnupg.nix
+            ./denix/modules/system/legacy-compat.nix
+            ./denix/modules/system/networking.nix
+            ./denix/modules/system/nix.nix
+            ./denix/modules/system/sysctl.nix
+          ];
+
+          extensions = denixExtensions;
+
+          specialArgs = {
+            inherit inputs;
+          };
+        };
+
+        the-precise-nature-of-the-catastrophe =
+          raspberryPiConfigurations.the-precise-nature-of-the-catastrophe;
+
+        crossThePreciseNatureOfTheCatastrophe =
+          the-precise-nature-of-the-catastrophe.extendModules {
+            modules = [{ nixpkgs.buildPlatform = "x86_64-linux"; }];
+          };
+
+        raspberryPiConfigurationsByBuildSystem = {
+          aarch64-linux = the-precise-nature-of-the-catastrophe;
+          x86_64-linux = crossThePreciseNatureOfTheCatastrophe;
+        };
+
+        standaloneRaspberryPiImage = configuration:
+          configuration.config.system.build.sdImage.overrideAttrs {
+            __structuredAttrs = true;
+            unsafeDiscardReferences.out = true;
+          };
       in
       {
         imports = [
@@ -90,19 +147,28 @@
           inputs.treefmt-nix.flakeModule
         ];
 
-        flake.nixosConfigurations = denixConfigurations;
+        flake.nixosConfigurations =
+          desktopConfigurations // raspberryPiConfigurations;
 
-        flake.packages = nixpkgs.lib.genAttrs systems (system:
-          let pkgs = nixpkgs.legacyPackages.${system}.extend (import ./packages);
+        flake.packages.x86_64-linux =
+          let pkgs = nixpkgs.legacyPackages.x86_64-linux.extend (import ./packages);
           in {
             linux-entra-sso = pkgs.linux-entra-sso;
-          }
-        );
+            the-precise-nature-of-the-catastrophe =
+              standaloneRaspberryPiImage raspberryPiConfigurationsByBuildSystem.x86_64-linux;
+          };
+
+        flake.packages.aarch64-linux.the-precise-nature-of-the-catastrophe =
+          standaloneRaspberryPiImage raspberryPiConfigurationsByBuildSystem.aarch64-linux;
 
         inherit systems;
 
-        perSystem = { config, pkgs, ... }: {
-          checks.fzf-history-highlight = import ./checks/fzf-history-highlight.nix { inherit pkgs; };
+        perSystem = { config, pkgs, system, ... }: {
+          checks = {
+            fzf-history-highlight = import ./checks/fzf-history-highlight.nix { inherit pkgs; };
+            the-precise-nature-of-the-catastrophe =
+              raspberryPiConfigurationsByBuildSystem.${system}.config.system.build.toplevel;
+          };
 
           treefmt.config = {
             inherit (config.flake-root) projectRootFile;
@@ -126,6 +192,7 @@
 
           devShells.default = pkgs.mkShell {
             packages = [
+              pkgs.bmaptool
               config.treefmt.build.wrapper
               pkgs.just
               pkgs.nvd

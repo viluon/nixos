@@ -22,10 +22,15 @@ jobs:
         include:
           - os: ubuntu-24.04
             host: nixluon
+            output: nixosConfigurations.nixluon.config.system.build.toplevel
           - os: ubuntu-24.04
             host: nixboerse
+            output: nixosConfigurations.nixboerse.config.system.build.toplevel
+          - os: ubuntu-24.04-arm
+            host: the-precise-nature-of-the-catastrophe
+            output: packages.aarch64-linux.the-precise-nature-of-the-catastrophe
     env:
-      output: nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
+      output: ${{ matrix.output }}
     steps:
       - name: create nix mount point
         if: contains(matrix.os, 'ubuntu')
@@ -65,14 +70,17 @@ jobs:
         run: nix build $TARGET --fallback --log-format raw --print-build-logs
 
       - name: garbage-collect build dependencies
+        if: startsWith(matrix.output, 'nixosConfigurations.')
         run: nix-collect-garbage
 
       - name: fetch old system to profile
+        if: startsWith(matrix.output, 'nixosConfigurations.')
         env:
           TARGET: "github:${{ github.repository }}/${{ github.base_ref }}#${{ env.output }}"
         run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile
 
       - name: add new system to profile
+        if: startsWith(matrix.output, 'nixosConfigurations.')
         env:
           TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ env.output }}"
         run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile
@@ -88,6 +96,7 @@ jobs:
           exit 1
 
       - name: Scan for security issues
+        if: startsWith(matrix.output, 'nixosConfigurations.')
         id: security
         run: | # https://stackoverflow.com/a/74232400
           nix run nixpkgs/nixos-unstable#vulnix -- \
@@ -108,6 +117,7 @@ jobs:
           fi
 
       - name: diff profile
+        if: startsWith(matrix.output, 'nixosConfigurations.')
         id: diff
         run: |
           delimiter="$(openssl rand -hex 16)"
@@ -116,6 +126,7 @@ jobs:
           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
 
       - name: prepare comment
+        if: startsWith(matrix.output, 'nixosConfigurations.')
         run: |
           cat <<'EOF' > ./comment.md
             ### Diff of `${{ env.output }}`
@@ -131,6 +142,7 @@ jobs:
           EOF
 
       - name: comment
+        if: startsWith(matrix.output, 'nixosConfigurations.')
         continue-on-error: true
         uses: marocchino/sticky-pull-request-comment@v3
         with:

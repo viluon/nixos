@@ -15,24 +15,41 @@ jobs:
     outputs:
       hosts: ${{ steps.list.outputs.hosts }}
     steps:
-      - name: checkout
-        uses: actions/checkout@v7
+      - name: install nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ github.token }}
 
       - name: list hosts
         id: list
-        run: echo "hosts=$(ls denix/hosts | jq --raw-input --null-input --compact-output '[inputs]')" >> "$GITHUB_OUTPUT"
+        env:
+          FLAKE: "github:${{ github.repository }}/${{ github.ref }}"
+        run: |
+          systems=$(nix eval --json "$FLAKE#nixosConfigurations" --apply 'builtins.mapAttrs (_: host: host.pkgs.stdenv.hostPlatform.system)')
+          packages=$(nix eval --json "$FLAKE#packages" --apply 'builtins.mapAttrs (_: builtins.attrNames)')
+          hosts=$(jq --compact-output --argjson packages "$packages" '
+            {"x86_64-linux": "ubuntu-26.04", "aarch64-linux": "ubuntu-26.04-arm"} as $runners
+            | to_entries
+            | map(.key as $host | .value as $system | {
+                host: $host,
+                os: ($runners[$system] // error("no runner for \($system)")),
+                image: (if $packages[$system] | any(. == $host) then "packages.\($system).\($host)" else null end)
+              })' <<< "$systems")
+          echo "hosts=$hosts" >> "$GITHUB_OUTPUT"
 
   build:
     needs: hosts
     name: build/${{ matrix.host }}
-    runs-on: ubuntu-26.04
+    runs-on: ${{ matrix.os }}
     concurrency:
       group: pr-${{ github.event.pull_request.number }}-${{ matrix.host }}
       cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
-        host: ${{ fromJSON(needs.hosts.outputs.hosts) }}
+        include: ${{ fromJSON(needs.hosts.outputs.hosts) }}
     env:
       output: nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
     steps:
@@ -86,6 +103,12 @@ jobs:
         env:
           TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ env.output }}"
         run: nix build $TARGET --fallback --log-format raw --print-build-logs
+
+      - name: build image
+        if: matrix.image
+        env:
+          TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ matrix.image }}"
+        run: nix build $TARGET --fallback --log-format raw --print-build-logs --out-link image
 
       - name: garbage-collect build dependencies
         run: nix-collect-garbage

@@ -4,7 +4,7 @@ delib.module {
 
   home.always.imports = [
     (
-      { config, pkgs, lib, ... }:
+      { pkgs, lib, ... }:
       let
         scripts = lib.mapAttrsToList
           (name: _type: import ./scripts/${name} { inherit pkgs; })
@@ -18,45 +18,7 @@ delib.module {
       {
         home.packages = scripts ++ [ pkgs.starship-pr-ci ];
 
-        programs.bash = {
-          enable = true;
-          enableCompletion = true;
-
-          shellAliases = {
-            lh = "ls -lhF";
-            ll = "ls -lhFA";
-          };
-        };
-
         programs.zsh = {
-          enable = true;
-          enableCompletion = true;
-          autosuggestion.enable = true;
-          syntaxHighlighting.enable = true;
-
-          shellAliases = {
-            cat = "bat";
-            find = "fd";
-            glr = "git pull --rebase";
-            grep = "rg";
-            gsh = "git show --ext-diff";
-            jb = "just build";
-            lh = "eza --long --git --icons=auto --classify=always";
-            ll = "eza --long --git --icons=auto --classify=always --all";
-            ls = "eza";
-            lt = "eza --long --git --icons=auto --classify=always --git-ignore --tree";
-          };
-
-          history = {
-            size = 100 * 1000;
-            path = "${config.xdg.dataHome}/zsh/history";
-          };
-
-          oh-my-zsh = {
-            enable = true;
-            plugins = [ "git" "sudo" ];
-          };
-
           # 1050: after shell-integration snippets (order 1000), before shellAliases (1100).
           initContent = lib.mkOrder 1050 ''
             # Vendored fzf key-bindings with syntax-highlighted history widget
@@ -121,8 +83,6 @@ delib.module {
         };
 
         programs.starship = {
-          enable = true;
-          enableZshIntegration = true;
           settings = {
             format = lib.concatStrings [
               "$username"
@@ -285,51 +245,6 @@ delib.module {
           };
         };
 
-        programs.fzf = {
-          enable = true;
-          enableZshIntegration = true;
-        };
-
-        programs.bat.enable = true;
-
-        programs.eza = {
-          enable = true;
-          enableZshIntegration = true;
-          git = true;
-          icons = "auto";
-        };
-
-        programs.kitty = {
-          enable = true;
-          font = {
-            size = lib.mkForce 12;
-          };
-          themeFile = "Catppuccin-Mocha";
-          keybindings = {
-            "ctrl+shift+t" = "new_tab_with_cwd";
-          };
-          settings = {
-            confirm_os_window_close = 0;
-            cursor_trail = 1;
-            dynamic_background_opacity = true;
-            enable_audio_bell = false;
-            momentum_scroll = 0.96;
-            mouse_hide_wait = "-1.0";
-            notify_on_cmd_finish = "unfocused";
-            pixel_scroll = true;
-            scrollback_lines = 50000;
-            scrollback_pager_history_size = 128;
-            shell = "${pkgs.zsh}/bin/zsh";
-            window_padding_width = 10;
-          };
-        };
-
-        programs.direnv = {
-          enable = true;
-          enableBashIntegration = true;
-          enableZshIntegration = true;
-          nix-direnv.enable = true;
-        };
       }
     )
   ];

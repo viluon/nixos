@@ -8,7 +8,7 @@
   {
     app-id = "jetbrains-idea";
     workspace = "idea";
-    command = [ "systemd-run" "--user" "--scope" "--collect" "--property=TimeoutStopSec=8s" "idea" ];
+    command = [ "systemd-run" "--user" "--scope" "--collect" "--property=TimeoutStopSec=8s" "intellij-idea" ];
   }
   {
     app-id = "obsidian";

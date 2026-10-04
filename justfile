@@ -11,6 +11,21 @@ check:
 build:
     nice -n 19 ionice -c 3 nix build -L .#nixosConfigurations.$(hostname).config.system.build.toplevel
 
+secrets-init:
+    nix run .#secretctl -- init
+
+onboard device public-key *scopes:
+    nix run .#secretctl -- onboard "{{device}}" "{{public-key}}" {{scopes}}
+
+offboard:
+    nix run .#secretctl -- offboard
+
+secret scope name:
+    nix run .#secretctl -- edit "{{scope}}" "{{name}}"
+
+remove-secret:
+    nix run .#secretctl -- remove
+
 # build & apply on the next boot
 boot:
     sudo nice -n 19 ionice -c 3 nixos-rebuild boot -L --flake .

@@ -19,6 +19,8 @@ delib.host {
       "gke.goog"
       "googleapis.com"
       "oa.pnrad.net"
+      "storage.cloud.google.com"
+      "*-apidata.googleusercontent.com"
     ];
   };
 

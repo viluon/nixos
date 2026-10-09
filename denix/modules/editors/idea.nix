@@ -2,7 +2,9 @@
 delib.module {
   name = "editors.idea";
 
-  home.always =
+  options = delib.singleEnableOption true;
+
+  home.ifEnabled =
     let
       idea = unstable-pkgs.jetbrains.idea;
 

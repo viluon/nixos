@@ -1,22 +1,33 @@
 // Async prompt backend: reads a cache and spawns a detached refresh, never blocking
-// on the network. Cache line is tab-separated: sha, state, detail, detail_url, pr_url, unresolved, queued.
+// on the network.
 
 use std::collections::hash_map::DefaultHasher;
 use std::env;
 use std::fs;
 use std::hash::{Hash, Hasher};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{Duration, SystemTime};
 
-use serde_json::Value;
+use anyhow::{Context, Result, ensure};
+use atomicwrites::{AllowOverwrite, AtomicFile};
+use clap::{Parser, Subcommand, ValueEnum};
+use nanoserde::{DeJson, DeJsonState, DeJsonTok, SerJson};
 
 const TTL: Duration = Duration::from_secs(15);
 const PRUNE_AGE: Duration = Duration::from_secs(30 * 24 * 60 * 60);
-const LOCK_STALE: Duration = Duration::from_secs(60);
 const PR_ICON: &str = "\u{f407}";
 const QUEUED_PR_ICON: &str = "\u{f4db}";
 const UNRESOLVED_ICON: &str = "\u{f41f}";
+
+const CHECKS_JQ: &str = r#"
+(. // []) | map({
+  name: (.name // .context),
+  url: (.detailsUrl // .targetUrl),
+  kind: {(.__typename): .}
+})
+"#;
 
 const PR_DETAILS_QUERY: &str = r#"
 query($owner:String!,$name:String!,$number:Int!){
@@ -43,47 +54,50 @@ query($owner:String!,$name:String!,$oid:GitObjectID!){
 }
 "#;
 
-#[derive(Default, Clone)]
+#[derive(Parser)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<PromptCommand>,
+}
+
+#[derive(Subcommand)]
+enum PromptCommand {
+    Read,
+    Detail,
+    Link,
+    IsPr,
+    IsQueued,
+    HasUnresolved,
+    Unresolved,
+    Is {
+        #[arg(value_enum)]
+        state: State,
+    },
+    #[command(name = "__refresh", hide = true)]
+    Refresh {
+        repo_root: PathBuf,
+        head_sha: String,
+        cache_file: PathBuf,
+    },
+}
+
+#[derive(Default, DeJson, SerJson)]
 struct Status {
-    state: String,
+    state: State,
     detail: String,
     detail_url: String,
     pr_url: String,
-    unresolved: String,
+    unresolved: usize,
     queued: bool,
 }
 
+#[derive(DeJson, SerJson)]
+struct Cache {
+    head_sha: String,
+    status: Status,
+}
+
 impl Status {
-    fn none() -> Self {
-        Status {
-            state: "none".into(),
-            ..Default::default()
-        }
-    }
-
-    fn cache_line(&self, head_sha: &str) -> String {
-        format!(
-            "{head_sha}\t{}\t{}\t{}\t{}\t{}\t{}\n",
-            self.state, self.detail, self.detail_url, self.pr_url, self.unresolved, self.queued
-        )
-    }
-
-    fn from_cache(line: &str) -> (String, Self) {
-        let fields: Vec<&str> = line.split('\t').collect();
-        let get = |i: usize| fields.get(i).copied().unwrap_or("").to_string();
-        (
-            get(0),
-            Self {
-                state: get(1),
-                detail: get(2),
-                detail_url: get(3),
-                pr_url: get(4),
-                unresolved: get(5),
-                queued: fields.get(6) == Some(&"true"),
-            },
-        )
-    }
-
     fn pr_label(&self) -> String {
         let icon = if self.queued { QUEUED_PR_ICON } else { PR_ICON };
         let number = self.pr_url.rsplit('/').next().unwrap_or("");
@@ -108,7 +122,7 @@ fn cache_dir() -> PathBuf {
     let base = env::var_os("XDG_CACHE_HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env::var_os("HOME").unwrap_or_default()).join(".cache"));
-    base.join("starship-pr-ci")
+    base.join("starship-pr-ci").join("v3")
 }
 
 fn age(path: &Path) -> Option<Duration> {
@@ -117,19 +131,12 @@ fn age(path: &Path) -> Option<Duration> {
 }
 
 fn parse_remote(url: &str) -> (String, String) {
-    let mut s = url;
-    if let Some(i) = s.find("://") {
-        s = &s[i + 3..];
-    }
-    if let Some(i) = s.find('@') {
-        s = &s[i + 1..];
-    }
-    let sep = s.find(|c| c == '/' || c == ':');
-    let (host, rest) = match sep {
-        Some(i) => (&s[..i], &s[i + 1..]),
-        None => (s, ""),
-    };
-    let slug = rest.strip_suffix(".git").unwrap_or(rest);
+    let authority = url.split_once("://").map_or(url, |(_, rest)| rest);
+    let remote = authority
+        .split_once('@')
+        .map_or(authority, |(_, rest)| rest);
+    let (host, path) = remote.split_once(['/', ':']).unwrap_or((remote, ""));
+    let slug = path.strip_suffix(".git").unwrap_or(path);
     (host.to_string(), slug.to_string())
 }
 
@@ -140,117 +147,127 @@ fn remote_url() -> Option<String> {
     git(&["remote", "get-url", &remote])
 }
 
-#[derive(PartialEq, Clone, Copy)]
-enum St {
+#[derive(Default, PartialEq, Eq, PartialOrd, Ord, Clone, DeJson, SerJson, ValueEnum)]
+#[cfg_attr(test, derive(Debug))]
+enum State {
+    #[default]
+    #[nserde(rename = "none")]
+    None,
+    #[nserde(rename = "success")]
     Success,
-    Failure,
+    #[nserde(rename = "pending")]
     Pending,
+    #[nserde(rename = "failure")]
+    Failure,
 }
 
-impl St {
+impl State {
     fn label(self) -> &'static str {
         match self {
-            St::Success => "success",
-            St::Failure => "failure",
-            St::Pending => "pending",
+            Self::None => "none",
+            Self::Success => "success",
+            Self::Pending => "pending",
+            Self::Failure => "failure",
         }
     }
 }
 
+#[derive(DeJson)]
 struct Check {
     name: String,
-    url: String,
-    st: St,
+    url: Option<String>,
+    kind: CheckKind,
 }
 
-fn node(n: &Value) -> Check {
-    let name = n["name"]
-        .as_str()
-        .or_else(|| n["context"].as_str())
-        .unwrap_or("check")
-        .to_string();
-    let url = n["detailsUrl"]
-        .as_str()
-        .or_else(|| n["targetUrl"].as_str())
-        .unwrap_or("")
-        .to_string();
-    let st = match n["__typename"].as_str().unwrap_or("") {
-        "CheckRun" => {
-            if n["status"].as_str() != Some("COMPLETED") {
-                St::Pending
-            } else {
-                match n["conclusion"].as_str().unwrap_or("") {
-                    "SUCCESS" | "NEUTRAL" | "SKIPPED" => St::Success,
-                    _ => St::Failure,
-                }
-            }
+#[derive(DeJson)]
+enum CheckKind {
+    CheckRun {
+        status: String,
+        conclusion: Option<String>,
+    },
+    StatusContext {
+        state: String,
+    },
+}
+
+impl CheckKind {
+    fn state(&self) -> State {
+        match self {
+            CheckKind::CheckRun { status, .. } if status != "COMPLETED" => State::Pending,
+            CheckKind::CheckRun { conclusion, .. } => match conclusion.as_deref() {
+                Some("SUCCESS" | "NEUTRAL" | "SKIPPED") => State::Success,
+                _ => State::Failure,
+            },
+            CheckKind::StatusContext { state } => match state.as_str() {
+                "SUCCESS" => State::Success,
+                "PENDING" => State::Pending,
+                _ => State::Failure,
+            },
         }
-        "StatusContext" => match n["state"].as_str().unwrap_or("") {
-            "SUCCESS" => St::Success,
-            "PENDING" => St::Pending,
-            _ => St::Failure,
-        },
-        _ => St::Pending,
-    };
-    Check { name, url, st }
+    }
 }
 
-// Winning state is failure > pending > success; detail is the sole winner's name
-// (else the winner count), with a link only when that winner is unique.
-fn verdict(nodes: &[Value]) -> Status {
-    let checks: Vec<Check> = nodes.iter().map(node).collect();
-    if checks.is_empty() {
-        return Status::none();
-    }
-    let winning = if checks.iter().any(|c| c.st == St::Failure) {
-        St::Failure
-    } else if checks.iter().any(|c| c.st == St::Pending) {
-        St::Pending
-    } else {
-        St::Success
+fn verdict(checks: &[Check]) -> Status {
+    let Some(winning) = checks.iter().map(|check| check.kind.state()).max() else {
+        return Status::default();
     };
-    let members: Vec<&Check> = checks.iter().filter(|c| c.st == winning).collect();
-    let (detail, detail_url) = if members.len() == 1 {
-        (members[0].name.clone(), members[0].url.clone())
-    } else {
-        (members.len().to_string(), String::new())
+    let members: Vec<&Check> = checks
+        .iter()
+        .filter(|c| c.kind.state() == winning)
+        .collect();
+    let (detail, detail_url) = match members.as_slice() {
+        [check] => (check.name.clone(), check.url.clone().unwrap_or_default()),
+        checks => (checks.len().to_string(), String::new()),
     };
     Status {
-        state: winning.label().into(),
+        state: winning,
         detail,
         detail_url,
-        pr_url: String::new(),
-        unresolved: String::new(),
-        queued: false,
+        ..Status::default()
     }
 }
 
-fn pr_details(pr: &Value) -> Option<(String, bool)> {
-    let nodes = pr["reviewThreads"]["nodes"].as_array()?;
-    let count = nodes
-        .iter()
-        .filter(|t| t["isResolved"].as_bool() == Some(false))
-        .count();
-    let unresolved = if count == 0 {
-        String::new()
-    } else {
-        count.to_string()
-    };
-    Some((unresolved, pr["mergeQueueEntry"].is_object()))
+#[derive(DeJson)]
+struct ReviewThreads {
+    nodes: Vec<ReviewThread>,
 }
 
-fn query_pr_details(host: &str, owner: &str, name: &str, number: i64) -> Option<(String, bool)> {
+#[derive(DeJson)]
+struct ReviewThread {
+    #[nserde(rename = "isResolved")]
+    is_resolved: bool,
+}
+
+#[derive(DeJson)]
+struct PrDetails {
+    #[nserde(rename = "reviewThreads")]
+    review_threads: ReviewThreads,
+    #[nserde(rename = "mergeQueueEntry")]
+    queued: bool,
+}
+
+#[derive(DeJson)]
+struct PullRequest {
+    state: String,
+    #[nserde(rename = "statusCheckRollup")]
+    status_check_rollup: Option<Vec<Check>>,
+    url: String,
+    number: u64,
+}
+
+fn decode_json<T: DeJson>(bytes: &[u8]) -> Result<T> {
+    let mut input = std::str::from_utf8(bytes)?.chars();
+    let mut state = DeJsonState::default();
+    state.next(&mut input);
+    state.next_tok(&mut input)?;
+    let value = T::de_json(&mut state, &mut input)?;
+    ensure!(state.tok == DeJsonTok::Eof, "trailing data in JSON");
+    Ok(value)
+}
+
+fn gh<T: DeJson>(host: &str, args: &[&str]) -> Option<T> {
     let out = Command::new("gh")
-        .args(["api", "graphql"])
-        .args([
-            "-F",
-            &format!("owner={owner}"),
-            "-F",
-            &format!("name={name}"),
-            "-F",
-            &format!("number={number}"),
-        ])
-        .args(["-f", &format!("query={PR_DETAILS_QUERY}")])
+        .args(args)
         .env("GH_HOST", host)
         .stderr(Stdio::null())
         .output()
@@ -258,70 +275,86 @@ fn query_pr_details(host: &str, owner: &str, name: &str, number: i64) -> Option<
     if !out.status.success() {
         return None;
     }
-    let v: Value = serde_json::from_slice(&out.stdout).ok()?;
-    pr_details(&v["data"]["repository"]["pullRequest"])
+    decode_json(&out.stdout)
+        .inspect_err(|error| eprintln!("starship-pr-ci: invalid GitHub response: {error}"))
+        .ok()
+}
+
+fn graphql<T: DeJson>(
+    host: &str,
+    slug: &str,
+    query: &str,
+    selector: &str,
+    variable: &str,
+    value: &str,
+) -> Option<T> {
+    let (owner, name) = slug.split_once('/')?;
+    gh(
+        host,
+        &[
+            "api",
+            "graphql",
+            "-F",
+            &format!("owner={owner}"),
+            "-F",
+            &format!("name={name}"),
+            "-F",
+            &format!("{variable}={value}"),
+            "-f",
+            &format!("query={query}"),
+            "--jq",
+            selector,
+        ],
+    )
 }
 
 fn query_pr(host: &str, slug: &str) -> Option<Status> {
-    let out = Command::new("gh")
-        .args(["pr", "view", "--json", "state,statusCheckRollup,url,number"])
-        .env("GH_HOST", host)
-        .stderr(Stdio::null())
-        .output()
-        .ok()?;
-    if !out.status.success() {
+    let pr: PullRequest = gh(
+        host,
+        &[
+            "pr",
+            "view",
+            "--json",
+            "state,statusCheckRollup,url,number",
+            "--jq",
+            &format!(".statusCheckRollup |= ({CHECKS_JQ})"),
+        ],
+    )?;
+    if pr.state != "OPEN" {
         return None;
     }
-    let v: Value = serde_json::from_slice(&out.stdout).ok()?;
-    if v["state"].as_str() != Some("OPEN") {
-        return None;
+    let mut status = verdict(pr.status_check_rollup.as_deref().unwrap_or_default());
+    status.pr_url = pr.url;
+    if let Some(details) = graphql::<PrDetails>(
+        host,
+        slug,
+        PR_DETAILS_QUERY,
+        ".data.repository.pullRequest | .mergeQueueEntry = (.mergeQueueEntry != null)",
+        "number",
+        &pr.number.to_string(),
+    ) {
+        status.unresolved = details
+            .review_threads
+            .nodes
+            .iter()
+            .filter(|t| !t.is_resolved)
+            .count();
+        status.queued = details.queued;
     }
-    let mut st = verdict(v["statusCheckRollup"].as_array()?);
-    st.pr_url = v["url"].as_str().unwrap_or("").to_string();
-    if let (Some((owner, name)), Some(number)) = (slug.split_once('/'), v["number"].as_i64()) {
-        if let Some((unresolved, queued)) = query_pr_details(host, owner, name, number) {
-            st.unresolved = unresolved;
-            st.queued = queued;
-        }
-    }
-    Some(st)
+    Some(status)
 }
 
-fn query_head(host: &str, slug: &str) -> Status {
-    let (owner, name) = match slug.split_once('/') {
-        Some((o, n)) => (o, n),
-        None => return Status::none(),
-    };
-    let sha = match git(&["rev-parse", "--quiet", "--verify", "HEAD"]) {
-        Some(s) => s,
-        None => return Status::none(),
-    };
-    let out = Command::new("gh")
-        .args(["api", "graphql"])
-        .args([
-            "-F",
-            &format!("owner={owner}"),
-            "-F",
-            &format!("name={name}"),
-            "-F",
-            &format!("oid={sha}"),
-        ])
-        .args(["-f", &format!("query={GRAPHQL_QUERY}")])
-        .env("GH_HOST", host)
-        .stderr(Stdio::null())
-        .output();
-    let out = match out {
-        Ok(o) if o.status.success() => o,
-        _ => return Status::none(),
-    };
-    let v: Value = match serde_json::from_slice(&out.stdout) {
-        Ok(v) => v,
-        Err(_) => return Status::none(),
-    };
-    match v["data"]["repository"]["object"]["statusCheckRollup"]["contexts"]["nodes"].as_array() {
-        Some(nodes) => verdict(nodes),
-        None => Status::none(),
-    }
+fn query_head(host: &str, slug: &str) -> Option<Status> {
+    let sha = git(&["rev-parse", "--quiet", "--verify", "HEAD"])?;
+    let checks: Vec<Check> = graphql(
+        host,
+        slug,
+        GRAPHQL_QUERY,
+        &format!(".data.repository.object.statusCheckRollup.contexts.nodes | {CHECKS_JQ}"),
+        "oid",
+        &sha,
+    )?;
+    Some(verdict(&checks))
 }
 
 fn gh_authed(host: &str) -> bool {
@@ -334,42 +367,39 @@ fn gh_authed(host: &str) -> bool {
         .unwrap_or(false)
 }
 
-fn query_ci() -> Status {
-    let url = match remote_url() {
-        Some(u) => u,
-        None => return Status::none(),
-    };
+fn query_ci() -> Option<Status> {
+    let url = remote_url()?;
     let (host, slug) = parse_remote(&url);
     if host.is_empty() || !gh_authed(&host) {
-        return Status::none();
+        return None;
     }
-    query_pr(&host, &slug).unwrap_or_else(|| query_head(&host, &slug))
+    query_pr(&host, &slug).or_else(|| query_head(&host, &slug))
 }
 
-fn refresh(repo_root: &str, head_sha: &str, cache_file: &Path) {
-    let lock = cache_file.with_extension("lock");
-    if let Some(a) = age(&lock) {
-        if a > LOCK_STALE {
-            let _ = fs::remove_file(&lock);
+fn refresh(repo_root: &Path, head_sha: &str, cache_file: &Path) -> Result<()> {
+    let lock = fs::OpenOptions::new()
+        .create(true)
+        .truncate(false)
+        .write(true)
+        .open(cache_file.with_extension("lock"))
+        .context("cannot open cache lock")?;
+    match lock.try_lock() {
+        Ok(()) => {}
+        Err(fs::TryLockError::WouldBlock) => return Ok(()),
+        Err(fs::TryLockError::Error(error)) => {
+            return Err(error).context("cannot lock cache");
         }
     }
-    if fs::OpenOptions::new()
-        .create_new(true)
-        .write(true)
-        .open(&lock)
-        .is_err()
-    {
-        return;
-    }
-    let _ = env::set_current_dir(repo_root);
-    let st = query_ci();
-    let line = st.cache_line(head_sha);
-    let tmp = cache_file.with_extension("tmp");
-    if fs::write(&tmp, line).is_ok() {
-        let _ = fs::rename(&tmp, cache_file);
-    }
+    env::set_current_dir(repo_root).context("cannot enter repository")?;
+    let cache = Cache {
+        head_sha: head_sha.to_string(),
+        status: query_ci().unwrap_or_default(),
+    };
+    AtomicFile::new(cache_file, AllowOverwrite)
+        .write(|file| file.write_all(cache.serialize_json().as_bytes()))
+        .context("cannot write cache")?;
     prune();
-    let _ = fs::remove_file(&lock);
+    Ok(())
 }
 
 fn prune() {
@@ -377,7 +407,7 @@ fn prune() {
     if let Ok(entries) = fs::read_dir(&dir) {
         for e in entries.flatten() {
             let p = e.path();
-            if p.is_file() {
+            if p.extension().is_none_or(|extension| extension != "lock") && p.is_file() {
                 if let Some(a) = age(&p) {
                     if a > PRUNE_AGE {
                         let _ = fs::remove_file(&p);
@@ -414,12 +444,12 @@ fn resolve() -> Status {
         "HEAD",
     ]) {
         Some(i) => i,
-        None => return Status::none(),
+        None => return Status::default(),
     };
     let mut lines = info.lines();
     let (repo_root, head_sha, branch) = match (lines.next(), lines.next(), lines.next()) {
         (Some(r), Some(s), Some(b)) => (r, s, b),
-        _ => return Status::none(),
+        _ => return Status::default(),
     };
 
     let mut hasher = DefaultHasher::new();
@@ -427,23 +457,21 @@ fn resolve() -> Status {
     branch.hash(&mut hasher);
     let cache_file = cache_dir().join(format!("{:016x}", hasher.finish()));
 
-    let cached = fs::read_to_string(&cache_file).ok();
-    let (cached_sha, status) = match &cached {
-        Some(c) => Status::from_cache(c.lines().next().unwrap_or("")),
-        None => (String::new(), Status::none()),
-    };
-
-    let stale = cached_sha != head_sha || age(&cache_file).map(|a| a >= TTL).unwrap_or(true);
+    let cached = fs::read(&cache_file).ok().and_then(|bytes| {
+        decode_json::<Cache>(&bytes)
+            .inspect_err(|error| eprintln!("starship-pr-ci: invalid cache: {error}"))
+            .ok()
+    });
+    let stale = cached
+        .as_ref()
+        .is_none_or(|cache| cache.head_sha != head_sha)
+        || age(&cache_file).is_none_or(|age| age >= TTL);
     if stale {
         let _ = fs::create_dir_all(cache_dir());
         spawn_refresh(repo_root, head_sha, &cache_file);
     }
 
-    if status.state.is_empty() {
-        Status::none()
-    } else {
-        status
-    }
+    cached.map(|cache| cache.status).unwrap_or_default()
 }
 
 fn osc8(url: &str, text: &str) {
@@ -454,46 +482,45 @@ fn osc8(url: &str, text: &str) {
     }
 }
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    let cmd = args.get(1).map(String::as_str).unwrap_or("read");
-
-    match cmd {
-        "__refresh" => {
-            if let (Some(root), Some(sha), Some(cache)) = (args.get(2), args.get(3), args.get(4)) {
-                refresh(root, sha, Path::new(cache));
-            }
+fn main() -> Result<()> {
+    match Cli::parse().command.unwrap_or(PromptCommand::Read) {
+        PromptCommand::Refresh {
+            repo_root,
+            head_sha,
+            cache_file,
+        } => {
+            refresh(&repo_root, &head_sha, &cache_file)?;
         }
-        "read" => print!("{}", resolve().state),
-        "detail" => {
+        PromptCommand::Read => print!("{}", resolve().state.label()),
+        PromptCommand::Detail => {
             let st = resolve();
             osc8(&st.detail_url, &st.detail);
         }
-        "link" => {
+        PromptCommand::Link => {
             let st = resolve();
             if !st.pr_url.is_empty() {
                 osc8(&st.pr_url, &st.pr_label());
             }
         }
-        "is-pr" => {
+        PromptCommand::IsPr => {
             if resolve().pr_url.is_empty() {
                 std::process::exit(1);
             }
         }
-        "is-queued" => {
+        PromptCommand::IsQueued => {
             let st = resolve();
             if st.pr_url.is_empty() || !st.queued {
                 std::process::exit(1);
             }
         }
-        "has-unresolved" => {
-            if resolve().unresolved.is_empty() {
+        PromptCommand::HasUnresolved => {
+            if resolve().unresolved == 0 {
                 std::process::exit(1);
             }
         }
-        "unresolved" => {
+        PromptCommand::Unresolved => {
             let st = resolve();
-            if !st.unresolved.is_empty() {
+            if st.unresolved > 0 {
                 let url = if st.pr_url.is_empty() {
                     String::new()
                 } else {
@@ -502,77 +529,114 @@ fn main() {
                 osc8(&url, &format!("{UNRESOLVED_ICON} {}", st.unresolved));
             }
         }
-        "is" => {
-            let want = args.get(2).map(String::as_str).unwrap_or("");
-            if resolve().state != want {
+        PromptCommand::Is { state } => {
+            if resolve().state != state {
                 std::process::exit(1);
             }
         }
-        _ => {
-            eprintln!(
-                "usage: starship-pr-ci [read|detail|link|is-pr|is-queued|unresolved|has-unresolved|is <state>]"
-            );
-            std::process::exit(2);
-        }
     }
+    Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::json;
 
     #[test]
-    fn queue_membership_and_unresolved_threads() {
-        let mut pr = json!({
-            "mergeQueueEntry": null,
-            "reviewThreads": {
-                "nodes": [{"isResolved": false}, {"isResolved": true}]
-            }
-        });
-        assert_eq!(pr_details(&pr), Some(("1".into(), false)));
-        pr["mergeQueueEntry"] = json!({"id": "queue-entry"});
-        assert_eq!(pr_details(&pr), Some(("1".into(), true)));
-        pr["reviewThreads"]["nodes"] = json!([]);
-        assert_eq!(pr_details(&pr), Some((String::new(), true)));
-        assert_eq!(pr_details(&Value::Null), None);
+    fn cache_rejects_trailing_documents() {
+        let cache = Cache {
+            head_sha: "head".into(),
+            status: Status::default(),
+        }
+        .serialize_json();
+        assert!(decode_json::<Cache>(format!("{cache} \n").as_bytes()).is_ok());
+        assert!(decode_json::<Cache>(format!("{cache} {{}}").as_bytes()).is_err());
     }
 
     #[test]
-    fn cache_round_trip_preserves_queue_and_existing_fields() {
-        for queued in [false, true] {
-            let status = Status {
-                state: "pending".into(),
-                detail: "build".into(),
-                detail_url: "https://github.com/owner/repo/actions/runs/1".into(),
-                pr_url: "https://github.com/owner/repo/pull/42".into(),
-                unresolved: "2".into(),
-                queued,
-            };
-            let line = status.cache_line("head-sha");
-            let (sha, cached) = Status::from_cache(line.trim_end_matches('\n'));
-            assert_eq!(sha, "head-sha");
-            assert_eq!(cached.cache_line(&sha), line);
+    fn remote_transports_resolve_to_same_repository() {
+        for remote in [
+            "git@github.com:owner/repo.git",
+            "ssh://git@github.com/owner/repo.git",
+            "https://github.com/owner/repo.git",
+            "https://github.com/owner/repo",
+        ] {
+            assert_eq!(
+                parse_remote(remote),
+                ("github.com".into(), "owner/repo".into())
+            );
         }
     }
 
     #[test]
-    fn old_cache_defaults_to_unqueued() {
-        let (_, status) = Status::from_cache(
-            "head-sha\tsuccess\tbuild\t\thttps://github.com/owner/repo/pull/42\t2",
-        );
-        assert!(!status.queued);
-        assert_eq!(status.unresolved, "2");
+    fn pr_icon_reflects_queue_membership() {
+        let mut status = Status {
+            pr_url: "https://github.com/owner/repo/pull/42".into(),
+            ..Status::default()
+        };
         assert_eq!(status.pr_label(), "\u{f407} #42");
+        status.queued = true;
+        assert_eq!(status.pr_label(), "\u{f4db} #42");
     }
 
     #[test]
-    fn queued_pr_uses_queue_icon() {
-        let status = Status {
-            pr_url: "https://github.com/owner/repo/pull/42".into(),
-            queued: true,
-            ..Status::none()
-        };
-        assert_eq!(status.pr_label(), "\u{f4db} #42");
+    fn check_runs_classify_completion_and_conclusion() {
+        for (status, conclusion, expected) in [
+            ("QUEUED", None, State::Pending),
+            ("IN_PROGRESS", Some("SUCCESS"), State::Pending),
+            ("COMPLETED", Some("SUCCESS"), State::Success),
+            ("COMPLETED", Some("NEUTRAL"), State::Success),
+            ("COMPLETED", Some("SKIPPED"), State::Success),
+            ("COMPLETED", Some("FAILURE"), State::Failure),
+            ("COMPLETED", Some("CANCELLED"), State::Failure),
+            ("COMPLETED", Some("TIMED_OUT"), State::Failure),
+            ("COMPLETED", None, State::Failure),
+        ] {
+            let kind = CheckKind::CheckRun {
+                status: status.into(),
+                conclusion: conclusion.map(String::from),
+            };
+            assert_eq!(kind.state(), expected);
+        }
+    }
+
+    #[test]
+    fn status_contexts_classify_errors_as_failures() {
+        for (state, expected) in [
+            ("SUCCESS", State::Success),
+            ("PENDING", State::Pending),
+            ("FAILURE", State::Failure),
+            ("ERROR", State::Failure),
+        ] {
+            let kind = CheckKind::StatusContext {
+                state: state.into(),
+            };
+            assert_eq!(kind.state(), expected);
+        }
+    }
+
+    #[test]
+    fn verdict_uses_highest_priority_and_links_only_unique_winner() {
+        let mut checks = Vec::<Check>::deserialize_json(r#"[
+            {"name": "pass", "kind": {"StatusContext": {"state": "SUCCESS"}}},
+            {"name": "wait", "kind": {"StatusContext": {"state": "PENDING"}}},
+            {"name": "fail", "url": "https://example.com/fail", "kind": {"StatusContext": {"state": "FAILURE"}}}
+        ]"#).unwrap();
+        let status = verdict(&checks);
+        assert_eq!(status.state, State::Failure);
+        assert_eq!(status.detail, "fail");
+        assert_eq!(status.detail_url, "https://example.com/fail");
+        checks.push(
+            Check::deserialize_json(
+                r#"{"name": "error", "kind": {"StatusContext": {"state": "ERROR"}}}"#,
+            )
+            .unwrap(),
+        );
+        let status = verdict(&checks);
+        assert_eq!(status.detail, "2");
+        assert!(status.detail_url.is_empty());
+        assert_eq!(verdict(&checks[..2]).state, State::Pending);
+        assert_eq!(verdict(&checks[..1]).state, State::Success);
+        assert_eq!(verdict(&[]).state, State::None);
     }
 }

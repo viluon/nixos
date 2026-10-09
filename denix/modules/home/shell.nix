@@ -213,6 +213,7 @@ delib.module {
               "$mise"
               "$crystal"
               "\${custom.pr_link}"
+              "\${custom.pr_queued_link}"
               "\${custom.pr_unresolved}"
               "\${custom.pr_ci_success}"
               "\${custom.pr_ci_failure}"
@@ -271,9 +272,15 @@ delib.module {
               format = "[$output $symbol]($style) ";
             };
             custom.pr_link = {
-              when = "starship-pr-ci is-pr";
+              when = "starship-pr-ci is-pr && ! starship-pr-ci is-queued";
               command = "starship-pr-ci link";
               style = "blue";
+              format = "[$output]($style) ";
+            };
+            custom.pr_queued_link = {
+              when = "starship-pr-ci is-queued";
+              command = "starship-pr-ci link";
+              style = "yellow";
               format = "[$output]($style) ";
             };
             custom.pr_unresolved = {

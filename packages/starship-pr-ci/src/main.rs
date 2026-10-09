@@ -1,5 +1,5 @@
 // Async prompt backend: reads a cache and spawns a detached refresh, never blocking
-// on the network. Cache line is tab-separated: sha, state, detail, detail_url, pr_url, unresolved.
+// on the network. Cache line is tab-separated: sha, state, detail, detail_url, pr_url, unresolved, queued.
 
 use std::collections::hash_map::DefaultHasher;
 use std::env;
@@ -15,12 +15,14 @@ const TTL: Duration = Duration::from_secs(15);
 const PRUNE_AGE: Duration = Duration::from_secs(30 * 24 * 60 * 60);
 const LOCK_STALE: Duration = Duration::from_secs(60);
 const PR_ICON: &str = "\u{f407}";
+const QUEUED_PR_ICON: &str = "\u{f4db}";
 const UNRESOLVED_ICON: &str = "\u{f41f}";
 
-const THREADS_QUERY: &str = r#"
+const PR_DETAILS_QUERY: &str = r#"
 query($owner:String!,$name:String!,$number:Int!){
   repository(owner:$owner,name:$name){
     pullRequest(number:$number){
+      mergeQueueEntry { id }
       reviewThreads(first:100){ nodes { isResolved } }
     }
   }
@@ -48,6 +50,7 @@ struct Status {
     detail_url: String,
     pr_url: String,
     unresolved: String,
+    queued: bool,
 }
 
 impl Status {
@@ -56,6 +59,35 @@ impl Status {
             state: "none".into(),
             ..Default::default()
         }
+    }
+
+    fn cache_line(&self, head_sha: &str) -> String {
+        format!(
+            "{head_sha}\t{}\t{}\t{}\t{}\t{}\t{}\n",
+            self.state, self.detail, self.detail_url, self.pr_url, self.unresolved, self.queued
+        )
+    }
+
+    fn from_cache(line: &str) -> (String, Self) {
+        let fields: Vec<&str> = line.split('\t').collect();
+        let get = |i: usize| fields.get(i).copied().unwrap_or("").to_string();
+        (
+            get(0),
+            Self {
+                state: get(1),
+                detail: get(2),
+                detail_url: get(3),
+                pr_url: get(4),
+                unresolved: get(5),
+                queued: fields.get(6) == Some(&"true"),
+            },
+        )
+    }
+
+    fn pr_label(&self) -> String {
+        let icon = if self.queued { QUEUED_PR_ICON } else { PR_ICON };
+        let number = self.pr_url.rsplit('/').next().unwrap_or("");
+        format!("{icon} #{number}")
     }
 }
 
@@ -189,10 +221,25 @@ fn verdict(nodes: &[Value]) -> Status {
         detail_url,
         pr_url: String::new(),
         unresolved: String::new(),
+        queued: false,
     }
 }
 
-fn query_unresolved(host: &str, owner: &str, name: &str, number: i64) -> String {
+fn pr_details(pr: &Value) -> Option<(String, bool)> {
+    let nodes = pr["reviewThreads"]["nodes"].as_array()?;
+    let count = nodes
+        .iter()
+        .filter(|t| t["isResolved"].as_bool() == Some(false))
+        .count();
+    let unresolved = if count == 0 {
+        String::new()
+    } else {
+        count.to_string()
+    };
+    Some((unresolved, pr["mergeQueueEntry"].is_object()))
+}
+
+fn query_pr_details(host: &str, owner: &str, name: &str, number: i64) -> Option<(String, bool)> {
     let out = Command::new("gh")
         .args(["api", "graphql"])
         .args([
@@ -203,31 +250,16 @@ fn query_unresolved(host: &str, owner: &str, name: &str, number: i64) -> String 
             "-F",
             &format!("number={number}"),
         ])
-        .args(["-f", &format!("query={THREADS_QUERY}")])
+        .args(["-f", &format!("query={PR_DETAILS_QUERY}")])
         .env("GH_HOST", host)
         .stderr(Stdio::null())
-        .output();
-    let out = match out {
-        Ok(o) if o.status.success() => o,
-        _ => return String::new(),
-    };
-    let v: Value = match serde_json::from_slice(&out.stdout) {
-        Ok(v) => v,
-        Err(_) => return String::new(),
-    };
-    let nodes = match v["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"].as_array() {
-        Some(n) => n,
-        None => return String::new(),
-    };
-    let count = nodes
-        .iter()
-        .filter(|t| t["isResolved"].as_bool() == Some(false))
-        .count();
-    if count == 0 {
-        String::new()
-    } else {
-        count.to_string()
+        .output()
+        .ok()?;
+    if !out.status.success() {
+        return None;
     }
+    let v: Value = serde_json::from_slice(&out.stdout).ok()?;
+    pr_details(&v["data"]["repository"]["pullRequest"])
 }
 
 fn query_pr(host: &str, slug: &str) -> Option<Status> {
@@ -247,7 +279,10 @@ fn query_pr(host: &str, slug: &str) -> Option<Status> {
     let mut st = verdict(v["statusCheckRollup"].as_array()?);
     st.pr_url = v["url"].as_str().unwrap_or("").to_string();
     if let (Some((owner, name)), Some(number)) = (slug.split_once('/'), v["number"].as_i64()) {
-        st.unresolved = query_unresolved(host, owner, name, number);
+        if let Some((unresolved, queued)) = query_pr_details(host, owner, name, number) {
+            st.unresolved = unresolved;
+            st.queued = queued;
+        }
     }
     Some(st)
 }
@@ -328,10 +363,7 @@ fn refresh(repo_root: &str, head_sha: &str, cache_file: &Path) {
     }
     let _ = env::set_current_dir(repo_root);
     let st = query_ci();
-    let line = format!(
-        "{head_sha}\t{}\t{}\t{}\t{}\t{}\n",
-        st.state, st.detail, st.detail_url, st.pr_url, st.unresolved
-    );
+    let line = st.cache_line(head_sha);
     let tmp = cache_file.with_extension("tmp");
     if fs::write(&tmp, line).is_ok() {
         let _ = fs::rename(&tmp, cache_file);
@@ -397,21 +429,7 @@ fn resolve() -> Status {
 
     let cached = fs::read_to_string(&cache_file).ok();
     let (cached_sha, status) = match &cached {
-        Some(c) => {
-            let line = c.lines().next().unwrap_or("");
-            let f: Vec<&str> = line.split('\t').collect();
-            let get = |i: usize| f.get(i).copied().unwrap_or("").to_string();
-            (
-                get(0),
-                Status {
-                    state: get(1),
-                    detail: get(2),
-                    detail_url: get(3),
-                    pr_url: get(4),
-                    unresolved: get(5),
-                },
-            )
-        }
+        Some(c) => Status::from_cache(c.lines().next().unwrap_or("")),
         None => (String::new(), Status::none()),
     };
 
@@ -454,12 +472,17 @@ fn main() {
         "link" => {
             let st = resolve();
             if !st.pr_url.is_empty() {
-                let num = st.pr_url.rsplit('/').next().unwrap_or("");
-                osc8(&st.pr_url, &format!("{PR_ICON} #{num}"));
+                osc8(&st.pr_url, &st.pr_label());
             }
         }
         "is-pr" => {
             if resolve().pr_url.is_empty() {
+                std::process::exit(1);
+            }
+        }
+        "is-queued" => {
+            let st = resolve();
+            if st.pr_url.is_empty() || !st.queued {
                 std::process::exit(1);
             }
         }
@@ -487,9 +510,69 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: starship-pr-ci [read|detail|link|is-pr|unresolved|has-unresolved|is <state>]"
+                "usage: starship-pr-ci [read|detail|link|is-pr|is-queued|unresolved|has-unresolved|is <state>]"
             );
             std::process::exit(2);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn queue_membership_and_unresolved_threads() {
+        let mut pr = json!({
+            "mergeQueueEntry": null,
+            "reviewThreads": {
+                "nodes": [{"isResolved": false}, {"isResolved": true}]
+            }
+        });
+        assert_eq!(pr_details(&pr), Some(("1".into(), false)));
+        pr["mergeQueueEntry"] = json!({"id": "queue-entry"});
+        assert_eq!(pr_details(&pr), Some(("1".into(), true)));
+        pr["reviewThreads"]["nodes"] = json!([]);
+        assert_eq!(pr_details(&pr), Some((String::new(), true)));
+        assert_eq!(pr_details(&Value::Null), None);
+    }
+
+    #[test]
+    fn cache_round_trip_preserves_queue_and_existing_fields() {
+        for queued in [false, true] {
+            let status = Status {
+                state: "pending".into(),
+                detail: "build".into(),
+                detail_url: "https://github.com/owner/repo/actions/runs/1".into(),
+                pr_url: "https://github.com/owner/repo/pull/42".into(),
+                unresolved: "2".into(),
+                queued,
+            };
+            let line = status.cache_line("head-sha");
+            let (sha, cached) = Status::from_cache(line.trim_end_matches('\n'));
+            assert_eq!(sha, "head-sha");
+            assert_eq!(cached.cache_line(&sha), line);
+        }
+    }
+
+    #[test]
+    fn old_cache_defaults_to_unqueued() {
+        let (_, status) = Status::from_cache(
+            "head-sha\tsuccess\tbuild\t\thttps://github.com/owner/repo/pull/42\t2",
+        );
+        assert!(!status.queued);
+        assert_eq!(status.unresolved, "2");
+        assert_eq!(status.pr_label(), "\u{f407} #42");
+    }
+
+    #[test]
+    fn queued_pr_uses_queue_icon() {
+        let status = Status {
+            pr_url: "https://github.com/owner/repo/pull/42".into(),
+            queued: true,
+            ..Status::none()
+        };
+        assert_eq!(status.pr_label(), "\u{f4db} #42");
     }
 }

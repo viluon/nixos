@@ -324,6 +324,9 @@ fn query_pr(host: &str, slug: &str) -> Option<Status> {
         return None;
     }
     let mut status = verdict(pr.status_check_rollup.as_deref().unwrap_or_default());
+    if status.state == State::Pending && !status.detail_url.is_empty() {
+        status.detail_url.push_str(&format!("?pr={}", pr.number));
+    }
     status.pr_url = pr.url;
     if let Some(details) = graphql::<PrDetails>(
         host,

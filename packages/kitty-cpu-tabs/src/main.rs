@@ -195,12 +195,12 @@ fn cpu_usage(
     Ok(100.0 * ticks_per_second / clock_ticks)
 }
 
-fn tab_color(usage: f64) -> String {
+fn tab_color(usage: f64, max_usage: f64) -> String {
     if usage < 10.0 {
         return "NONE".into();
     }
     let colors = [[0xf9, 0xe2, 0xaf], [0xfa, 0xb3, 0x87], [0xf3, 0x8b, 0xa8]];
-    let position = ((usage - 10.0) / 65.0).clamp(0.0, 1.0) * 2.0;
+    let position = ((usage - 10.0) / (max_usage - 10.0)).clamp(0.0, 1.0) * 2.0;
     let segment = (position as usize).min(1);
     let weight = position - segment as f64;
     let [red, green, blue] = std::array::from_fn(|channel| {
@@ -216,6 +216,7 @@ fn update(
     previous: &Readings,
     current: &mut Readings,
     clock_ticks: f64,
+    max_usage: f64,
     snapshot: &mut Option<Vec<Connection>>,
 ) -> Result<()> {
     let bytes = remote(socket, &["ls", "--match", "state:active"])?;
@@ -251,8 +252,8 @@ fn update(
         }
         let usage = cpu_usage(&pids, previous, current, clock_ticks)?;
         let usage = (usage + old.unwrap_or(usage)) / 2.0;
-        let color = tab_color(usage);
-        if old.is_none_or(|old| tab_color(old) != color) {
+        let color = tab_color(usage, max_usage);
+        if old.is_none_or(|old| tab_color(old, max_usage) != color) {
             let foreground = if color == "NONE" { "NONE" } else { "#1e1e2e" };
             remote(
                 socket,
@@ -277,6 +278,10 @@ fn main() -> Result<()> {
         PathBuf::from(env::var_os("XDG_RUNTIME_DIR").context("XDG_RUNTIME_DIR is unset")?);
     let clock_ticks = unsafe { libc::sysconf(libc::_SC_CLK_TCK) };
     ensure!(clock_ticks > 0, "cannot determine kernel clock tick rate");
+    let max_usage = 95.0
+        * thread::available_parallelism()
+            .context("cannot determine available CPU count")?
+            .get() as f64;
     let mut previous = Readings::default();
     loop {
         let started = Instant::now();
@@ -296,6 +301,7 @@ fn main() -> Result<()> {
                     &previous,
                     &mut current,
                     clock_ticks as f64,
+                    max_usage,
                     &mut snapshot,
                 ) {
                     eprintln!("kitty-cpu-tabs: {}: {error:#}", socket.display());

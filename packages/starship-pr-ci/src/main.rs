@@ -617,39 +617,28 @@ mod tests {
         status.merge_queue = Some(MergeQueueEntry {
             position: 1,
             estimated_time_to_merge: None,
-            queue: Some(MergeQueue {
-                url: "https://github.com/owner/repo/queue/main".into(),
-            }),
+            queue: None,
         });
         assert_eq!(status.pr_label(), "\u{f4db} #42");
     }
 
     #[test]
-    fn queued_pr_label_includes_available_estimate() {
-        for (seconds, estimate) in [(0, "<1m"), (59, "<1m"), (60, "1m"), (61, "2m"), (180, "3m")] {
+    fn queue_label_formats_position_and_optional_estimate() {
+        for (seconds, expected) in [
+            (None, "q2"),
+            (Some(0), "q2 ~<1m"),
+            (Some(59), "q2 ~<1m"),
+            (Some(60), "q2 ~1m"),
+            (Some(61), "q2 ~2m"),
+            (Some(180), "q2 ~3m"),
+        ] {
             let entry = MergeQueueEntry {
                 position: 2,
-                estimated_time_to_merge: Some(seconds),
-                queue: Some(MergeQueue {
-                    url: "https://github.com/owner/repo/queue/main".into(),
-                }),
+                estimated_time_to_merge: seconds,
+                queue: None,
             };
-            assert_eq!(entry.label(), format!("q2 ~{estimate}"));
+            assert_eq!(entry.label(), expected);
         }
-    }
-
-    #[test]
-    fn queued_pr_label_includes_position_with_or_without_estimate() {
-        let mut entry = MergeQueueEntry {
-            position: 2,
-            estimated_time_to_merge: None,
-            queue: Some(MergeQueue {
-                url: "https://github.com/owner/repo/queue/main".into(),
-            }),
-        };
-        assert_eq!(entry.label(), "q2");
-        entry.estimated_time_to_merge = Some(180);
-        assert_eq!(entry.label(), "q2 ~3m");
     }
 
     #[test]
@@ -690,21 +679,27 @@ mod tests {
 
     #[test]
     fn verdict_uses_highest_priority_and_links_only_unique_winner() {
-        let mut checks = Vec::<Check>::deserialize_json(r#"[
-            {"name": "pass", "kind": {"StatusContext": {"state": "SUCCESS"}}},
-            {"name": "wait", "kind": {"StatusContext": {"state": "PENDING"}}},
-            {"name": "fail", "url": "https://example.com/fail", "kind": {"StatusContext": {"state": "FAILURE"}}}
-        ]"#).unwrap();
+        let mut checks: Vec<_> = [
+            ("pass", "SUCCESS", None),
+            ("wait", "PENDING", None),
+            ("fail", "FAILURE", Some("https://example.com/fail")),
+        ]
+        .into_iter()
+        .map(|(name, state, url)| Check {
+            name: name.into(),
+            url: url.map(String::from),
+            kind: CheckKind::StatusContext { state: state.into() },
+        })
+        .collect();
         let status = verdict(&checks);
         assert_eq!(status.state, State::Failure);
         assert_eq!(status.detail, "fail");
         assert_eq!(status.detail_url, "https://example.com/fail");
-        checks.push(
-            Check::deserialize_json(
-                r#"{"name": "error", "kind": {"StatusContext": {"state": "ERROR"}}}"#,
-            )
-            .unwrap(),
-        );
+        checks.push(Check {
+            name: "error".into(),
+            url: None,
+            kind: CheckKind::StatusContext { state: "ERROR".into() },
+        });
         let status = verdict(&checks);
         assert_eq!(status.detail, "2");
         assert!(status.detail_url.is_empty());

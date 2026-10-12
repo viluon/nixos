@@ -50,12 +50,39 @@ struct Connection {
     pids: Vec<u32>,
 }
 
-type Rgb = [u8; 3];
+type Rgb = [f64; 3];
 
-#[derive(DeJson, Clone, Copy, PartialEq)]
+fn mix(start: Rgb, end: Rgb, weight: f64) -> Rgb {
+    std::array::from_fn(|channel| start[channel] + (end[channel] - start[channel]) * weight)
+}
+
+fn hex(color: Rgb) -> String {
+    let [red, green, blue] = color.map(|channel| channel.round() as u8);
+    format!("#{red:02x}{green:02x}{blue:02x}")
+}
+
+#[derive(DeJson, Clone, Copy)]
 struct TabColors {
     background: Rgb,
     foreground: Rgb,
+}
+
+impl TabColors {
+    fn ease_towards(self, target: TabColors) -> TabColors {
+        TabColors {
+            background: mix(self.background, target.background, 0.5),
+            foreground: mix(self.foreground, target.foreground, 0.5),
+        }
+    }
+}
+
+fn kitty_color_args([active, inactive]: [TabColors; 2]) -> [String; 4] {
+    [
+        format!("active_bg={}", hex(active.background)),
+        format!("inactive_bg={}", hex(inactive.background)),
+        format!("active_fg={}", hex(active.foreground)),
+        format!("inactive_fg={}", hex(inactive.foreground)),
+    ]
 }
 
 #[derive(DeJson)]
@@ -73,56 +100,41 @@ struct Heatmap {
 
 impl Heatmap {
     fn shade(&self, idle: TabColors, usage: f64) -> TabColors {
-        let [warm, hot, hottest] = self.palette.heat;
-        let colors = [idle.background, warm, hot, hottest];
-        let position = if usage < 10.0 {
-            usage / 10.0
-        } else {
-            1.0 + ((usage - 10.0) / (self.max_usage - 10.0)).clamp(0.0, 1.0) * 2.0
-        };
-        let segment = (position as usize).min(2);
-        let weight = position - segment as f64;
-        let background = std::array::from_fn(|channel| {
-            let start = colors[segment][channel] as f64;
-            let end = colors[segment + 1][channel] as f64;
-            (start + (end - start) * weight).round() as u8
-        });
-        let contrast = |text| (luminance(text) - luminance(background)).abs();
-        let foreground = if contrast(idle.foreground) >= contrast(self.palette.hot_text) {
-            idle.foreground
-        } else {
-            self.palette.hot_text
-        };
+        if usage < 10.0 {
+            return idle;
+        }
+        let heat = self.palette.heat;
+        let position = ((usage - 10.0) / (self.max_usage - 10.0)).clamp(0.0, 1.0) * 2.0;
+        let segment = (position as usize).min(1);
         TabColors {
-            background,
-            foreground,
+            background: mix(heat[segment], heat[segment + 1], position - segment as f64),
+            foreground: self.palette.hot_text,
         }
     }
 
-    fn colors(&self, usage: f64) -> [TabColors; 2] {
-        [
-            self.shade(self.palette.active, usage),
-            self.shade(self.palette.inactive, usage),
-        ]
+    fn idle_colors(&self) -> [TabColors; 2] {
+        [self.palette.active, self.palette.inactive]
     }
-}
 
-fn luminance([red, green, blue]: Rgb) -> f64 {
-    0.2126 * red as f64 + 0.7152 * green as f64 + 0.0722 * blue as f64
-}
-
-fn hex([red, green, blue]: Rgb) -> String {
-    format!("#{red:02x}{green:02x}{blue:02x}")
+    fn colors(&self, usage: f64) -> [TabColors; 2] {
+        self.idle_colors().map(|idle| self.shade(idle, usage))
+    }
 }
 
 fn load_palette(path: &Path) -> Result<Palette> {
     Ok(Palette::deserialize_json(&fs::read_to_string(path)?)?)
 }
 
+#[derive(Clone, Copy)]
+struct TabReading {
+    usage: f64,
+    shown: [TabColors; 2],
+}
+
 #[derive(Default)]
 struct Readings {
     processes: HashMap<(u32, u64), (u64, Instant)>,
-    tabs: HashMap<(PathBuf, u64), f64>,
+    tabs: HashMap<(PathBuf, u64), TabReading>,
 }
 
 fn run(args: &[&str]) -> Result<Vec<u8>> {
@@ -297,24 +309,24 @@ fn update(
             }
         }
         let usage = cpu_usage(&pids, previous, current, clock_ticks)?;
-        let usage = (usage + old.unwrap_or(usage)) / 2.0;
-        let colors = heatmap.colors(usage);
-        if old.is_none_or(|old| heatmap.colors(old) != colors) {
-            let [active, inactive] = colors;
-            remote(
-                socket,
-                &[
-                    "set-tab-color",
-                    "--match",
-                    &format!("window_id:{}", window.id),
-                    &format!("active_bg={}", hex(active.background)),
-                    &format!("inactive_bg={}", hex(inactive.background)),
-                    &format!("active_fg={}", hex(active.foreground)),
-                    &format!("inactive_fg={}", hex(inactive.foreground)),
-                ],
-            )?;
+        let usage = (usage + old.map_or(usage, |old| old.usage)) / 2.0;
+        let shown = old.map_or(heatmap.idle_colors(), |old| old.shown);
+        let target = heatmap.colors(usage);
+        let eased = std::array::from_fn(|role| shown[role].ease_towards(target[role]));
+        let color_args = kitty_color_args(eased);
+        if old.is_none() || kitty_color_args(shown) != color_args {
+            let window_match = format!("window_id:{}", window.id);
+            let mut command = vec!["set-tab-color", "--match", &window_match];
+            command.extend(color_args.iter().map(String::as_str));
+            remote(socket, &command)?;
         }
-        current.tabs.insert(key, usage);
+        current.tabs.insert(
+            key,
+            TabReading {
+                usage,
+                shown: eased,
+            },
+        );
     }
     Ok(())
 }

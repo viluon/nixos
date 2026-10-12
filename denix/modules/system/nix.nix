@@ -7,8 +7,10 @@ delib.module {
     {
       imports = [
         (
-          { pkgs, ... }:
+          { inputs, pkgs, ... }:
           {
+            system.checks = [ inputs.self.checks.${pkgs.stdenv.hostPlatform.system}.treefmt ];
+
             nix = {
               package = pkgs.nixVersions.stable;
 

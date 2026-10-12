@@ -10,7 +10,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, ensure};
-use nanoserde::{DeJson, DeJsonState, DeJsonTok};
+use nanoserde::DeJson;
 
 #[derive(DeJson)]
 struct OsWindow {
@@ -48,6 +48,75 @@ struct Connection {
     local: SocketAddr,
     peer: SocketAddr,
     pids: Vec<u32>,
+}
+
+type Rgb = [u8; 3];
+
+#[derive(DeJson, Clone, Copy, PartialEq)]
+struct TabColors {
+    background: Rgb,
+    foreground: Rgb,
+}
+
+#[derive(DeJson)]
+struct Palette {
+    active: TabColors,
+    inactive: TabColors,
+    heat: [Rgb; 3],
+    hot_text: Rgb,
+}
+
+struct Heatmap {
+    palette: Palette,
+    max_usage: f64,
+}
+
+impl Heatmap {
+    fn shade(&self, idle: TabColors, usage: f64) -> TabColors {
+        let [warm, hot, hottest] = self.palette.heat;
+        let colors = [idle.background, warm, hot, hottest];
+        let position = if usage < 10.0 {
+            usage / 10.0
+        } else {
+            1.0 + ((usage - 10.0) / (self.max_usage - 10.0)).clamp(0.0, 1.0) * 2.0
+        };
+        let segment = (position as usize).min(2);
+        let weight = position - segment as f64;
+        let background = std::array::from_fn(|channel| {
+            let start = colors[segment][channel] as f64;
+            let end = colors[segment + 1][channel] as f64;
+            (start + (end - start) * weight).round() as u8
+        });
+        let contrast = |text| (luminance(text) - luminance(background)).abs();
+        let foreground = if contrast(idle.foreground) >= contrast(self.palette.hot_text) {
+            idle.foreground
+        } else {
+            self.palette.hot_text
+        };
+        TabColors {
+            background,
+            foreground,
+        }
+    }
+
+    fn colors(&self, usage: f64) -> [TabColors; 2] {
+        [
+            self.shade(self.palette.active, usage),
+            self.shade(self.palette.inactive, usage),
+        ]
+    }
+}
+
+fn luminance([red, green, blue]: Rgb) -> f64 {
+    0.2126 * red as f64 + 0.7152 * green as f64 + 0.0722 * blue as f64
+}
+
+fn hex([red, green, blue]: Rgb) -> String {
+    format!("#{red:02x}{green:02x}{blue:02x}")
+}
+
+fn load_palette(path: &Path) -> Result<Palette> {
+    Ok(Palette::deserialize_json(&fs::read_to_string(path)?)?)
 }
 
 #[derive(Default)]
@@ -195,40 +264,17 @@ fn cpu_usage(
     Ok(100.0 * ticks_per_second / clock_ticks)
 }
 
-fn tab_color(usage: f64, max_usage: f64) -> String {
-    if usage < 10.0 {
-        return "NONE".into();
-    }
-    let colors = [[0xf9, 0xe2, 0xaf], [0xfa, 0xb3, 0x87], [0xf3, 0x8b, 0xa8]];
-    let position = ((usage - 10.0) / (max_usage - 10.0)).clamp(0.0, 1.0) * 2.0;
-    let segment = (position as usize).min(1);
-    let weight = position - segment as f64;
-    let [red, green, blue] = std::array::from_fn(|channel| {
-        let start = colors[segment][channel] as f64;
-        let end = colors[segment + 1][channel] as f64;
-        (start + (end - start) * weight).round() as u8
-    });
-    format!("#{red:02x}{green:02x}{blue:02x}")
-}
-
 fn update(
     socket: &Path,
     previous: &Readings,
     current: &mut Readings,
     clock_ticks: f64,
-    max_usage: f64,
+    heatmap: &Heatmap,
     snapshot: &mut Option<Vec<Connection>>,
 ) -> Result<()> {
     let bytes = remote(socket, &["ls", "--match", "state:active"])?;
-    let mut input = str::from_utf8(&bytes)?.chars();
-    let mut state = DeJsonState::default();
-    state.next(&mut input);
-    state.next_tok(&mut input)?;
-    let windows = Vec::<OsWindow>::de_json(&mut state, &mut input)?;
-    ensure!(
-        state.tok == DeJsonTok::Eof,
-        "trailing data in Kitty response"
-    );
+    let windows = Vec::<OsWindow>::deserialize_json(str::from_utf8(&bytes)?)
+        .context("invalid Kitty response")?;
     for tab in windows.into_iter().flat_map(|window| window.tabs) {
         let Some(window) = tab.windows.first() else {
             continue;
@@ -252,19 +298,19 @@ fn update(
         }
         let usage = cpu_usage(&pids, previous, current, clock_ticks)?;
         let usage = (usage + old.unwrap_or(usage)) / 2.0;
-        let color = tab_color(usage, max_usage);
-        if old.is_none_or(|old| tab_color(old, max_usage) != color) {
-            let foreground = if color == "NONE" { "NONE" } else { "#1e1e2e" };
+        let colors = heatmap.colors(usage);
+        if old.is_none_or(|old| heatmap.colors(old) != colors) {
+            let [active, inactive] = colors;
             remote(
                 socket,
                 &[
                     "set-tab-color",
                     "--match",
                     &format!("window_id:{}", window.id),
-                    &format!("active_bg={color}"),
-                    &format!("inactive_bg={color}"),
-                    &format!("active_fg={foreground}"),
-                    &format!("inactive_fg={foreground}"),
+                    &format!("active_bg={}", hex(active.background)),
+                    &format!("inactive_bg={}", hex(inactive.background)),
+                    &format!("active_fg={}", hex(active.foreground)),
+                    &format!("inactive_fg={}", hex(inactive.foreground)),
                 ],
             )?;
         }
@@ -278,10 +324,19 @@ fn main() -> Result<()> {
         PathBuf::from(env::var_os("XDG_RUNTIME_DIR").context("XDG_RUNTIME_DIR is unset")?);
     let clock_ticks = unsafe { libc::sysconf(libc::_SC_CLK_TCK) };
     ensure!(clock_ticks > 0, "cannot determine kernel clock tick rate");
-    let max_usage = 95.0
-        * thread::available_parallelism()
-            .context("cannot determine available CPU count")?
-            .get() as f64;
+    let palette_path = PathBuf::from(
+        env::args_os()
+            .nth(1)
+            .context("usage: kitty-cpu-tabs PALETTE_JSON")?,
+    );
+    let heatmap = Heatmap {
+        palette: load_palette(&palette_path)
+            .with_context(|| format!("cannot load palette {}", palette_path.display()))?,
+        max_usage: 95.0
+            * thread::available_parallelism()
+                .context("cannot determine available CPU count")?
+                .get() as f64,
+    };
     let mut previous = Readings::default();
     loop {
         let started = Instant::now();
@@ -301,7 +356,7 @@ fn main() -> Result<()> {
                     &previous,
                     &mut current,
                     clock_ticks as f64,
-                    max_usage,
+                    &heatmap,
                     &mut snapshot,
                 ) {
                     eprintln!("kitty-cpu-tabs: {}: {error:#}", socket.display());

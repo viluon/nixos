@@ -33,7 +33,7 @@ const PR_DETAILS_QUERY: &str = r#"
 query($owner:String!,$name:String!,$number:Int!){
   repository(owner:$owner,name:$name){
     pullRequest(number:$number){
-      mergeQueueEntry { id }
+      mergeQueueEntry { position estimatedTimeToMerge mergeQueue { url } }
       reviewThreads(first:100){ nodes { isResolved } }
     }
   }
@@ -65,6 +65,7 @@ enum PromptCommand {
     Read,
     Detail,
     Link,
+    Queue,
     IsPr,
     IsQueued,
     HasUnresolved,
@@ -88,7 +89,21 @@ struct Status {
     detail_url: String,
     pr_url: String,
     unresolved: usize,
-    queued: bool,
+    merge_queue: Option<MergeQueueEntry>,
+}
+
+#[derive(DeJson, SerJson)]
+struct MergeQueueEntry {
+    position: u64,
+    #[nserde(rename = "estimatedTimeToMerge")]
+    estimated_time_to_merge: Option<u64>,
+    #[nserde(rename = "mergeQueue")]
+    queue: Option<MergeQueue>,
+}
+
+#[derive(DeJson, SerJson)]
+struct MergeQueue {
+    url: String,
 }
 
 #[derive(DeJson, SerJson)]
@@ -99,9 +114,23 @@ struct Cache {
 
 impl Status {
     fn pr_label(&self) -> String {
-        let icon = if self.queued { QUEUED_PR_ICON } else { PR_ICON };
+        let icon = if self.merge_queue.is_some() { QUEUED_PR_ICON } else { PR_ICON };
         let number = self.pr_url.rsplit('/').next().unwrap_or("");
         format!("{icon} #{number}")
+    }
+}
+
+impl MergeQueueEntry {
+    fn label(&self) -> String {
+        let mut label = format!("q{}", self.position);
+        if let Some(seconds) = self.estimated_time_to_merge {
+            if seconds < 60 {
+                label.push_str(" ~<1m");
+            } else {
+                label.push_str(&format!(" ~{}m", seconds.div_ceil(60)));
+            }
+        }
+        label
     }
 }
 
@@ -122,7 +151,7 @@ fn cache_dir() -> PathBuf {
     let base = env::var_os("XDG_CACHE_HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env::var_os("HOME").unwrap_or_default()).join(".cache"));
-    base.join("starship-pr-ci").join("v3")
+    base.join("starship-pr-ci").join("v4")
 }
 
 fn age(path: &Path) -> Option<Duration> {
@@ -243,7 +272,7 @@ struct PrDetails {
     #[nserde(rename = "reviewThreads")]
     review_threads: ReviewThreads,
     #[nserde(rename = "mergeQueueEntry")]
-    queued: bool,
+    merge_queue: Option<MergeQueueEntry>,
 }
 
 #[derive(DeJson)]
@@ -332,7 +361,7 @@ fn query_pr(host: &str, slug: &str) -> Option<Status> {
         host,
         slug,
         PR_DETAILS_QUERY,
-        ".data.repository.pullRequest | .mergeQueueEntry = (.mergeQueueEntry != null)",
+        ".data.repository.pullRequest",
         "number",
         &pr.number.to_string(),
     ) {
@@ -342,7 +371,7 @@ fn query_pr(host: &str, slug: &str) -> Option<Status> {
             .iter()
             .filter(|t| !t.is_resolved)
             .count();
-        status.queued = details.queued;
+        status.merge_queue = details.merge_queue;
     }
     Some(status)
 }
@@ -505,6 +534,13 @@ fn main() -> Result<()> {
                 osc8(&st.pr_url, &st.pr_label());
             }
         }
+        PromptCommand::Queue => {
+            let st = resolve();
+            if !st.pr_url.is_empty() && let Some(entry) = st.merge_queue {
+                let url = entry.queue.as_ref().map_or("", |queue| queue.url.as_str());
+                osc8(url, &entry.label());
+            }
+        }
         PromptCommand::IsPr => {
             if resolve().pr_url.is_empty() {
                 std::process::exit(1);
@@ -512,7 +548,7 @@ fn main() -> Result<()> {
         }
         PromptCommand::IsQueued => {
             let st = resolve();
-            if st.pr_url.is_empty() || !st.queued {
+            if st.pr_url.is_empty() || st.merge_queue.is_none() {
                 std::process::exit(1);
             }
         }
@@ -578,8 +614,42 @@ mod tests {
             ..Status::default()
         };
         assert_eq!(status.pr_label(), "\u{f407} #42");
-        status.queued = true;
+        status.merge_queue = Some(MergeQueueEntry {
+            position: 1,
+            estimated_time_to_merge: None,
+            queue: Some(MergeQueue {
+                url: "https://github.com/owner/repo/queue/main".into(),
+            }),
+        });
         assert_eq!(status.pr_label(), "\u{f4db} #42");
+    }
+
+    #[test]
+    fn queued_pr_label_includes_available_estimate() {
+        for (seconds, estimate) in [(0, "<1m"), (59, "<1m"), (60, "1m"), (61, "2m"), (180, "3m")] {
+            let entry = MergeQueueEntry {
+                position: 2,
+                estimated_time_to_merge: Some(seconds),
+                queue: Some(MergeQueue {
+                    url: "https://github.com/owner/repo/queue/main".into(),
+                }),
+            };
+            assert_eq!(entry.label(), format!("q2 ~{estimate}"));
+        }
+    }
+
+    #[test]
+    fn queued_pr_label_includes_position_with_or_without_estimate() {
+        let mut entry = MergeQueueEntry {
+            position: 2,
+            estimated_time_to_merge: None,
+            queue: Some(MergeQueue {
+                url: "https://github.com/owner/repo/queue/main".into(),
+            }),
+        };
+        assert_eq!(entry.label(), "q2");
+        entry.estimated_time_to_merge = Some(180);
+        assert_eq!(entry.label(), "q2 ~3m");
     }
 
     #[test]

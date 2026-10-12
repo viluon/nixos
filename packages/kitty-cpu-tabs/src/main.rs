@@ -195,12 +195,20 @@ fn cpu_usage(
     Ok(100.0 * ticks_per_second / clock_ticks)
 }
 
-fn tab_color(usage: f64) -> &'static str {
-    match usage {
-        usage if usage < 10.0 => "NONE",
-        usage if usage < 75.0 => "#f9e2af",
-        _ => "#f38ba8",
+fn tab_color(usage: f64) -> String {
+    if usage < 10.0 {
+        return "NONE".into();
     }
+    let colors = [[0xf9, 0xe2, 0xaf], [0xfa, 0xb3, 0x87], [0xf3, 0x8b, 0xa8]];
+    let position = ((usage - 10.0) / 65.0).clamp(0.0, 1.0) * 2.0;
+    let segment = (position as usize).min(1);
+    let weight = position - segment as f64;
+    let [red, green, blue] = std::array::from_fn(|channel| {
+        let start = colors[segment][channel] as f64;
+        let end = colors[segment + 1][channel] as f64;
+        (start + (end - start) * weight).round() as u8
+    });
+    format!("#{red:02x}{green:02x}{blue:02x}")
 }
 
 fn update(
@@ -244,7 +252,7 @@ fn update(
         let usage = cpu_usage(&pids, previous, current, clock_ticks)?;
         let usage = (usage + old.unwrap_or(usage)) / 2.0;
         let color = tab_color(usage);
-        if old.map(tab_color) != Some(color) {
+        if old.is_none_or(|old| tab_color(old) != color) {
             let foreground = if color == "NONE" { "NONE" } else { "#1e1e2e" };
             remote(
                 socket,
@@ -271,6 +279,7 @@ fn main() -> Result<()> {
     ensure!(clock_ticks > 0, "cannot determine kernel clock tick rate");
     let mut previous = Readings::default();
     loop {
+        let started = Instant::now();
         let mut current = Readings::default();
         let mut snapshot = None;
         for entry in fs::read_dir(&runtime)? {
@@ -294,6 +303,6 @@ fn main() -> Result<()> {
             }
         }
         previous = current;
-        thread::sleep(Duration::from_secs(1));
+        thread::sleep(Duration::from_millis(250).saturating_sub(started.elapsed()));
     }
 }

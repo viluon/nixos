@@ -114,7 +114,11 @@ struct Cache {
 
 impl Status {
     fn pr_label(&self) -> String {
-        let icon = if self.merge_queue.is_some() { QUEUED_PR_ICON } else { PR_ICON };
+        let icon = if self.merge_queue.is_some() {
+            QUEUED_PR_ICON
+        } else {
+            PR_ICON
+        };
         let number = self.pr_url.rsplit('/').next().unwrap_or("");
         format!("{icon} #{number}")
     }
@@ -536,7 +540,9 @@ fn main() -> Result<()> {
         }
         PromptCommand::Queue => {
             let st = resolve();
-            if !st.pr_url.is_empty() && let Some(entry) = st.merge_queue {
+            if !st.pr_url.is_empty()
+                && let Some(entry) = st.merge_queue
+            {
                 let url = entry.queue.as_ref().map_or("", |queue| queue.url.as_str());
                 osc8(url, &entry.label());
             }
@@ -688,7 +694,9 @@ mod tests {
         .map(|(name, state, url)| Check {
             name: name.into(),
             url: url.map(String::from),
-            kind: CheckKind::StatusContext { state: state.into() },
+            kind: CheckKind::StatusContext {
+                state: state.into(),
+            },
         })
         .collect();
         let status = verdict(&checks);
@@ -698,7 +706,9 @@ mod tests {
         checks.push(Check {
             name: "error".into(),
             url: None,
-            kind: CheckKind::StatusContext { state: "ERROR".into() },
+            kind: CheckKind::StatusContext {
+                state: "ERROR".into(),
+            },
         });
         let status = verdict(&checks);
         assert_eq!(status.detail, "2");

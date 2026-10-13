@@ -50,6 +50,8 @@ struct Connection {
     pids: Vec<u32>,
 }
 
+const COLOR_HALF_LIFE: Duration = Duration::from_millis(250);
+
 type Rgb = [f64; 3];
 
 fn mix(start: Rgb, end: Rgb, weight: f64) -> Rgb {
@@ -68,10 +70,11 @@ struct TabColors {
 }
 
 impl TabColors {
-    fn ease_towards(self, target: TabColors) -> TabColors {
+    fn ease_towards(self, target: TabColors, elapsed: Duration) -> TabColors {
+        let progress = 1.0 - 0.5_f64.powf(elapsed.div_duration_f64(COLOR_HALF_LIFE));
         TabColors {
-            background: mix(self.background, target.background, 0.5),
-            foreground: mix(self.foreground, target.foreground, 0.5),
+            background: mix(self.background, target.background, progress),
+            foreground: mix(self.foreground, target.foreground, progress),
         }
     }
 }
@@ -129,6 +132,7 @@ fn load_palette(path: &Path) -> Result<Palette> {
 struct TabReading {
     usage: f64,
     shown: [TabColors; 2],
+    shown_at: Instant,
 }
 
 #[derive(Default)]
@@ -310,9 +314,11 @@ fn update(
         }
         let usage = cpu_usage(&pids, previous, current, clock_ticks)?;
         let usage = (usage + old.map_or(usage, |old| old.usage)) / 2.0;
+        let now = Instant::now();
         let shown = old.map_or(heatmap.idle_colors(), |old| old.shown);
+        let elapsed = old.map_or(COLOR_HALF_LIFE, |old| now.duration_since(old.shown_at));
         let target = heatmap.colors(usage);
-        let eased = std::array::from_fn(|role| shown[role].ease_towards(target[role]));
+        let eased = std::array::from_fn(|role| shown[role].ease_towards(target[role], elapsed));
         let color_args = kitty_color_args(eased);
         if old.is_none() || kitty_color_args(shown) != color_args {
             let window_match = format!("window_id:{}", window.id);
@@ -325,6 +331,7 @@ fn update(
             TabReading {
                 usage,
                 shown: eased,
+                shown_at: now,
             },
         );
     }

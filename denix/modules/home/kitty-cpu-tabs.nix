@@ -32,7 +32,7 @@ delib.module {
           };
           Service = {
             ExecStart = "${pkgs.kitty-cpu-tabs}/bin/kitty-cpu-tabs ${palette}";
-            Environment = "PATH=${lib.makeBinPath [ config.programs.kitty.package pkgs.coreutils pkgs.iproute2 ]}";
+            Environment = "PATH=${lib.makeBinPath [ config.programs.kitty.package pkgs.coreutils ]}";
             Nice = 19;
             IOSchedulingClass = "idle";
             Restart = "on-failure";

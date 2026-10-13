@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs;
-use std::net::SocketAddr;
+use std::io;
 use std::os::unix::fs::FileTypeExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -32,22 +32,6 @@ struct Window {
 #[derive(DeJson)]
 struct Process {
     pid: u32,
-    cmdline: Option<Vec<String>>,
-}
-
-impl Process {
-    fn is_mill_launcher(&self) -> bool {
-        self.cmdline
-            .iter()
-            .flatten()
-            .any(|arg| arg.starts_with("mill.main.cli=") || arg.starts_with("-Dmill.main.cli="))
-    }
-}
-
-struct Connection {
-    local: SocketAddr,
-    peer: SocketAddr,
-    pids: Vec<u32>,
 }
 
 const COLOR_HALF_LIFE: Duration = Duration::from_millis(250);
@@ -164,76 +148,68 @@ fn remote(socket: &Path, args: &[&str]) -> Result<Vec<u8>> {
     run(&command)
 }
 
-fn connections() -> Result<Vec<Connection>> {
-    let bytes = run(&[
-        "ss",
-        "-Hntp",
-        "state",
-        "established",
-        "( src 127.0.0.1 or src [::1] or src [::ffff:127.0.0.1] )",
-    ])?;
-    str::from_utf8(&bytes)?
-        .lines()
-        .map(|line| {
-            let mut fields = line.split_whitespace().skip(2);
-            let mut local: SocketAddr = fields.next().context("missing local endpoint")?.parse()?;
-            let mut peer: SocketAddr = fields.next().context("missing peer endpoint")?.parse()?;
-            local.set_ip(local.ip().to_canonical());
-            peer.set_ip(peer.ip().to_canonical());
-            let pids = line
-                .split(",pid=")
-                .skip(1)
-                .map(|owner| {
-                    Ok(owner
-                        .split_once(',')
-                        .context("invalid socket owner")?
-                        .0
-                        .parse()?)
-                })
-                .collect::<Result<_>>()?;
-            Ok(Connection { local, peer, pids })
-        })
-        .collect()
+fn live<T>(result: io::Result<T>) -> io::Result<Option<T>> {
+    match result {
+        Ok(value) => Ok(Some(value)),
+        Err(error)
+            if error.kind() == io::ErrorKind::NotFound
+                || error.raw_os_error() == Some(libc::ESRCH) =>
+        {
+            Ok(None)
+        }
+        Err(error) => Err(error),
+    }
 }
 
-fn mill_daemon(pid: u32, snapshot: &mut Option<Vec<Connection>>) -> Result<Option<u32>> {
-    let sockets = match snapshot {
-        Some(sockets) => sockets,
-        None => snapshot.insert(connections()?),
+fn children(pid: u32) -> Result<Vec<u32>> {
+    let Some(mut tasks) = live(fs::read_dir(format!("/proc/{pid}/task")))? else {
+        return Ok(Vec::new());
     };
-    for client in sockets
-        .iter()
-        .filter(|connection| connection.pids.contains(&pid))
-    {
-        let Some(server) = sockets
-            .iter()
-            .find(|connection| connection.local == client.peer && connection.peer == client.local)
-        else {
-            continue;
-        };
-        for &daemon in &server.pids {
-            let bytes = match fs::read(format!("/proc/{daemon}/cmdline")) {
-                Ok(bytes) => bytes,
-                Err(error)
-                    if error.kind() == std::io::ErrorKind::NotFound
-                        || error.raw_os_error() == Some(libc::ESRCH) =>
-                {
-                    continue;
-                }
-                Err(error) => return Err(error).context("cannot identify socket peer"),
-            };
-            if bytes
-                .split(|byte| *byte == 0)
-                .any(|arg| arg == b"mill.daemon.MillDaemonMain")
-            {
-                return Ok(Some(daemon));
-            }
+    tasks.try_fold(Vec::new(), |mut children, task| {
+        let listing = live(fs::read_to_string(task?.path().join("children")))?.unwrap_or_default();
+        for child in listing.split_whitespace() {
+            children.push(child.parse()?);
+        }
+        Ok(children)
+    })
+}
+
+fn process_tree(roots: impl IntoIterator<Item = u32>) -> Result<HashSet<u32>> {
+    let mut tree = HashSet::new();
+    let mut pending = Vec::from_iter(roots);
+    while let Some(pid) = pending.pop() {
+        if tree.insert(pid) {
+            pending.extend(children(pid).context("cannot list child processes")?);
         }
     }
-    Ok(None)
+    Ok(tree)
 }
 
-fn process_stat(bytes: &[u8]) -> Result<(u64, u64)> {
+fn is_mill_launcher(pid: u32) -> Result<bool> {
+    let cmdline = live(fs::read(format!("/proc/{pid}/cmdline")))?.unwrap_or_default();
+    Ok(cmdline
+        .split(|byte| *byte == 0)
+        .any(|arg| arg.starts_with(b"mill.main.cli=") || arg.starts_with(b"-Dmill.main.cli=")))
+}
+
+fn mill_daemon(launcher: u32) -> Result<Option<u32>> {
+    let Some(workdir) = live(fs::read_link(format!("/proc/{launcher}/cwd")))? else {
+        return Ok(None);
+    };
+    Ok(workdir
+        .ancestors()
+        .find_map(|dir| fs::read_to_string(dir.join("out/mill-daemon/processId")).ok())
+        .and_then(|pid| pid.trim().parse().ok()))
+}
+
+fn read_process_stat(pid: u32) -> Result<Option<(u64, u64)>> {
+    live(fs::read(format!("/proc/{pid}/stat")))
+        .context("cannot read process stat")?
+        .map(|bytes| parse_process_stat(&bytes))
+        .transpose()
+}
+
+fn parse_process_stat(bytes: &[u8]) -> Result<(u64, u64)> {
     let end = bytes
         .iter()
         .rposition(|byte| *byte == b')')
@@ -254,19 +230,12 @@ fn cpu_usage(
     current: &mut Readings,
     clock_ticks: f64,
 ) -> Result<f64> {
+    let live_stats = pids
+        .iter()
+        .map(|&pid| Ok(read_process_stat(pid)?.map(|stat| (pid, stat))))
+        .collect::<Result<Vec<_>>>()?;
     let mut ticks_per_second = 0.0;
-    for &pid in pids {
-        let bytes = match fs::read(format!("/proc/{pid}/stat")) {
-            Ok(bytes) => bytes,
-            Err(error)
-                if error.kind() == std::io::ErrorKind::NotFound
-                    || error.raw_os_error() == Some(libc::ESRCH) =>
-            {
-                continue;
-            }
-            Err(error) => return Err(error).context("cannot read process stat"),
-        };
-        let (start, ticks) = process_stat(&bytes)?;
+    for (pid, (start, ticks)) in live_stats.into_iter().flatten() {
         let key = (pid, start);
         let now = Instant::now();
         if let Some((old_ticks, old_time)) = previous.processes.get(&key) {
@@ -286,32 +255,30 @@ fn update(
     current: &mut Readings,
     clock_ticks: f64,
     heatmap: &Heatmap,
-    snapshot: &mut Option<Vec<Connection>>,
 ) -> Result<()> {
     let bytes = remote(socket, &["ls", "--match", "state:active"])?;
     let windows = Vec::<OsWindow>::deserialize_json(str::from_utf8(&bytes)?)
         .context("invalid Kitty response")?;
-    for tab in windows.into_iter().flat_map(|window| window.tabs) {
-        let Some(window) = tab.windows.first() else {
-            continue;
-        };
-        let key = (socket.to_path_buf(), tab.id);
+    let tab_leaders = windows
+        .into_iter()
+        .flat_map(|os_window| os_window.tabs)
+        .filter_map(|tab| Some((tab.id, tab.windows.into_iter().next()?)));
+    for (tab_id, window) in tab_leaders {
+        let key = (socket.to_path_buf(), tab_id);
         let old = previous.tabs.get(&key).copied();
-        let mut pids = window
-            .foreground_processes
-            .iter()
-            .map(|process| process.pid)
-            .collect::<HashSet<_>>();
-        for process in window
-            .foreground_processes
-            .iter()
-            .filter(|process| process.is_mill_launcher())
-        {
-            if let Some(daemon) = mill_daemon(process.pid, snapshot)? {
-                pids.remove(&process.pid);
-                pids.insert(daemon);
+        let mut pids = process_tree(
+            window
+                .foreground_processes
+                .iter()
+                .map(|process| process.pid),
+        )?;
+        let mut daemons = Vec::new();
+        for &pid in &pids {
+            if is_mill_launcher(pid)? {
+                daemons.extend(mill_daemon(pid)?);
             }
         }
+        pids.extend(process_tree(daemons)?);
         let usage = cpu_usage(&pids, previous, current, clock_ticks)?;
         let usage = (usage + old.map_or(usage, |old| old.usage)) / 2.0;
         let now = Instant::now();
@@ -360,7 +327,6 @@ fn main() -> Result<()> {
     loop {
         let started = Instant::now();
         let mut current = Readings::default();
-        let mut snapshot = None;
         for entry in fs::read_dir(&runtime)? {
             let entry = entry?;
             if entry
@@ -376,7 +342,6 @@ fn main() -> Result<()> {
                     &mut current,
                     clock_ticks as f64,
                     &heatmap,
-                    &mut snapshot,
                 ) {
                     eprintln!("kitty-cpu-tabs: {}: {error:#}", socket.display());
                 }

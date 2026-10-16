@@ -40,6 +40,7 @@ delib.module {
             glr = "git pull --rebase";
             grep = "rg";
             gsh = "git show --ext-diff";
+            jc = "just compile";
             jb = "just build";
             lh = "eza --long --git --icons=auto --classify=always";
             ll = "eza --long --git --icons=auto --classify=always --all";

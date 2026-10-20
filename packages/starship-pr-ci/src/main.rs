@@ -20,6 +20,7 @@ const PRUNE_AGE: Duration = Duration::from_secs(30 * 24 * 60 * 60);
 const PR_ICON: &str = "\u{f407}";
 const QUEUED_PR_ICON: &str = "\u{f4db}";
 const UNRESOLVED_ICON: &str = "\u{f41f}";
+const CONFLICT_ICON: &str = "\u{f421}";
 
 const CHECKS_JQ: &str = r#"
 (. // []) | map({
@@ -68,6 +69,8 @@ enum PromptCommand {
     Queue,
     IsPr,
     IsQueued,
+    HasConflicts,
+    Conflicts,
     HasUnresolved,
     Unresolved,
     Is {
@@ -88,6 +91,7 @@ struct Status {
     detail: String,
     detail_url: String,
     pr_url: String,
+    conflicting: bool,
     unresolved: usize,
     merge_queue: Option<MergeQueueEntry>,
 }
@@ -155,7 +159,7 @@ fn cache_dir() -> PathBuf {
     let base = env::var_os("XDG_CACHE_HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env::var_os("HOME").unwrap_or_default()).join(".cache"));
-    base.join("starship-pr-ci").join("v4")
+    base.join("starship-pr-ci").join("v5")
 }
 
 fn age(path: &Path) -> Option<Duration> {
@@ -282,6 +286,7 @@ struct PrDetails {
 #[derive(DeJson)]
 struct PullRequest {
     state: String,
+    mergeable: String,
     #[nserde(rename = "statusCheckRollup")]
     status_check_rollup: Option<Vec<Check>>,
     url: String,
@@ -348,7 +353,7 @@ fn query_pr(host: &str, slug: &str) -> Option<Status> {
             "pr",
             "view",
             "--json",
-            "state,statusCheckRollup,url,number",
+            "state,mergeable,statusCheckRollup,url,number",
             "--jq",
             &format!(".statusCheckRollup |= ({CHECKS_JQ})"),
         ],
@@ -361,6 +366,7 @@ fn query_pr(host: &str, slug: &str) -> Option<Status> {
         status.detail_url.push_str(&format!("?pr={}", pr.number));
     }
     status.pr_url = pr.url;
+    status.conflicting = pr.mergeable == "CONFLICTING";
     if let Some(details) = graphql::<PrDetails>(
         host,
         slug,
@@ -556,6 +562,17 @@ fn main() -> Result<()> {
             let st = resolve();
             if st.pr_url.is_empty() || st.merge_queue.is_none() {
                 std::process::exit(1);
+            }
+        }
+        PromptCommand::HasConflicts => {
+            if !resolve().conflicting {
+                std::process::exit(1);
+            }
+        }
+        PromptCommand::Conflicts => {
+            let st = resolve();
+            if st.conflicting {
+                osc8(&st.pr_url, CONFLICT_ICON);
             }
         }
         PromptCommand::HasUnresolved => {

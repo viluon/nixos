@@ -217,6 +217,7 @@ delib.module {
               "\${custom.pr_queued_link}"
               "\${custom.pr_queue}"
               "\${custom.pr_unresolved}"
+              "\${custom.pr_conflicts}"
               "\${custom.pr_ci_success}"
               "\${custom.pr_ci_failure}"
               "\${custom.pr_ci_pending}"
@@ -295,6 +296,12 @@ delib.module {
               when = "starship-pr-ci has-unresolved";
               command = "starship-pr-ci unresolved";
               style = "bold magenta";
+              format = "[$output]($style) ";
+            };
+            custom.pr_conflicts = {
+              when = "starship-pr-ci has-conflicts";
+              command = "starship-pr-ci conflicts";
+              style = "bold red";
               format = "[$output]($style) ";
             };
           };

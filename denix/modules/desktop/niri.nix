@@ -21,7 +21,7 @@ delib.module {
         );
 
         environment.systemPackages = with pkgs; [
-          (import ./niri/idea-terminals.nix moduleArgs)
+          (import ./niri/idea-terminals.nix (moduleArgs // { hostname = config.networking.hostName; }))
           grim
           libsecret
           networkmanagerapplet

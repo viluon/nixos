@@ -1,10 +1,25 @@
-{ pkgs, ... }:
+{ pkgs, lib, hostname, ... }:
+let
+  projectTabsSession = pkgs.writeText "idea-terminal.session" (
+    lib.concatStringsSep "\nnew_tab\n" (lib.replicate 4 "cd $IDEA_TERMINAL_CWD")
+  );
+
+  spawnTerminal = {
+    nixboerse = ''
+      niri msg action spawn -- env "IDEA_TERMINAL_CWD=$HOME/projects/m7g$terminal_number" \
+        kitty --app-id=idea-terminal --session=${projectTabsSession}
+    '';
+  }.${hostname} or ''
+    niri msg action spawn -- kitty --app-id=idea-terminal
+  '';
+in
 pkgs.writeShellApplication {
   name = "idea-terminals";
   runtimeInputs = with pkgs; [ coreutils jq ];
   text = ''
     declare -A workspace_name
     declare -A spawned_for
+    terminal_number=0
 
     classify='
       if .WorkspacesChanged then
@@ -31,7 +46,8 @@ pkgs.writeShellApplication {
               [[ -z "''${spawned_for[$id]:-}" ]] || continue
 
               spawned_for["$id"]=1
-              niri msg action spawn -- kitty --app-id=idea-terminal
+              terminal_number=$((terminal_number + 1))
+              ${spawnTerminal}
               ;;
           esac
         done

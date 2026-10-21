@@ -1,7 +1,7 @@
 { pkgs, lib, hostname, ... }:
 let
   projectTabsSession = pkgs.writeText "idea-terminal.session" (
-    lib.concatStringsSep "\nnew_tab\n" (lib.replicate 4 "cd $IDEA_TERMINAL_CWD")
+    lib.concatStringsSep "\nnew_tab\n" (lib.replicate 4 "cd $IDEA_TERMINAL_CWD\nlaunch")
   );
 
   spawnTerminal = {

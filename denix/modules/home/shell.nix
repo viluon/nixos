@@ -14,6 +14,8 @@ delib.module {
         gitScriptVerbs = map (n: lib.removePrefix "git-" (lib.removeSuffix ".nix" n))
           (builtins.filter (n: lib.hasPrefix "git-" n) scriptFileNames);
         gitUserCommandsZstyle = lib.concatStringsSep " " (map (v: "${v}:'Custom git command'") gitScriptVerbs);
+
+        caseInsensitiveMatcher = "m:{a-z}={A-Za-z}";
       in
       {
         home.packages = scripts ++ [ pkgs.starship-pr-ci ];
@@ -26,43 +28,33 @@ delib.module {
             source ${./fzf-key-bindings.zsh}
             source ${inputs.fzf-git-sh}/fzf-git.sh
 
-            # Case insensitive completion
-            zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+            zstyle ':completion:*' matcher-list '${caseInsensitiveMatcher}'
 
-            # Better ls colors
             export LS_COLORS="$(vivid generate catppuccin-mocha)"
 
-            # Docker completion
             if command -v docker >/dev/null 2>&1; then
               source <(docker completion zsh)
             fi
 
-            # Kubectl completion
             if command -v kubectl >/dev/null 2>&1; then
               source <(kubectl completion zsh)
             fi
 
-            # Niri completion
             if command -v niri >/dev/null 2>&1; then
               source <(niri completions zsh)
             fi
 
-            # Just completion
             if command -v just >/dev/null 2>&1; then
               source <(just --completions zsh)
             fi
 
-            # Mill completion
             source ${./completions/mill.sh}
 
-            # comma-rs completion
             source <(, --print-completions zsh 2>/dev/null)
             compdef _comma ,
 
-            # completion for aliases
             unsetopt completealiases
-            # Expose packaged git-* scripts as git subcommands for completion.
-            # Automatically generated from ./scripts (git-*.nix) at build time.
+
             zstyle ':completion:*:*:git:*' user-commands ${gitUserCommandsZstyle}
 
             _git-ready() {
@@ -77,7 +69,6 @@ delib.module {
               fi
             }
 
-            # VS Code shell integration
             [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
           '';
         };

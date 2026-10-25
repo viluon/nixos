@@ -60,6 +60,13 @@
           config = { allowUnfree = true; };
         };
 
+        denixExtensions = with inputs.denix.lib.extensions; [
+          args
+          (base.withConfig { args.enable = true; })
+        ];
+
+        serverHosts = [ ./denix/hosts/never-talk-to-strangers ];
+
         denixConfigurations = inputs.denix.lib.configurations {
           moduleSystem = "nixos";
           homeManagerUser = "viluon";
@@ -70,17 +77,35 @@
             ./denix/modules/desktop/niri
             ./denix/modules/home/scripts
             ./denix/modules/home/slack-review.nix
-          ];
+          ] ++ serverHosts;
 
-          extensions = with inputs.denix.lib.extensions; [
-            args
-            (base.withConfig { args.enable = true; })
-          ];
+          extensions = denixExtensions;
 
           specialArgs = {
             inherit inputs unstable-pkgs;
             inherit (inputs) niri;
           };
+        };
+
+        serverConfigurations = inputs.denix.lib.configurations {
+          moduleSystem = "nixos";
+          homeManagerUser = "viluon";
+
+          paths = serverHosts ++ [
+            ./denix/modules/core/constants.nix
+            ./denix/modules/core/home-manager.nix
+            ./denix/modules/core/locale.nix
+            ./denix/modules/core/nixpkgs.nix
+            ./denix/modules/core/user.nix
+            ./denix/modules/home/basic-shell.nix
+            ./denix/modules/home/core.nix
+            ./denix/modules/home/git.nix
+            ./denix/modules/system/nix.nix
+          ];
+
+          extensions = denixExtensions;
+
+          specialArgs = { inherit inputs; };
         };
       in
       {
@@ -90,7 +115,7 @@
           inputs.treefmt-nix.flakeModule
         ];
 
-        flake.nixosConfigurations = denixConfigurations;
+        flake.nixosConfigurations = denixConfigurations // serverConfigurations;
 
         flake.packages = nixpkgs.lib.genAttrs systems (system:
           let pkgs = nixpkgs.legacyPackages.${system}.extend (import ./packages);

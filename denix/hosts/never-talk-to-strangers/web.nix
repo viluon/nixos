@@ -1,4 +1,4 @@
-{ delib, ... }:
+{ lib, ... }:
 let
   cloudflareRanges = [
     "173.245.48.0/20"
@@ -32,65 +32,56 @@ let
     extraConfig = "error_page 404 /404.html;";
   };
 in
-delib.host {
-  name = "never-talk-to-strangers";
+{
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
 
-  nixos.imports = [
-    (
-      { lib, ... }:
-      {
-        networking.firewall.allowedTCPPorts = [ 80 443 ];
+  security.acme.acceptTerms = true;
 
-        security.acme.acceptTerms = true;
+  services.nginx = {
+    enable = true;
+    recommendedTlsSettings = true;
+    recommendedOptimisation = true;
+    recommendedGzipSettings = true;
+    recommendedProxySettings = true;
 
-        services.nginx = {
-          enable = true;
-          recommendedTlsSettings = true;
-          recommendedOptimisation = true;
-          recommendedGzipSettings = true;
-          recommendedProxySettings = true;
+    commonHttpConfig = ''
+      ${lib.concatMapStrings (range: "set_real_ip_from ${range};\n") cloudflareRanges}
+      real_ip_header CF-Connecting-IP;
 
-          commonHttpConfig = ''
-            ${lib.concatMapStrings (range: "set_real_ip_from ${range};\n") cloudflareRanges}
-            real_ip_header CF-Connecting-IP;
-
-            geo $realip_remote_addr $via_cloudflare {
-              default 0;
-              ${lib.concatMapStrings (range: "${range} 1;\n") cloudflareRanges}
-            }
-          '';
-
-          virtualHosts = {
-            "_" = {
-              default = true;
-              rejectSSL = true;
-              locations."/".return = "444";
-            };
-
-            "cc.viluon.me" = staticSite "/srv/www/cc";
-            "copy-cat.viluon.me" = staticSite "/srv/www/copy-cat";
-
-            "cloud-catcher.viluon.me" = lib.recursiveUpdate (staticSite "/srv/www/cloud-catcher") {
-              locations."~ /(view|connect|host|cloud\\.lua)" = {
-                proxyPass = "http://localhost:8080";
-                proxyWebsockets = true;
-              };
-            };
-
-            "ntts.viluon.me" = {
-              enableACME = true;
-              forceSSL = true;
-              locations."/".return = "404";
-            };
-
-            "grocy.viluon.me".extraConfig = ''
-              if ($via_cloudflare = 0) {
-                return 444;
-              }
-            '';
-          };
-        };
+      geo $realip_remote_addr $via_cloudflare {
+        default 0;
+        ${lib.concatMapStrings (range: "${range} 1;\n") cloudflareRanges}
       }
-    )
-  ];
+    '';
+
+    virtualHosts = {
+      "_" = {
+        default = true;
+        rejectSSL = true;
+        locations."/".return = "444";
+      };
+
+      "cc.viluon.me" = staticSite "/srv/www/cc";
+      "copy-cat.viluon.me" = staticSite "/srv/www/copy-cat";
+
+      "cloud-catcher.viluon.me" = lib.recursiveUpdate (staticSite "/srv/www/cloud-catcher") {
+        locations."~ /(view|connect|host|cloud\\.lua)" = {
+          proxyPass = "http://localhost:8080";
+          proxyWebsockets = true;
+        };
+      };
+
+      "ntts.viluon.me" = {
+        enableACME = true;
+        forceSSL = true;
+        locations."/".return = "404";
+      };
+
+      "grocy.viluon.me".extraConfig = ''
+        if ($via_cloudflare = 0) {
+          return 444;
+        }
+      '';
+    };
+  };
 }

@@ -1,4 +1,4 @@
-{ delib, unstable-pkgs, ... }:
+{ delib, ... }:
 delib.module {
   name = "home.core";
 
@@ -9,50 +9,19 @@ delib.module {
         home.stateVersion = "25.05";
 
         home.packages = with pkgs; [
+          cachix
           fd
-          fzf
-          gh
+          figlet
+          file
           git-absorb
-          grimblast
+          gum
+          just
           manix
           nixd
-          obsidian
           ripgrep
           shellcheck
-          starship
-          unstable-pkgs.github-copilot-cli
           unzip
           vivid
-          waybar
-
-          blueman
-          brightnessctl
-          btrfs-assistant
-          cachix
-          cliphist
-          compsize
-          ddcui
-          file
-          just
-          networkmanager
-          pavucontrol
-          playerctl
-          polkit_gnome
-          wl-clipboard
-          xwayland-run
-          xwayland-satellite
-
-          noto-fonts
-          noto-fonts-color-emoji
-          noto-fonts-cjk-sans
-          font-awesome
-
-          figlet
-          gum
-          matugen
-          wallust
-          awww
-          xdg-user-dirs
         ];
 
         programs.home-manager.enable = true;

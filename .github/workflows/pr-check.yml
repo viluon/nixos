@@ -10,30 +10,37 @@ permissions:
   pull-requests: write
 
 jobs:
+  hosts:
+    runs-on: ubuntu-24.04
+    outputs:
+      hosts: ${{ steps.list.outputs.hosts }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+
+      - name: list hosts
+        id: list
+        run: echo "hosts=$(ls denix/hosts | jq --raw-input --null-input --compact-output '[inputs]')" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: hosts
     name: build/${{ matrix.host }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-24.04
     concurrency:
       group: pr-${{ github.event.pull_request.number }}-${{ matrix.host }}
       cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-24.04
-            host: nixluon
-          - os: ubuntu-24.04
-            host: nixboerse
+        host: ${{ fromJSON(needs.hosts.outputs.hosts) }}
     env:
       output: nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
     steps:
       - name: create nix mount point
-        if: contains(matrix.os, 'ubuntu')
         run: sudo mkdir /nix
 
       - name: maximize build space
         uses: easimon/maximize-build-space@v10
-        if: contains(matrix.os, 'ubuntu')
         with:
           build-mount-path: /nix
           overprovision-lvm: true
@@ -68,6 +75,7 @@ jobs:
         run: nix-collect-garbage
 
       - name: fetch old system to profile
+        continue-on-error: true
         env:
           TARGET: "github:${{ github.repository }}/${{ github.base_ref }}#${{ env.output }}"
         run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile

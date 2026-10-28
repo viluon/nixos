@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   hosts:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       hosts: ${{ steps.list.outputs.hosts }}
     steps:
@@ -25,7 +25,7 @@ jobs:
   build:
     needs: hosts
     name: build/${{ matrix.host }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     concurrency:
       group: pr-${{ github.event.pull_request.number }}-${{ matrix.host }}
       cancel-in-progress: true

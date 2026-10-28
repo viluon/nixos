@@ -1,8 +1,8 @@
-{ delib, unstable-pkgs, ... }:
+{ delib, host, unstable-pkgs, ... }:
 delib.module {
   name = "editors.idea";
 
-  options = delib.singleEnableOption true;
+  options = delib.singleEnableOption host.codingFeatured;
 
   home.ifEnabled =
     let

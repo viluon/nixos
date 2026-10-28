@@ -1,8 +1,10 @@
-{ delib, lib, pkgs, ... }:
+{ delib, host, pkgs, ... }:
 delib.module {
   name = "programs.firefox";
 
-  nixos.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled = {
     programs.firefox = {
       enable = true;
       package = pkgs.firefox-devedition;

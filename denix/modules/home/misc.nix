@@ -1,8 +1,10 @@
-{ delib, lib, pkgs, ... }:
+{ delib, host, lib, pkgs, ... }:
 delib.module {
   name = "home.misc";
 
-  home.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  home.ifEnabled = {
     home.file = {
       ".mozilla/native-messaging-hosts/linux_entra_sso.json".source =
         "${pkgs.linux-entra-sso}/firefox/linux_entra_sso.json";

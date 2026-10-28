@@ -1,8 +1,10 @@
-{ delib, ... }:
+{ delib, host, ... }:
 delib.module {
   name = "editors.neovim";
 
-  home.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  home.ifEnabled = {
     programs.neovim = {
       enable = true;
       defaultEditor = true;

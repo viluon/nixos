@@ -1,8 +1,8 @@
-{ delib, ... }:
+{ delib, host, ... }:
 delib.module {
   name = "system.autoUpgrade";
 
-  options = delib.singleEnableOption false;
+  options = delib.singleEnableOption host.isServer;
 
   nixos.ifEnabled = { myconfig, ... }: {
     system.autoUpgrade = {

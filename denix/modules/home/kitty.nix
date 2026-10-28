@@ -1,8 +1,10 @@
-{ delib, lib, pkgs, ... }:
+{ delib, host, lib, pkgs, ... }:
 delib.module {
   name = "home.kitty";
 
-  home.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  home.ifEnabled = {
     programs.kitty = {
       enable = true;
       font.size = lib.mkForce 12;

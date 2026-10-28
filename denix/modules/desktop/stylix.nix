@@ -1,10 +1,12 @@
-{ delib, inputs, lib, pkgs, ... }:
+{ delib, host, inputs, lib, pkgs, ... }:
 delib.module {
   name = "desktop.stylix";
 
-  nixos.always = {
-    imports = [ inputs.stylix.nixosModules.stylix ];
+  options = delib.singleEnableOption host.isLaptop;
 
+  nixos.always.imports = [ inputs.stylix.nixosModules.stylix ];
+
+  nixos.ifEnabled = {
     stylix = {
       enable = true;
       base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";

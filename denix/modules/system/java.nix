@@ -1,6 +1,8 @@
-{ delib, ... }:
+{ delib, host, ... }:
 delib.module {
   name = "system.java";
 
-  nixos.always.programs.java.enable = true;
+  options = delib.singleEnableOption host.codingFeatured;
+
+  nixos.ifEnabled.programs.java.enable = true;
 }

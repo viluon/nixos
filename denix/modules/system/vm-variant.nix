@@ -1,8 +1,10 @@
-{ delib, lib, pkgs, ... }:
+{ delib, host, lib, pkgs, ... }:
 delib.module {
   name = "system.vmVariant";
 
-  nixos.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled = {
     virtualisation.vmVariant = {
       virtualisation = {
         cores = 2;

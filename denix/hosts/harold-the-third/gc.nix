@@ -1,6 +1,5 @@
-{ lib, ... }:
 {
-  nix.gc.automatic = lib.mkForce false;
+  myconfig.system.gc.enable = false;
   programs.nh.clean = {
     enable = true;
     dates = "daily";

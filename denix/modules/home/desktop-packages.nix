@@ -1,8 +1,10 @@
-{ delib, unstable-pkgs, pkgs, ... }:
+{ delib, host, pkgs, unstable-pkgs, ... }:
 delib.module {
   name = "home.desktop-packages";
 
-  home.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  home.ifEnabled = {
     home.packages = with pkgs; [
       gh
       grimblast

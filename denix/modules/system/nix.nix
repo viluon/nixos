@@ -36,11 +36,6 @@ delib.module {
           dates = [ "20:00" ];
         };
 
-        gc = {
-          automatic = true;
-          randomizedDelaySec = "15min";
-          options = "--delete-older-than 60d";
-        };
       };
     };
 }

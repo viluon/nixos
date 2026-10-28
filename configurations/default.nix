@@ -8,7 +8,11 @@ let
 
     extensions = with inputs.denix.lib.extensions; [
       args
-      (base.withConfig { args.enable = true; })
+      (base.withConfig {
+        args.enable = true;
+        hosts.type.types = [ "laptop" "server" ];
+        hosts.features.features = [ "coding" "gaming" "monitoring" ];
+      })
     ];
   } // settings);
 

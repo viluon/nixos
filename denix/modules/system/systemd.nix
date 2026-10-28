@@ -1,8 +1,10 @@
-{ delib, pkgs, ... }:
+{ delib, host, pkgs, ... }:
 delib.module {
   name = "system.systemd";
 
-  nixos.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled = {
     systemd.settings.Manager = {
       DefaultTimeoutStartSec = "8s";
       DefaultCPUAccounting = true;

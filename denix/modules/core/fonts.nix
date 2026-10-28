@@ -1,8 +1,10 @@
-{ delib, pkgs, ... }:
+{ delib, host, pkgs, ... }:
 delib.module {
   name = "fonts";
 
-  nixos.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled = {
     fonts.packages = with pkgs; [
       corefonts
       libertine

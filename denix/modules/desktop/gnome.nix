@@ -1,8 +1,10 @@
-{ delib, inputs, pkgs, ... }:
+{ delib, host, inputs, pkgs, ... }:
 delib.module {
   name = "desktop.gnome";
 
-  nixos.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled = {
     services.xserver = {
       enable = true;
       xkb.layout = "us";
@@ -48,7 +50,7 @@ delib.module {
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
   };
 
-  home.always.imports = [
+  home.ifEnabled.imports = [
     "${inputs.xhmm}/desktop/gnome/extensions.nix"
     (
       { lib, ... }:

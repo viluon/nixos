@@ -1,8 +1,8 @@
-{ delib, pkgs, unstable-pkgs, ... }:
+{ delib, host, pkgs, unstable-pkgs, ... }:
 delib.module {
   name = "editors.vscode";
 
-  options = delib.singleEnableOption true;
+  options = delib.singleEnableOption host.codingFeatured;
 
   home.ifEnabled = {
     home.file.".vscode/argv.json".source = ./argv.json;

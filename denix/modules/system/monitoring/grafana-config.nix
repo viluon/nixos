@@ -1,8 +1,8 @@
-{ config, delib, pkgs, ... }:
+{ config, delib, host, pkgs, ... }:
 delib.module {
   name = "system.monitoring.grafana-config";
 
-  options = delib.singleEnableOption true;
+  options = delib.singleEnableOption host.monitoringFeatured;
 
   nixos.ifEnabled =
     let

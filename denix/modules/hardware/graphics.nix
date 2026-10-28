@@ -1,11 +1,8 @@
-{ delib, ... }:
+{ delib, host, ... }:
 delib.module {
   name = "hardware.graphics";
 
-  nixos.always = {
-    hardware.graphics = {
-      enable = true;
-      enable32Bit = true;
-    };
-  };
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled.hardware.graphics.enable = true;
 }

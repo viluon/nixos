@@ -1,8 +1,10 @@
-{ delib, ... }:
+{ delib, host, ... }:
 delib.module {
   name = "home.kittyCpuTabs";
 
-  home.always.imports = [
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled.home-manager.sharedModules = [
     (
       { config, lib, pkgs, ... }:
       let

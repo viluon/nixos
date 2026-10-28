@@ -10,6 +10,7 @@ denixConfigurations {
     ../denix/modules/home/core.nix
     ../denix/modules/home/git.nix
     ../denix/modules/system/auto-upgrade.nix
+    ../denix/modules/system/gc.nix
     ../denix/modules/system/nix.nix
   ];
 

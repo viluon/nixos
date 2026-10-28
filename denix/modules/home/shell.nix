@@ -1,8 +1,10 @@
-{ delib, inputs, lib, pkgs, ... }:
+{ delib, host, inputs, lib, pkgs, ... }:
 delib.module {
   name = "home.shell";
 
-  home.always =
+  options = delib.singleEnableOption host.isLaptop;
+
+  home.ifEnabled =
     let
       scripts = lib.mapAttrsToList
         (name: _type: import ./scripts/${name} { inherit pkgs; })

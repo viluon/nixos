@@ -1,24 +1,19 @@
-{ config, delib, niri, pkgs, ... }@moduleArgs:
+{ config, delib, host, niri, pkgs, ... }@moduleArgs:
+let
+  helperArgs = moduleArgs // { hostname = config.networking.hostName; };
+in
 delib.module {
   name = "desktop.niri";
 
-  nixos.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled = {
     nixpkgs.overlays = [ niri.overlays.niri ];
 
-    programs.steam = {
-      enable = true;
-      remotePlay.openFirewall = true;
-      localNetworkGameTransfers.openFirewall = true;
-    };
-
-    programs.gamescope.enable = true;
-
-    programs.niri = import ./niri/tuned.nix (
-      moduleArgs // { hostname = config.networking.hostName; inherit niri; }
-    );
+    programs.niri = import ./niri/tuned.nix helperArgs;
 
     environment.systemPackages = with pkgs; [
-      (import ./niri/idea-terminals.nix (moduleArgs // { hostname = config.networking.hostName; }))
+      (import ./niri/idea-terminals.nix helperArgs)
       grim
       libsecret
       networkmanagerapplet
@@ -41,93 +36,93 @@ delib.module {
 
     fonts.packages = [ pkgs.maple-mono.NF-CN ];
     security.pam.services.hyprlock.enable = true;
-  };
 
-  home.always.imports = [
-    (
-      { config, lib, pkgs, ... }@moduleArgs:
-      {
-        programs.niri.settings = import ./niri/niri-config.nix moduleArgs;
+    home-manager.sharedModules = [
+      (
+        { config, lib, pkgs, ... }@moduleArgs:
+        {
+          programs.niri.settings = import ./niri/niri-config.nix moduleArgs;
 
-        programs.btop = {
-          enable = true;
-          package = pkgs.btop-cuda;
-          settings = {
-            freq_mode = "range";
-            io_mode = true;
-          };
-        };
-
-        programs.vicinae =
-          let
-            extensionNames = builtins.attrNames (
-              lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./niri/vicinae-extensions)
-            );
-            mkLocalExtension = name: config.lib.vicinae.mkExtension {
-              inherit name;
-              src = ./niri/vicinae-extensions/${name};
+          programs.btop = {
+            enable = true;
+            package = pkgs.btop-cuda;
+            settings = {
+              freq_mode = "range";
+              io_mode = true;
             };
-          in
-          {
+          };
+
+          programs.vicinae =
+            let
+              extensionNames = builtins.attrNames (
+                lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./niri/vicinae-extensions)
+              );
+              mkLocalExtension = name: config.lib.vicinae.mkExtension {
+                inherit name;
+                src = ./niri/vicinae-extensions/${name};
+              };
+            in
+            {
+              enable = true;
+              systemd.enable = true;
+              settings.keybinds.toggle-action-panel = "control+.";
+              extensions = builtins.map mkLocalExtension extensionNames;
+            };
+
+          programs.hyprlock = {
+            enable = true;
+            settings = import ./niri/hyprlock-config.nix moduleArgs;
+          };
+
+          programs.waybar = {
             enable = true;
             systemd.enable = true;
-            settings.keybinds.toggle-action-panel = "control+.";
-            extensions = builtins.map mkLocalExtension extensionNames;
+            settings = import ./niri/waybar-config.nix moduleArgs;
+            style = builtins.readFile ./niri/waybar.css;
           };
 
-        programs.hyprlock = {
-          enable = true;
-          settings = import ./niri/hyprlock-config.nix moduleArgs;
-        };
+          services.gnome-keyring.enable = true;
 
-        programs.waybar = {
-          enable = true;
-          systemd.enable = true;
-          settings = import ./niri/waybar-config.nix moduleArgs;
-          style = builtins.readFile ./niri/waybar.css;
-        };
-
-        services.gnome-keyring.enable = true;
-
-        services.dunst = {
-          enable = true;
-          settings.global = {
-            corner_radius = 8;
-            follow = "mouse";
-            gap_size = 12;
-            history_length = 5000;
-            mouse_left_click = "do_action,open_url,close_current";
-            mouse_middle_click = "context";
-            mouse_right_click = "close_current";
-            timeout = 0;
-          };
-        };
-
-        systemd.user.services.dunst.Service = {
-          Restart = "on-failure";
-          RestartSec = 1;
-        };
-
-        systemd.user.services.niri-flake-polkit.Service.Enable = false;
-
-        systemd.user.services.polkit-gnome-authentication-agent-1 = {
-          Unit = {
-            Description = "polkit-gnome-authentication-agent-1";
-            After = [ "graphical-session.target" ];
-            Wants = [ "graphical-session.target" ];
+          services.dunst = {
+            enable = true;
+            settings.global = {
+              corner_radius = 8;
+              follow = "mouse";
+              gap_size = 12;
+              history_length = 5000;
+              mouse_left_click = "do_action,open_url,close_current";
+              mouse_middle_click = "context";
+              mouse_right_click = "close_current";
+              timeout = 0;
+            };
           };
 
-          Service = {
-            Type = "simple";
-            ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+          systemd.user.services.dunst.Service = {
             Restart = "on-failure";
             RestartSec = 1;
-            TimeoutStopSec = 10;
           };
 
-          Install.WantedBy = [ "graphical-session.target" ];
-        };
-      }
-    )
-  ];
+          systemd.user.services.niri-flake-polkit.Service.Enable = false;
+
+          systemd.user.services.polkit-gnome-authentication-agent-1 = {
+            Unit = {
+              Description = "polkit-gnome-authentication-agent-1";
+              After = [ "graphical-session.target" ];
+              Wants = [ "graphical-session.target" ];
+            };
+
+            Service = {
+              Type = "simple";
+              ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+              Restart = "on-failure";
+              RestartSec = 1;
+              TimeoutStopSec = 10;
+            };
+
+            Install.WantedBy = [ "graphical-session.target" ];
+          };
+        }
+      )
+    ];
+  };
 }

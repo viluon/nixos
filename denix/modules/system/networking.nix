@@ -1,8 +1,10 @@
-{ delib, ... }:
+{ delib, host, ... }:
 delib.module {
   name = "system.networking";
 
-  nixos.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled = {
     networking.firewall.enable = true;
     networking.networkmanager.enable = true;
 

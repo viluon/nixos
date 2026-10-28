@@ -1,8 +1,10 @@
-{ delib, pkgs, ... }:
+{ delib, host, pkgs, ... }:
 delib.module {
   name = "desktop.input-methods";
 
-  home.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  home.ifEnabled = {
     i18n.inputMethod = {
       enable = true;
       type = "fcitx5";

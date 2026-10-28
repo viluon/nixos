@@ -1,8 +1,10 @@
-{ delib, pkgs, ... }:
+{ delib, host, pkgs, ... }:
 delib.module {
   name = "home.copilotHooks";
 
-  home.always =
+  options = delib.singleEnableOption host.isLaptop;
+
+  home.ifEnabled =
     let
       sentinel = "comments are a poor fix for illegible code";
 

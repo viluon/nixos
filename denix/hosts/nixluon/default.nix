@@ -114,7 +114,10 @@ delib.host {
         programs.gnome-disks.enable = true;
       }
     )
-  ];
+  ] ++ delib.umport {
+    path = ./.;
+    exclude = [ ./default.nix ];
+  };
 
   home.imports = [
     (

@@ -100,7 +100,10 @@ delib.host {
         system.stateVersion = "25.05";
       }
     )
-  ];
+  ] ++ delib.umport {
+    path = ./.;
+    exclude = [ ./default.nix ];
+  };
 
   home.imports = [
     (

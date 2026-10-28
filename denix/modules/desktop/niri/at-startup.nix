@@ -1,3 +1,4 @@
+{ osConfig }:
 [
   {
     app-id = "^firefox-devedition$";
@@ -9,6 +10,7 @@
     app-id = "jetbrains-idea";
     workspace = "idea";
     command = [ "systemd-run" "--user" "--scope" "--collect" "--property=TimeoutStopSec=8s" "intellij-idea" ];
+    enable = osConfig.myconfig.editors.idea.enable;
   }
   {
     app-id = "obsidian";
@@ -20,11 +22,13 @@
     app-id = "virt-manager";
     workspace = "virt-manager";
     command = [ "virt-manager" ];
+    enable = osConfig.programs.virt-manager.enable;
   }
   {
     app-id = "^code$";
     workspace = "vs-code";
     command = [ "code" "/home/viluon/nixos" ];
+    enable = osConfig.myconfig.editors.vscode.enable;
     maximized = true;
   }
   {

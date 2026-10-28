@@ -1,7 +1,12 @@
 { config
 , lib
+, osConfig
 , ...
-}: with config.lib.niri.actions; {
+}:
+let
+  startupApps = lib.filter (app: app.enable or true) (import ./at-startup.nix { inherit osConfig; });
+in
+with config.lib.niri.actions; {
   includes = [
     ./blur.kdl
   ];
@@ -32,8 +37,9 @@
 
   spawn-at-startup = [
     { argv = [ "swaybg" "--image" config.stylix.image "--mode" "fill" ]; }
-    { argv = [ "idea-terminals" ]; }
-  ] ++ lib.map (app: { argv = app.command; }) (import ./at-startup.nix);
+  ]
+  ++ lib.optional osConfig.myconfig.editors.idea.enable { argv = [ "idea-terminals" ]; }
+  ++ lib.map (app: { argv = app.command; }) startupApps;
 
   workspaces =
     lib.listToAttrs
@@ -132,7 +138,7 @@
         open-on-workspace = app.workspace;
         open-maximized = app.maximized or null;
       })
-      (import ./at-startup.nix);
+      startupApps;
 
   layer-rules = [
     {

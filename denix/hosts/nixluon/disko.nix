@@ -1,8 +1,5 @@
-{ delib, ... }:
-delib.host {
-  name = "nixluon";
-
-  nixos.disko.devices.disk.main = {
+{
+  disko.devices.disk.main = {
     type = "disk";
     device = "/dev/disk/by-id/nvme-WD_BLACK_SN850X_2000GB_250304804903";
     content = {

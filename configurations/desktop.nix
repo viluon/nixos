@@ -1,12 +1,12 @@
-{ inputs, denixConfigurations, serverHosts }:
+{ inputs, denixConfigurations, hosts }:
 denixConfigurations {
-  paths = [ ../denix ];
+  paths = [ ../denix/modules ] ++ hosts;
   exclude = [
     ../denix/modules/editors/vscode-settings.nix
     ../denix/modules/desktop/niri
     ../denix/modules/home/scripts
     ../denix/modules/home/slack-review.nix
-  ] ++ serverHosts;
+  ];
 
   specialArgs = {
     inherit inputs;

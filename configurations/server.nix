@@ -1,6 +1,6 @@
-{ inputs, denixConfigurations, serverHosts }:
+{ inputs, denixConfigurations, hosts }:
 denixConfigurations {
-  paths = map (host: host + "/default.nix") serverHosts ++ [
+  paths = hosts ++ [
     ../denix/modules/core/constants.nix
     ../denix/modules/core/home-manager.nix
     ../denix/modules/core/locale.nix
@@ -9,6 +9,7 @@ denixConfigurations {
     ../denix/modules/home/basic-shell.nix
     ../denix/modules/home/core.nix
     ../denix/modules/home/git.nix
+    ../denix/modules/system/auto-upgrade.nix
     ../denix/modules/system/nix.nix
   ];
 

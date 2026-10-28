@@ -12,6 +12,8 @@ delib.module {
           preferences = {
             "browser.tabs.allow_transparent_browser" = true;
 
+            "media.eme.enabled" = true;
+
             "network.lna.blocking" = false;
           };
         };

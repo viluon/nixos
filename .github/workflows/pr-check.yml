@@ -59,12 +59,28 @@ jobs:
             experimental-features = nix-command flakes
             access-tokens = github.com=${{ github.token }}
 
+      - name: compute push filter
+        id: push-filter
+        env:
+          HEAD_TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ env.output }}"
+          BASE_TARGET: "github:${{ github.repository }}/${{ github.base_ref }}#${{ env.output }}"
+        run: |
+          head_drv=$(nix eval --raw "$HEAD_TARGET.drvPath")
+          base_drv=$(nix eval --raw "$BASE_TARGET.drvPath" || true)
+          intellij_drvs=$(nix-store --query --requisites $head_drv $base_drv | grep -E -- '-intellij-idea-[0-9.]+\.drv$' || true)
+          if [ -n "$intellij_drvs" ]; then
+            uncached_drvs=$( { nix-store --query --referrers-closure $intellij_drvs; nix-store --query --references $intellij_drvs; } | grep '\.drv$' | sort -u)
+            hashes=$(nix-store --query --outputs $uncached_drvs | sed -E 's|^/nix/store/([a-z0-9]{32})-.*|\1|' | paste -sd'|')
+            echo "regex=($hashes)" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: setup cachix
         uses: cachix/cachix-action@v17
         with:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           extraPullNames: nix-community
           name: viluon
+          pushFilter: ${{ steps.push-filter.outputs.regex }}
 
       - name: build system
         env:

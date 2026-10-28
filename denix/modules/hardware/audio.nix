@@ -1,8 +1,10 @@
-{ delib, ... }:
+{ delib, host, ... }:
 delib.module {
   name = "hardware.audio";
 
-  nixos.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled = {
     services.pulseaudio.enable = false;
     security.rtkit.enable = true;
     services.pipewire = {

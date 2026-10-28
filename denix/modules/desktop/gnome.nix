@@ -1,59 +1,56 @@
-{ delib, inputs, ... }:
+{ delib, host, inputs, pkgs, ... }:
 delib.module {
   name = "desktop.gnome";
 
-  nixos.always.imports = [
-    (
-      { pkgs, ... }:
-      {
-        services.xserver = {
-          enable = true;
-          xkb.layout = "us";
-          excludePackages = [ pkgs.xterm ];
-        };
+  options = delib.singleEnableOption host.isLaptop;
 
-        services.displayManager = {
-          gdm.enable = true;
-          defaultSession = "niri";
-        };
-        services.desktopManager.gnome.enable = true;
+  nixos.ifEnabled = {
+    services.xserver = {
+      enable = true;
+      xkb.layout = "us";
+      excludePackages = [ pkgs.xterm ];
+    };
 
-        hardware.uinput.enable = true;
-        services.kanata = {
-          enable = true;
-          keyboards.framework.config = ''
-            (defsrc
-              esc
-              grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
-              tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
-              caps a    s    d    f    g    h    j    k    l    ;    '    ret
-              lsft z    x    c    v    b    n    m    ,    .    /    rsft
-              lctl lmet lalt           spc            ralt rctl
-            )
+    services.displayManager = {
+      gdm.enable = true;
+      defaultSession = "niri";
+    };
+    services.desktopManager.gnome.enable = true;
 
-            (deflayer swapped
-              caps
-              grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
-              tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
-              esc  a    s    d    f    g    h    j    k    l    ;    '    ret
-              lsft z    x    c    v    b    n    m    ,    .    /    rsft
-              lctl lmet lalt           spc            ralt rctl
-            )
-          '';
-        };
+    hardware.uinput.enable = true;
+    services.kanata = {
+      enable = true;
+      keyboards.framework.config = ''
+        (defsrc
+          esc
+          grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+          tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
+          caps a    s    d    f    g    h    j    k    l    ;    '    ret
+          lsft z    x    c    v    b    n    m    ,    .    /    rsft
+          lctl lmet lalt           spc            ralt rctl
+        )
 
-        systemd.services.kanata-framework.serviceConfig = {
-          Restart = "on-failure";
-          RestartSec = 2;
-        };
+        (deflayer swapped
+          caps
+          grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+          tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
+          esc  a    s    d    f    g    h    j    k    l    ;    '    ret
+          lsft z    x    c    v    b    n    m    ,    .    /    rsft
+          lctl lmet lalt           spc            ralt rctl
+        )
+      '';
+    };
 
-        environment.systemPackages = [ pkgs.gnome-tweaks ];
-        environment.sessionVariables.NIXOS_OZONE_WL = "1";
-      }
-    )
-  ];
+    systemd.services.kanata-framework.serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = 2;
+    };
 
-  home.always.imports = [
+    environment.systemPackages = [ pkgs.gnome-tweaks ];
+    environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  };
+
+  home.ifEnabled.imports = [
     "${inputs.xhmm}/desktop/gnome/extensions.nix"
     (
       { lib, ... }:

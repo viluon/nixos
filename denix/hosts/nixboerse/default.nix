@@ -2,6 +2,7 @@
 delib.host {
   name = "nixboerse";
   type = "laptop";
+  features = [ "coding" "gaming" "monitoring" ];
 
   homeManagerSystem = "x86_64-linux";
 

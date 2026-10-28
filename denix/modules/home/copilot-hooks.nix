@@ -1,72 +1,70 @@
-{ delib, ... }:
+{ delib, host, pkgs, ... }:
 delib.module {
   name = "home.copilotHooks";
 
-  home.always.imports = [
-    (
-      { pkgs, ... }:
-      let
-        sentinel = "comments are a poor fix for illegible code";
+  options = delib.singleEnableOption host.isLaptop;
 
-        reviewReason = ''
-          review any code changes you've made
-          - comments are a poor fix for illegible code
-          - `just build` should pass, if applicable
-        '';
+  home.ifEnabled =
+    let
+      sentinel = "comments are a poor fix for illegible code";
 
-        reminder = pkgs.writeShellScript "copilot-review-reminder" ''
-          set -euo pipefail
-          payload="$(cat)"
-          session="$(printf '%s' "$payload" | ${pkgs.jq}/bin/jq -er .sessionId)"
-          marker="/tmp/copilot-review-reminder-''${session}"
-          if [ -e "$marker" ]; then
-            exit 0
-          fi
-          : > "$marker"
-          cat ${blockDecision}
-        '';
+      reviewReason = ''
+        review any code changes you've made
+        - comments are a poor fix for illegible code
+        - `just build` should pass, if applicable
+      '';
 
-        blockDecision = pkgs.writeText "copilot-review-block.json" (
-          builtins.toJSON {
-            decision = "block";
-            reason = reviewReason;
-          }
-        );
+      reminder = pkgs.writeShellScript "copilot-review-reminder" ''
+        set -euo pipefail
+        payload="$(cat)"
+        session="$(printf '%s' "$payload" | ${pkgs.jq}/bin/jq -er .sessionId)"
+        marker="/tmp/copilot-review-reminder-''${session}"
+        if [ -e "$marker" ]; then
+          exit 0
+        fi
+        : > "$marker"
+        cat ${blockDecision}
+      '';
 
-        clearMarker = pkgs.writeShellScript "copilot-review-reminder-clear" ''
-          set -euo pipefail
-          payload="$(cat)"
-          session="$(printf '%s' "$payload" | ${pkgs.jq}/bin/jq -er .sessionId)"
-          prompt="$(printf '%s' "$payload" | ${pkgs.jq}/bin/jq -er '.prompt // ""')"
-          if printf '%s' "$prompt" | ${pkgs.gnugrep}/bin/grep -qF ${pkgs.lib.escapeShellArg sentinel}; then
-            exit 0
-          fi
-          rm -f "/tmp/copilot-review-reminder-''${session}"
-        '';
+      blockDecision = pkgs.writeText "copilot-review-block.json" (
+        builtins.toJSON {
+          decision = "block";
+          reason = reviewReason;
+        }
+      );
 
-        config = {
-          version = 1;
-          hooks = {
-            agentStop = [
-              {
-                type = "command";
-                bash = "${reminder}";
-                timeoutSec = 10;
-              }
-            ];
-            userPromptSubmitted = [
-              {
-                type = "command";
-                bash = "${clearMarker}";
-                timeoutSec = 10;
-              }
-            ];
-          };
+      clearMarker = pkgs.writeShellScript "copilot-review-reminder-clear" ''
+        set -euo pipefail
+        payload="$(cat)"
+        session="$(printf '%s' "$payload" | ${pkgs.jq}/bin/jq -er .sessionId)"
+        prompt="$(printf '%s' "$payload" | ${pkgs.jq}/bin/jq -er '.prompt // ""')"
+        if printf '%s' "$prompt" | ${pkgs.gnugrep}/bin/grep -qF ${pkgs.lib.escapeShellArg sentinel}; then
+          exit 0
+        fi
+        rm -f "/tmp/copilot-review-reminder-''${session}"
+      '';
+
+      config = {
+        version = 1;
+        hooks = {
+          agentStop = [
+            {
+              type = "command";
+              bash = "${reminder}";
+              timeoutSec = 10;
+            }
+          ];
+          userPromptSubmitted = [
+            {
+              type = "command";
+              bash = "${clearMarker}";
+              timeoutSec = 10;
+            }
+          ];
         };
-      in
-      {
-        home.file.".copilot/hooks/review-reminder.json".text = builtins.toJSON config;
-      }
-    )
-  ];
+      };
+    in
+    {
+      home.file.".copilot/hooks/review-reminder.json".text = builtins.toJSON config;
+    };
 }

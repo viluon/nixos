@@ -1,43 +1,40 @@
-{ delib, unstable-pkgs, ... }:
+{ delib, host, pkgs, unstable-pkgs, ... }:
 delib.module {
   name = "home.desktop-packages";
 
-  home.always.imports = [
-    (
-      { pkgs, ... }:
-      {
-        home.packages = with pkgs; [
-          gh
-          grimblast
-          obsidian
-          unstable-pkgs.github-copilot-cli
-          waybar
+  options = delib.singleEnableOption host.isLaptop;
 
-          blueman
-          brightnessctl
-          btrfs-assistant
-          cliphist
-          compsize
-          ddcui
-          networkmanager
-          pavucontrol
-          playerctl
-          polkit_gnome
-          wl-clipboard
-          xwayland-run
-          xwayland-satellite
+  home.ifEnabled = {
+    home.packages = with pkgs; [
+      gh
+      grimblast
+      obsidian
+      unstable-pkgs.github-copilot-cli
+      waybar
 
-          noto-fonts
-          noto-fonts-color-emoji
-          noto-fonts-cjk-sans
-          font-awesome
+      blueman
+      brightnessctl
+      btrfs-assistant
+      cliphist
+      compsize
+      ddcui
+      networkmanager
+      pavucontrol
+      playerctl
+      polkit_gnome
+      wl-clipboard
+      xwayland-run
+      xwayland-satellite
 
-          matugen
-          wallust
-          awww
-          xdg-user-dirs
-        ];
-      }
-    )
-  ];
+      noto-fonts
+      noto-fonts-color-emoji
+      noto-fonts-cjk-sans
+      font-awesome
+
+      matugen
+      wallust
+      awww
+      xdg-user-dirs
+    ];
+  };
 }

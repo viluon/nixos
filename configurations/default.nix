@@ -1,28 +1,34 @@
 { inputs }:
 let
-  inherit (inputs.nixpkgs) lib;
-
-  denixConfigurations = settings: inputs.denix.lib.configurations ({
-    moduleSystem = "nixos";
-    homeManagerUser = "viluon";
-
-    extensions = with inputs.denix.lib.extensions; [
-      args
-      (base.withConfig { args.enable = true; })
-    ];
-  } // settings);
-
-  hostEntryPoints = map (name: ../denix/hosts + "/${name}/default.nix");
   hostNames = builtins.attrNames (builtins.readDir ../denix/hosts);
-  serverHostNames = [ "never-talk-to-strangers" ];
-
-  desktop = import ./desktop.nix {
-    inherit inputs denixConfigurations;
-    hosts = hostEntryPoints (lib.subtractLists serverHostNames hostNames);
-  };
-  server = import ./server.nix {
-    inherit inputs denixConfigurations;
-    hosts = hostEntryPoints serverHostNames;
-  };
 in
-desktop // server
+inputs.denix.lib.configurations {
+  moduleSystem = "nixos";
+  homeManagerUser = "viluon";
+
+  paths = [ ../denix/modules ] ++ map (name: ../denix/hosts + "/${name}/default.nix") hostNames;
+  exclude = [
+    ../denix/modules/editors/vscode-settings.nix
+    ../denix/modules/desktop/niri
+    ../denix/modules/home/scripts
+    ../denix/modules/home/slack-review.nix
+  ];
+
+  extensions = with inputs.denix.lib.extensions; [
+    args
+    (base.withConfig {
+      args.enable = true;
+      hosts.type.types = [ "laptop" "server" ];
+      hosts.features.features = [ "coding" "gaming" "monitoring" ];
+    })
+  ];
+
+  specialArgs = {
+    inherit inputs;
+    inherit (inputs) niri;
+    unstable-pkgs = import inputs.nixpkgs-unstable {
+      system = "x86_64-linux";
+      config = { allowUnfree = true; };
+    };
+  };
+}

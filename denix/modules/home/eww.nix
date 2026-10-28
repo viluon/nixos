@@ -1,8 +1,10 @@
-{ delib, ... }:
+{ delib, host, ... }:
 delib.module {
   name = "home.eww";
 
-  home.always = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  home.ifEnabled = {
     programs.eww = {
       enable = true;
       yuckConfig = builtins.readFile ./eww-config/eww.yuck;

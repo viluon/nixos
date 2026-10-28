@@ -1,242 +1,239 @@
-{ delib, inputs, ... }:
+{ delib, host, inputs, lib, pkgs, ... }:
 delib.module {
   name = "home.shell";
 
-  home.always.imports = [
-    (
-      { pkgs, lib, ... }:
-      let
-        scripts = lib.mapAttrsToList
-          (name: _type: import ./scripts/${name} { inherit pkgs; })
-          (builtins.readDir ./scripts);
+  options = delib.singleEnableOption host.isLaptop;
 
-        scriptFileNames = builtins.attrNames (builtins.readDir ./scripts);
-        gitScriptVerbs = map (n: lib.removePrefix "git-" (lib.removeSuffix ".nix" n))
-          (builtins.filter (n: lib.hasPrefix "git-" n) scriptFileNames);
-        gitUserCommandsZstyle = lib.concatStringsSep " " (map (v: "${v}:'Custom git command'") gitScriptVerbs);
+  home.ifEnabled =
+    let
+      scripts = lib.mapAttrsToList
+        (name: _type: import ./scripts/${name} { inherit pkgs; })
+        (builtins.readDir ./scripts);
 
-        caseInsensitiveMatcher = "m:{a-z}={A-Za-z}";
-      in
-      {
-        home.packages = scripts ++ [ pkgs.starship-pr-ci ];
+      scriptFileNames = builtins.attrNames (builtins.readDir ./scripts);
+      gitScriptVerbs = map (n: lib.removePrefix "git-" (lib.removeSuffix ".nix" n))
+        (builtins.filter (n: lib.hasPrefix "git-" n) scriptFileNames);
+      gitUserCommandsZstyle = lib.concatStringsSep " " (map (v: "${v}:'Custom git command'") gitScriptVerbs);
 
-        programs.zsh = {
-          # 1050: after shell-integration snippets (order 1000), before shellAliases (1100).
-          initContent = lib.mkOrder 1050 ''
-            # Vendored fzf key-bindings with syntax-highlighted history widget
-            __FZF_ZSH_SH_DIR="${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting"
-            source ${./fzf-key-bindings.zsh}
-            source ${inputs.fzf-git-sh}/fzf-git.sh
+      caseInsensitiveMatcher = "m:{a-z}={A-Za-z}";
+      betweenIntegrationsAndAliases = 1050;
+    in
+    {
+      home.packages = scripts ++ [ pkgs.starship-pr-ci ];
 
-            zstyle ':completion:*' matcher-list '${caseInsensitiveMatcher}'
+      programs.zsh = {
+        initContent = lib.mkOrder betweenIntegrationsAndAliases ''
+          __FZF_ZSH_SH_DIR="${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting"
+          source ${./fzf-key-bindings.zsh}
+          source ${inputs.fzf-git-sh}/fzf-git.sh
 
-            export LS_COLORS="$(vivid generate catppuccin-mocha)"
+          zstyle ':completion:*' matcher-list '${caseInsensitiveMatcher}'
 
-            if command -v docker >/dev/null 2>&1; then
-              source <(docker completion zsh)
+          export LS_COLORS="$(vivid generate catppuccin-mocha)"
+
+          if command -v docker >/dev/null 2>&1; then
+            source <(docker completion zsh)
+          fi
+
+          if command -v kubectl >/dev/null 2>&1; then
+            source <(kubectl completion zsh)
+          fi
+
+          if command -v niri >/dev/null 2>&1; then
+            source <(niri completions zsh)
+          fi
+
+          if command -v just >/dev/null 2>&1; then
+            source <(just --completions zsh)
+          fi
+
+          source ${./completions/mill.sh}
+
+          source <(, --print-completions zsh 2>/dev/null)
+          compdef _comma ,
+
+          unsetopt completealiases
+
+          zstyle ':completion:*:*:git:*' user-commands ${gitUserCommandsZstyle}
+
+          _git-ready() {
+            _values 'git ready arguments' auto
+          }
+
+          _git-open() {
+            if (( CURRENT == 2 )); then
+              _values 'git open arguments' ready
+            elif (( CURRENT == 3 )) && [[ "''${words[2]}" == "ready" ]]; then
+              _values 'git open arguments' auto
             fi
+          }
 
-            if command -v kubectl >/dev/null 2>&1; then
-              source <(kubectl completion zsh)
-            fi
+          [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
+        '';
+      };
 
-            if command -v niri >/dev/null 2>&1; then
-              source <(niri completions zsh)
-            fi
-
-            if command -v just >/dev/null 2>&1; then
-              source <(just --completions zsh)
-            fi
-
-            source ${./completions/mill.sh}
-
-            source <(, --print-completions zsh 2>/dev/null)
-            compdef _comma ,
-
-            unsetopt completealiases
-
-            zstyle ':completion:*:*:git:*' user-commands ${gitUserCommandsZstyle}
-
-            _git-ready() {
-              _values 'git ready arguments' auto
-            }
-
-            _git-open() {
-              if (( CURRENT == 2 )); then
-                _values 'git open arguments' ready
-              elif (( CURRENT == 3 )) && [[ "''${words[2]}" == "ready" ]]; then
-                _values 'git open arguments' auto
-              fi
-            }
-
-            [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
-          '';
-        };
-
-        programs.starship = {
-          settings = {
-            format = lib.concatStrings [
-              "$username"
-              "$hostname"
-              "$localip"
-              "$shlvl"
-              "$singularity"
-              "$kubernetes"
-              "$nats"
-              "$directory"
-              "$vcsh"
-              "$fossil_branch"
-              "$fossil_metrics"
-              "$git_branch"
-              "$git_commit"
-              "$git_state"
-              "$git_metrics"
-              "$git_status"
-              "$hg_branch"
-              "$hg_state"
-              "$pijul_channel"
-              "$docker_context"
-              "$package"
-              "$bun"
-              "$c"
-              "$cmake"
-              "$cobol"
-              "$cpp"
-              "$daml"
-              "$dart"
-              "$deno"
-              "$dotnet"
-              "$elixir"
-              "$elm"
-              "$erlang"
-              "$fennel"
-              "$fortran"
-              "$gleam"
-              "$golang"
-              "$gradle"
-              "$haskell"
-              "$haxe"
-              "$helm"
-              "$java"
-              "$julia"
-              "$kotlin"
-              "$lua"
-              "$maven"
-              "$mojo"
-              "$nim"
-              "$nodejs"
-              "$ocaml"
-              "$odin"
-              "$opa"
-              "$perl"
-              "$php"
-              "$pulumi"
-              "$purescript"
-              "$python"
-              "$quarto"
-              "$raku"
-              "$rlang"
-              "$red"
-              "$ruby"
-              "$rust"
-              "$scala"
-              "$solidity"
-              "$swift"
-              "$terraform"
-              "$typst"
-              "$vlang"
-              "$vagrant"
-              "$xmake"
-              "$zig"
-              "$buf"
-              "$guix_shell"
-              "$nix_shell"
-              "$conda"
-              "$pixi"
-              "$meson"
-              "$spack"
-              "$memory_usage"
-              "$aws"
-              "$openstack"
-              "$azure"
-              "$direnv"
-              "$env_var"
-              "$mise"
-              "$crystal"
-              "\${custom.pr_link}"
-              "\${custom.pr_queued_link}"
-              "\${custom.pr_queue}"
-              "\${custom.pr_unresolved}"
-              "\${custom.pr_conflicts}"
-              "\${custom.pr_ci_success}"
-              "\${custom.pr_ci_failure}"
-              "\${custom.pr_ci_pending}"
-              "$sudo"
-              "$cmd_duration"
-              "$line_break"
-              "$jobs"
-              "$battery"
-              "$time"
-              "$status"
-              "$container"
-              "$netns"
-              "$os"
-              "$shell"
-              "$character"
-            ];
-            custom.pr_ci_success = {
-              when = "starship-pr-ci is success";
-              symbol = "";
-              style = "bold green";
-              format = "[$symbol]($style) ";
-            };
-            custom.pr_ci_failure = {
-              when = "starship-pr-ci is failure";
-              symbol = "";
-              style = "bold red";
-              command = "starship-pr-ci detail";
-              format = "[$output $symbol]($style) ";
-            };
-            custom.pr_ci_pending = {
-              when = "starship-pr-ci is pending";
-              symbol = "";
-              style = "bold yellow";
-              command = "starship-pr-ci detail";
-              format = "[$output $symbol]($style) ";
-            };
-            custom.pr_link = {
-              when = "starship-pr-ci is-pr && ! starship-pr-ci is-queued";
-              command = "starship-pr-ci link";
-              style = "blue";
-              format = "[$output]($style) ";
-            };
-            custom.pr_queued_link = {
-              when = "starship-pr-ci is-queued";
-              command = "starship-pr-ci link";
-              style = "yellow";
-              format = "[$output]($style) ";
-            };
-            custom.pr_queue = {
-              when = "starship-pr-ci is-queued";
-              command = "starship-pr-ci queue";
-              style = "dimmed white";
-              format = "[$output]($style) ";
-            };
-            custom.pr_unresolved = {
-              when = "starship-pr-ci has-unresolved";
-              command = "starship-pr-ci unresolved";
-              style = "bold magenta";
-              format = "[$output]($style) ";
-            };
-            custom.pr_conflicts = {
-              when = "starship-pr-ci has-conflicts";
-              command = "starship-pr-ci conflicts";
-              style = "bold red";
-              format = "[$output]($style) ";
-            };
+      programs.starship = {
+        settings = {
+          format = lib.concatStrings [
+            "$username"
+            "$hostname"
+            "$localip"
+            "$shlvl"
+            "$singularity"
+            "$kubernetes"
+            "$nats"
+            "$directory"
+            "$vcsh"
+            "$fossil_branch"
+            "$fossil_metrics"
+            "$git_branch"
+            "$git_commit"
+            "$git_state"
+            "$git_metrics"
+            "$git_status"
+            "$hg_branch"
+            "$hg_state"
+            "$pijul_channel"
+            "$docker_context"
+            "$package"
+            "$bun"
+            "$c"
+            "$cmake"
+            "$cobol"
+            "$cpp"
+            "$daml"
+            "$dart"
+            "$deno"
+            "$dotnet"
+            "$elixir"
+            "$elm"
+            "$erlang"
+            "$fennel"
+            "$fortran"
+            "$gleam"
+            "$golang"
+            "$gradle"
+            "$haskell"
+            "$haxe"
+            "$helm"
+            "$java"
+            "$julia"
+            "$kotlin"
+            "$lua"
+            "$maven"
+            "$mojo"
+            "$nim"
+            "$nodejs"
+            "$ocaml"
+            "$odin"
+            "$opa"
+            "$perl"
+            "$php"
+            "$pulumi"
+            "$purescript"
+            "$python"
+            "$quarto"
+            "$raku"
+            "$rlang"
+            "$red"
+            "$ruby"
+            "$rust"
+            "$scala"
+            "$solidity"
+            "$swift"
+            "$terraform"
+            "$typst"
+            "$vlang"
+            "$vagrant"
+            "$xmake"
+            "$zig"
+            "$buf"
+            "$guix_shell"
+            "$nix_shell"
+            "$conda"
+            "$pixi"
+            "$meson"
+            "$spack"
+            "$memory_usage"
+            "$aws"
+            "$openstack"
+            "$azure"
+            "$direnv"
+            "$env_var"
+            "$mise"
+            "$crystal"
+            "\${custom.pr_link}"
+            "\${custom.pr_queued_link}"
+            "\${custom.pr_queue}"
+            "\${custom.pr_unresolved}"
+            "\${custom.pr_conflicts}"
+            "\${custom.pr_ci_success}"
+            "\${custom.pr_ci_failure}"
+            "\${custom.pr_ci_pending}"
+            "$sudo"
+            "$cmd_duration"
+            "$line_break"
+            "$jobs"
+            "$battery"
+            "$time"
+            "$status"
+            "$container"
+            "$netns"
+            "$os"
+            "$shell"
+            "$character"
+          ];
+          custom.pr_ci_success = {
+            when = "starship-pr-ci is success";
+            symbol = "";
+            style = "bold green";
+            format = "[$symbol]($style) ";
+          };
+          custom.pr_ci_failure = {
+            when = "starship-pr-ci is failure";
+            symbol = "";
+            style = "bold red";
+            command = "starship-pr-ci detail";
+            format = "[$output $symbol]($style) ";
+          };
+          custom.pr_ci_pending = {
+            when = "starship-pr-ci is pending";
+            symbol = "";
+            style = "bold yellow";
+            command = "starship-pr-ci detail";
+            format = "[$output $symbol]($style) ";
+          };
+          custom.pr_link = {
+            when = "starship-pr-ci is-pr && ! starship-pr-ci is-queued";
+            command = "starship-pr-ci link";
+            style = "blue";
+            format = "[$output]($style) ";
+          };
+          custom.pr_queued_link = {
+            when = "starship-pr-ci is-queued";
+            command = "starship-pr-ci link";
+            style = "yellow";
+            format = "[$output]($style) ";
+          };
+          custom.pr_queue = {
+            when = "starship-pr-ci is-queued";
+            command = "starship-pr-ci queue";
+            style = "dimmed white";
+            format = "[$output]($style) ";
+          };
+          custom.pr_unresolved = {
+            when = "starship-pr-ci has-unresolved";
+            command = "starship-pr-ci unresolved";
+            style = "bold magenta";
+            format = "[$output]($style) ";
+          };
+          custom.pr_conflicts = {
+            when = "starship-pr-ci has-conflicts";
+            command = "starship-pr-ci conflicts";
+            style = "bold red";
+            format = "[$output]($style) ";
           };
         };
-      }
-    )
-  ];
+      };
+    };
 }

@@ -1,8 +1,10 @@
-{ delib, ... }:
+{ delib, host, ... }:
 delib.module {
   name = "system.sysctl";
 
-  nixos.always.boot.kernel.sysctl = {
+  options = delib.singleEnableOption host.isLaptop;
+
+  nixos.ifEnabled.boot.kernel.sysctl = {
     "kernel.sysrq" = 502;
     "kernel.perf_event_paranoid" = 1;
     "kernel.kptr_restrict" = 0;

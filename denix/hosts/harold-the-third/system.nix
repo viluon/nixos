@@ -8,6 +8,7 @@
   services.hardware.bolt.enable = true;
 
   programs.steam.enable = lib.mkForce false;
+  hardware.graphics.enable32Bit = lib.mkForce false;
   programs.java.enable = lib.mkForce false;
   services.orca.enable = lib.mkForce false;
   services.speechd.enable = lib.mkForce false;

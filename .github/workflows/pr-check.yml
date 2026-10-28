@@ -85,21 +85,17 @@ jobs:
       - name: build system
         env:
           TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ env.output }}"
-        run: nix build $TARGET --fallback --log-format raw --print-build-logs
+        run: nix build $TARGET --fallback --log-format raw --print-build-logs --out-link head
 
       - name: garbage-collect build dependencies
         run: nix-collect-garbage
 
-      - name: fetch old system to profile
+      - name: fetch old system
+        id: base
         continue-on-error: true
         env:
           TARGET: "github:${{ github.repository }}/${{ github.base_ref }}#${{ env.output }}"
-        run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile
-
-      - name: add new system to profile
-        env:
-          TARGET: "github:${{ github.repository }}/${{ github.ref }}#${{ env.output }}"
-        run: nix build $TARGET --log-format raw --print-build-logs --profile ./profile
+        run: nix build $TARGET --log-format raw --print-build-logs --out-link base
 
       - name: output build failure
         if: failure()
@@ -111,52 +107,85 @@ jobs:
           fi
           exit 1
 
-      - name: Scan for security issues
-        id: security
-        run: | # https://stackoverflow.com/a/74232400
+      - name: scan for vulnerabilities
+        run: |
           nix run nixpkgs/nixos-unstable#vulnix -- \
             --whitelist https://raw.githubusercontent.com/ckauhaus/nixos-vulnerability-roundup/master/whitelists/nixos-unstable.toml \
-            ./profile \
-            | tee /tmp/security.txt
+            ./head > vulns.txt || [ $? -lt 3 ]
 
-          delimiter="$(openssl rand -hex 16)"
-          echo "security<<${delimiter}" >> "${GITHUB_OUTPUT}"
-          cat /tmp/security.txt >> "${GITHUB_OUTPUT}"
-          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+      - name: diff systems
+        if: steps.base.outcome == 'success'
+        run: nix run nixpkgs/nixos-unstable#nvd -- diff ./base ./head > diff.txt
 
-          # if the report has more than 3 lines
-          if [ $(wc -l < /tmp/security.txt) -gt 3 ]; then
-            echo "icon=:warning:" >> "${GITHUB_OUTPUT}"
+      - name: write report
+        env:
+          HOST: ${{ matrix.host }}
+          SUMMARY_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#summary-${{ job.check_run_id }}
+        run: |
+          vulns=$(sed -nE 's/^([0-9]+) derivations with active advisories$/\1/p' vulns.txt)
+          if [ ! -f diff.txt ]; then
+            change="no baseline"
+          elif grep -q '(0 paths added, 0 paths removed,' diff.txt; then
+            change="unchanged"
           else
-            echo "icon=:white_check_mark:" >> "${GITHUB_OUTPUT}"
+            change=$(sed -nE 's/^Closure size: .*delta ([^,]+), disk usage ([^)]+)\)\.$/delta \1, \2/p' diff.txt)
           fi
 
-      - name: diff profile
-        id: diff
+          mkdir report
+          {
+            echo "<details><summary><code>$HOST</code>: $change, <a href=\"$SUMMARY_URL\">${vulns:-0} vulns</a></summary>"
+            if [ "$change" != unchanged ] && [ -f diff.txt ]; then
+              echo
+              echo '```'
+              cat diff.txt
+              echo '```'
+            fi
+            echo "</details>"
+          } > "report/$HOST.md"
+
+          {
+            echo "### $HOST"
+            echo '```'
+            cat vulns.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: upload report
+        uses: actions/upload-artifact@v7
+        with:
+          name: report-${{ matrix.host }}
+          path: report/
+
+  comment:
+    needs: [hosts, build]
+    if: ${{ !cancelled() && needs.hosts.result == 'success' && needs.build.result != 'cancelled' }}
+    runs-on: ubuntu-26.04
+    concurrency:
+      group: pr-${{ github.event.pull_request.number }}-comment
+      cancel-in-progress: true
+    steps:
+      - name: download reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: report-*
+          merge-multiple: true
+          path: reports
+
+      - name: assemble comment
+        env:
+          HOSTS: ${{ needs.hosts.outputs.hosts }}
         run: |
-          delimiter="$(openssl rand -hex 16)"
-          echo "diff<<${delimiter}" >> "${GITHUB_OUTPUT}"
-          nix run nixpkgs/nixos-unstable#nvd -- history --profile ./profile >> "${GITHUB_OUTPUT}"
-          echo "${delimiter}" >> "${GITHUB_OUTPUT}"
-
-      - name: prepare comment
-        run: |
-          cat <<'EOF' > ./comment.md
-            ### Diff of `${{ env.output }}`
-
-            ```
-            ${{ steps.diff.outputs.diff }}
-            ```
-
-            <details>
-            <summary> ${{ steps.security.outputs.icon }} Security vulnerability report </summary> <br>
-            <pre> ${{ steps.security.outputs.security }} </pre>
-            </details>
-          EOF
+          for host in $(jq -r '.[]' <<< "$HOSTS"); do
+            if [ -f "reports/$host.md" ]; then
+              cat "reports/$host.md"
+            else
+              echo "<details><summary><code>$host</code>: failed</summary></details>"
+            fi
+          done > comment.md
 
       - name: comment
         continue-on-error: true
         uses: marocchino/sticky-pull-request-comment@v3
         with:
-          header: ".#${{ matrix.host }}"
-          path: ./comment.md
+          header: systems
+          path: comment.md

@@ -1,16 +1,11 @@
-{ delib, ... }:
+{ delib, pkgs, ... }:
 delib.module {
   name = "fonts";
 
-  nixos.always.imports = [
-    (
-      { pkgs, ... }:
-      {
-        fonts.packages = with pkgs; [
-          corefonts
-          libertine
-        ];
-      }
-    )
-  ];
+  nixos.always = {
+    fonts.packages = with pkgs; [
+      corefonts
+      libertine
+    ];
+  };
 }

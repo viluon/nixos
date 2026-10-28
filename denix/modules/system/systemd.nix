@@ -1,63 +1,58 @@
-{ delib, ... }:
+{ delib, pkgs, ... }:
 delib.module {
   name = "system.systemd";
 
-  nixos.always.imports = [
-    (
-      { pkgs, ... }:
-      {
-        systemd.settings.Manager = {
-          DefaultTimeoutStartSec = "8s";
-          DefaultCPUAccounting = true;
-          DefaultIOAccounting = true;
-          DefaultMemoryAccounting = true;
-          DefaultTasksAccounting = true;
-        };
+  nixos.always = {
+    systemd.settings.Manager = {
+      DefaultTimeoutStartSec = "8s";
+      DefaultCPUAccounting = true;
+      DefaultIOAccounting = true;
+      DefaultMemoryAccounting = true;
+      DefaultTasksAccounting = true;
+    };
 
-        systemd.user.extraConfig = ''
-          DefaultTimeoutStopSec=20s
+    systemd.user.extraConfig = ''
+      DefaultTimeoutStopSec=20s
+    '';
+
+    systemd.oomd = {
+      enable = true;
+      enableUserSlices = true;
+      enableSystemSlice = true;
+      settings.OOM = {
+        SwapUsedLimit = "90%";
+        DefaultMemoryPressureDurationSec = "20s";
+      };
+    };
+
+    systemd.services."user@" = {
+      overrideStrategy = "asDropin";
+      serviceConfig = {
+        ManagedOOMMemoryPressure = "kill";
+        ManagedOOMMemoryPressureLimit = "50%";
+      };
+    };
+
+    systemd.slices.user.sliceConfig = {
+      ManagedOOMSwap = "kill";
+    };
+
+    systemd.slices.system.sliceConfig = {
+      ManagedOOMMemoryPressureLimit = "50%";
+    };
+
+    systemd.user.services.oomd-notify = {
+      description = "Notify on OOM kills";
+      wantedBy = [ "default.target" ];
+      serviceConfig = {
+        ExecStart = pkgs.writeShellScript "oomd-notify" ''
+          ${pkgs.systemd}/bin/journalctl -f -o cat -u systemd-oomd.service | while read -r line; do
+            ${pkgs.libnotify}/bin/notify-send -u critical "OOM Kill" "$line"
+          done
         '';
-
-        systemd.oomd = {
-          enable = true;
-          enableUserSlices = true;
-          enableSystemSlice = true;
-          settings.OOM = {
-            SwapUsedLimit = "90%";
-            DefaultMemoryPressureDurationSec = "20s";
-          };
-        };
-
-        systemd.services."user@" = {
-          overrideStrategy = "asDropin";
-          serviceConfig = {
-            ManagedOOMMemoryPressure = "kill";
-            ManagedOOMMemoryPressureLimit = "50%";
-          };
-        };
-
-        systemd.slices.user.sliceConfig = {
-          ManagedOOMSwap = "kill";
-        };
-
-        systemd.slices.system.sliceConfig = {
-          ManagedOOMMemoryPressureLimit = "50%";
-        };
-
-        systemd.user.services.oomd-notify = {
-          description = "Notify on OOM kills";
-          wantedBy = [ "default.target" ];
-          serviceConfig = {
-            ExecStart = pkgs.writeShellScript "oomd-notify" ''
-              ${pkgs.systemd}/bin/journalctl -f -o cat -u systemd-oomd.service | while read -r line; do
-                ${pkgs.libnotify}/bin/notify-send -u critical "OOM Kill" "$line"
-              done
-            '';
-            Restart = "on-failure";
-            RestartSec = 5;
-          };
-        };
-      }
-    )
-  ];
+        Restart = "on-failure";
+        RestartSec = 5;
+      };
+    };
+  };
 }

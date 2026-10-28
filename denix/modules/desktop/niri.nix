@@ -1,52 +1,47 @@
-{ delib, niri, ... }:
+{ config, delib, niri, pkgs, ... }@moduleArgs:
 delib.module {
   name = "desktop.niri";
 
-  nixos.always.imports = [
-    (
-      { config, pkgs, ... }@moduleArgs:
-      {
-        nixpkgs.overlays = [ niri.overlays.niri ];
+  nixos.always = {
+    nixpkgs.overlays = [ niri.overlays.niri ];
 
-        programs.steam = {
-          enable = true;
-          remotePlay.openFirewall = true;
-          localNetworkGameTransfers.openFirewall = true;
-        };
+    programs.steam = {
+      enable = true;
+      remotePlay.openFirewall = true;
+      localNetworkGameTransfers.openFirewall = true;
+    };
 
-        programs.gamescope.enable = true;
+    programs.gamescope.enable = true;
 
-        programs.niri = import ./niri/tuned.nix (
-          moduleArgs // { hostname = config.networking.hostName; inherit niri; }
-        );
+    programs.niri = import ./niri/tuned.nix (
+      moduleArgs // { hostname = config.networking.hostName; inherit niri; }
+    );
 
-        environment.systemPackages = with pkgs; [
-          (import ./niri/idea-terminals.nix (moduleArgs // { hostname = config.networking.hostName; }))
-          grim
-          libsecret
-          networkmanagerapplet
-          pavucontrol
-          playerctl
-          slurp
-          swaybg
-          wireplumber
-          wl-clipboard
-          wlogout
-          (pkgs.writeShellApplication {
-            name = "lock";
-            runtimeInputs = with pkgs; [
-              procps
-              hyprlock
-            ];
-            text = "pidof hyprlock || hyprlock";
-          })
+    environment.systemPackages = with pkgs; [
+      (import ./niri/idea-terminals.nix (moduleArgs // { hostname = config.networking.hostName; }))
+      grim
+      libsecret
+      networkmanagerapplet
+      pavucontrol
+      playerctl
+      slurp
+      swaybg
+      wireplumber
+      wl-clipboard
+      wlogout
+      (pkgs.writeShellApplication {
+        name = "lock";
+        runtimeInputs = with pkgs; [
+          procps
+          hyprlock
         ];
+        text = "pidof hyprlock || hyprlock";
+      })
+    ];
 
-        fonts.packages = [ pkgs.maple-mono.NF-CN ];
-        security.pam.services.hyprlock.enable = true;
-      }
-    )
-  ];
+    fonts.packages = [ pkgs.maple-mono.NF-CN ];
+    security.pam.services.hyprlock.enable = true;
+  };
 
   home.always.imports = [
     (

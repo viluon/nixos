@@ -9,6 +9,7 @@ denixConfigurations {
     ../denix/modules/home/basic-shell.nix
     ../denix/modules/home/core.nix
     ../denix/modules/home/git.nix
+    ../denix/modules/system/auto-upgrade.nix
     ../denix/modules/system/nix.nix
   ];
 

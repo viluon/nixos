@@ -88,11 +88,11 @@ delib.module {
             };
 
             limits_config = {
-              ingestion_rate_mb = 16; # up from default 4MB
-              ingestion_burst_size_mb = 32; # larger burst size
+              ingestion_rate_mb = 16;
+              ingestion_burst_size_mb = 32;
               per_stream_rate_limit = "16MB";
               per_stream_rate_limit_burst = "32MB";
-              retention_period = "365d"; # keep logs for 1 year
+              retention_period = "365d";
               volume_enabled = true;
             };
 
@@ -160,7 +160,6 @@ delib.module {
           };
           provision =
             let
-              # see https://grafana.com/tutorials/provision-dashboards-and-data-sources/#define-a-dashboard-provider
               dashboard-providers = [
                 {
                   name = "provisoned nixluon central";

@@ -16,14 +16,13 @@ delib.module {
       gitUserCommandsZstyle = lib.concatStringsSep " " (map (v: "${v}:'Custom git command'") gitScriptVerbs);
 
       caseInsensitiveMatcher = "m:{a-z}={A-Za-z}";
+      betweenIntegrationsAndAliases = 1050;
     in
     {
       home.packages = scripts ++ [ pkgs.starship-pr-ci ];
 
       programs.zsh = {
-        # 1050: after shell-integration snippets (order 1000), before shellAliases (1100).
-        initContent = lib.mkOrder 1050 ''
-          # Vendored fzf key-bindings with syntax-highlighted history widget
+        initContent = lib.mkOrder betweenIntegrationsAndAliases ''
           __FZF_ZSH_SH_DIR="${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting"
           source ${./fzf-key-bindings.zsh}
           source ${inputs.fzf-git-sh}/fzf-git.sh

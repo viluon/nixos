@@ -73,7 +73,6 @@ delib.module {
 
       networking.firewall = {
         extraCommands = lib.mkAfter ''
-          # Allow Docker/kind containers to reach host's resolved stub on docker0
           iptables -I nixos-fw -d ${dockerBridgeDns} -p udp --dport 53 -j nixos-fw-accept
           iptables -I nixos-fw -d ${dockerBridgeDns} -p tcp --dport 53 -j nixos-fw-accept
         '';

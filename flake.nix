@@ -52,7 +52,22 @@
         inherit (flake-parts-lib) importApply;
         amd-epp-tool-module = importApply ./packages/amd-epp-tool.nix { inherit withSystem; };
 
-        systems = [ "x86_64-linux" ];
+        systems = [
+          "aarch64-linux"
+          "x86_64-linux"
+        ];
+
+        nixosConfigurations = import ./configurations { inherit inputs; };
+
+        hasSdImageFor = system: configuration:
+          configuration.pkgs.stdenv.hostPlatform.system == system
+          && configuration.config.system.build ? sdImage;
+
+        standaloneSdImage = configuration:
+          configuration.config.system.build.sdImage.overrideAttrs {
+            __structuredAttrs = true;
+            unsafeDiscardReferences.out = true;
+          };
       in
       {
         imports = [
@@ -61,7 +76,7 @@
           inputs.treefmt-nix.flakeModule
         ];
 
-        flake.nixosConfigurations = import ./configurations { inherit inputs; };
+        flake.nixosConfigurations = nixosConfigurations;
 
         flake.packages = nixpkgs.lib.genAttrs systems (system:
           let pkgs = nixpkgs.legacyPackages.${system}.extend (import ./packages);
@@ -72,7 +87,10 @@
 
         inherit systems;
 
-        perSystem = { config, pkgs, ... }: {
+        perSystem = { config, lib, pkgs, system, ... }: {
+          packages = lib.mapAttrs (_: standaloneSdImage)
+            (lib.filterAttrs (_: hasSdImageFor system) nixosConfigurations);
+
           checks.fzf-history-highlight = import ./checks/fzf-history-highlight.nix { inherit pkgs; };
 
           treefmt.config = {
@@ -97,6 +115,7 @@
 
           devShells.default = pkgs.mkShell {
             packages = [
+              pkgs.bmaptool
               config.treefmt.build.wrapper
               pkgs.just
               pkgs.nvd

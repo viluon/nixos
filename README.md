@@ -16,6 +16,18 @@ Build with
 nice -n 19 ionice -c 3 nix build .#nixosConfigurations.$(hostname).config.system.build.toplevel
 ```
 
+Build The Precise Nature Of The Catastrophe's Raspberry Pi image with
+
+```sh
+just build-image
+```
+
+Flash it to an unmounted microSD card with
+
+```sh
+just flash-image /dev/<device>
+```
+
 Update with
 
 ```sh

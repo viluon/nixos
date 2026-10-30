@@ -130,6 +130,7 @@ delib.host {
         ];
 
         home.packages = [
+          unstable-pkgs.kargo
           unstable-pkgs.mill
           pkgs.nodejs_24
           (pkgs.google-cloud-sdk.withExtraComponents [

@@ -1,10 +1,10 @@
 { pkgs }:
 let
-  slackReview = import ../slack-review.nix;
+  slackReview = import ../slack-review.nix { inherit pkgs; };
 in
 pkgs.writeShellApplication {
   name = "git-open";
-  runtimeInputs = with pkgs; [ gh git coreutils jq wl-clipboard ];
+  runtimeInputs = with pkgs; [ gh git coreutils jq ] ++ slackReview.runtimeInputs;
   text = ''
     set -euo pipefail
 
@@ -113,7 +113,7 @@ pkgs.writeShellApplication {
 
     mark_ready() { gh pr ready >/dev/null 2>&1 || fail "failed to mark pr ready"; }
 
-    ${slackReview}
+    ${slackReview.text}
 
     copy_result() {
       local json number url additions deletions key message

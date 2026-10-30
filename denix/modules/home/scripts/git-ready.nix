@@ -1,10 +1,10 @@
 { pkgs }:
 let
-  slackReview = import ../slack-review.nix;
+  slackReview = import ../slack-review.nix { inherit pkgs; };
 in
 pkgs.writeShellApplication {
   name = "git-ready";
-  runtimeInputs = with pkgs; [ gh git coreutils jq wl-clipboard ];
+  runtimeInputs = with pkgs; [ gh git coreutils jq ] ++ slackReview.runtimeInputs;
   text = ''
     set -euo pipefail
 
@@ -13,7 +13,7 @@ pkgs.writeShellApplication {
     ensure_branch() { git symbolic-ref --quiet --short HEAD >/dev/null 2>&1 || fail "detached HEAD state"; }
     usage() { fail "usage: git ready [auto]"; }
 
-    ${slackReview}
+    ${slackReview.text}
 
     pr_json() {
       gh pr view --json number,url,isDraft,additions,deletions 2>/dev/null >/tmp/git-ready-pr.json || fail "no pull request associated with branch";

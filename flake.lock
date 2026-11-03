@@ -429,11 +429,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1793597822,
-        "narHash": "sha256-JvbPSgNuMOb9Z7+yshvuaBPZaLpeyOmoXkmXuIYqxEc=",
+        "lastModified": 1793686692,
+        "narHash": "sha256-cEEoekWM19uI6CjG641FOt4pe/VdJ9up3VZXnFLH8fY=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "c665371a1b0bc9680661fe976006f8e1a2bee27d",
+        "rev": "e50182452d68c18d8e27c8d345e3bd18dccb49d1",
         "type": "github"
       },
       "original": {

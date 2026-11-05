@@ -1,50 +1,31 @@
 { pkgs }:
 pkgs.writeShellApplication {
   name = "git-with";
-  runtimeInputs = with pkgs; [ git fzf gnused coreutils gawk ];
+  runtimeInputs = with pkgs; [ git fzf gawk ];
   text = ''
-    set -euo pipefail
-
     fail() { echo "$1" >&2; exit 1; }
 
     git rev-parse --show-toplevel >/dev/null 2>&1 || fail "not inside a git repository"
+    git rev-parse --verify --quiet origin/HEAD >/dev/null \
+      || fail "origin/HEAD unknown; run: git remote set-head origin --auto"
+    base=$(git merge-base HEAD origin/HEAD) || fail "HEAD shares no history with origin/HEAD"
 
-    self=$(git config user.email 2>/dev/null || true)
+    self=$(git config user.email || true)
+    candidates=$(git log --format='%an <%ae>%n%(trailers:key=Co-authored-by,valueonly)' \
+      | awk -v self="$self" 'match($0, /<[^>]*>$/) {
+          email = substr($0, RSTART + 1, RLENGTH - 2)
+          if (email != self && !seen[email]++) print
+        }')
+    [ -n "$candidates" ] || fail "no other authors or co-authors found in this repository"
 
-    candidates=$(git log --format=$'%an\t%ae' \
-      | awk -F'\t' -v self="$self" '!seen[$2]++ && $2 != self { print $1 " <" $2 ">" }' \
-      | sort)
-    [ -n "$candidates" ] || fail "no other committers found in this repository"
+    selection=$(fzf --multi --prompt='co-authors> ' --header='TAB to select several' <<< "$candidates") \
+      || fail "no co-authors selected"
 
-    selection=$(printf '%s\n' "$candidates" \
-      | fzf --multi --prompt='co-authors> ' \
-            --header='select co-authors (TAB to multi-select)') \
-      || true
-    [ -n "$selection" ] || fail "no co-authors selected"
-
-    trailer_file=$(mktemp)
-    helper=$(mktemp)
-    trap 'rm -f "$trailer_file" "$helper"' EXIT
-
-    while IFS= read -r entry; do
-      [ -n "$entry" ] || continue
-      printf 'Co-authored-by: %s\n' "$entry" >> "$trailer_file"
+    amend=(git -c trailer.ifexists=addIfDifferent commit --amend --no-edit --allow-empty)
+    while IFS= read -r coauthor; do
+      amend+=(--trailer "Co-authored-by: $coauthor")
     done <<< "$selection"
 
-    default_branch=$(git rev-parse --abbrev-ref origin/HEAD | sed 's|^origin/||')
-    merge_base=$(git merge-base HEAD "origin/$default_branch")
-
-    cat > "$helper" <<EOF
-    #!/usr/bin/env bash
-    set -euo pipefail
-    args=()
-    while IFS= read -r line; do
-      [ -n "\$line" ] && args+=(--trailer "\$line")
-    done < "$trailer_file"
-    git commit --amend --no-edit "\''${args[@]}"
-    EOF
-    chmod +x "$helper"
-
-    git rebase "$merge_base" --exec "$helper"
+    git rebase --interactive --autostash "$base" --exec "''${amend[*]@Q}"
   '';
 }

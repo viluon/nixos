@@ -7,6 +7,11 @@
     maximized = true;
   }
   {
+    app-id = "^ddcui$";
+    workspace = "firefox";
+    command = [ "ddcui" ];
+  }
+  {
     app-id = "jetbrains-idea";
     workspace = "idea";
     command = [ "systemd-run" "--user" "--scope" "--collect" "--property=TimeoutStopSec=8s" "intellij-idea" ];

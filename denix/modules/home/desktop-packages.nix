@@ -9,7 +9,7 @@ delib.module {
       gh
       grimblast
       obsidian
-      unstable-pkgs.github-copilot-cli
+      (unstable-pkgs.callPackage ../../../packages/github-copilot-cli.nix { })
       waybar
 
       blueman

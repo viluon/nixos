@@ -5,7 +5,7 @@ delib.module {
   nixos.always =
     { myconfig, ... }:
     {
-      system.checks = [ inputs.self.checks.${pkgs.stdenv.hostPlatform.system}.treefmt ];
+      system.checks = [ inputs.self.checks.${pkgs.stdenv.buildPlatform.system}.treefmt ];
 
       nix = {
         package = pkgs.nixVersions.stable;

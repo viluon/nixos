@@ -146,22 +146,23 @@ pkgs.writeShellApplication {
 
     create_pr() {
       local stats additions deletions grug_body
+      local -a new_args=(--fill-first)
       stats=$(get_diff_stats)
       additions=$(echo "$stats" | cut -d' ' -f1)
       deletions=$(echo "$stats" | cut -d' ' -f2)
 
-      if [ "$ready_requested" -eq 1 ]; then
-        gh pr new --fill-first
-      else
-        gh pr new -d --fill-first
+      if [ "$ready_requested" -eq 0 ]; then
+        new_args+=(-d)
       fi
 
       if [ "$deletions" -gt "$additions" ]; then
         grug_body=$(get_grug_reply)
         if [ -n "$grug_body" ]; then
-          gh pr edit --body "$grug_body"
+          new_args+=(--body "$grug_body")
         fi
       fi
+
+      gh pr new "''${new_args[@]}"
 
       if [ "$auto_merge_requested" -eq 1 ]; then
         enable_auto_merge "$additions" "$deletions"

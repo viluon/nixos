@@ -429,11 +429,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1794722696,
-        "narHash": "sha256-fcSTGNZd8SbdVhJ90qEO/x/jBs8loQx17jaWqHOngp8=",
+        "lastModified": 1794809093,
+        "narHash": "sha256-C42an0OqaCpEWPxPV9Ic62SlKxI2D3Cr7Gves0Whyzw=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "ee811a80ab7c16c158c655ae38877817bcd40a27",
+        "rev": "6434a14e42078d87816f98df4ef84abfa357ed84",
         "type": "github"
       },
       "original": {
@@ -845,11 +845,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1793888258,
-        "narHash": "sha256-EO8Y2HSab3b+cgcoskslZBKCzEkwVIxFsmOJuMpQdq4=",
+        "lastModified": 1794832012,
+        "narHash": "sha256-7NKGOO1TFK1g24FgcG75QrU3YN6VvWIGXVVPsoXdqQk=",
         "owner": "Supreeeme",
         "repo": "xwayland-satellite",
-        "rev": "b424e5e44f1f0a5c201db67b745a4293da4f9146",
+        "rev": "79aaba68930a674540f7deac8a5dd6106cf15dd7",
         "type": "github"
       },
       "original": {

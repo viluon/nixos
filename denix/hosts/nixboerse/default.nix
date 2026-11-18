@@ -1,4 +1,7 @@
 { delib, inputs, ... }:
+let
+  wifiInterface = "wlp9s0";
+in
 delib.host {
   name = "nixboerse";
   type = "laptop";
@@ -8,7 +11,7 @@ delib.host {
 
   myconfig.system.containerNetworking = {
     enable = true;
-    uplinkInterface = "wlp9s0";
+    uplinkInterface = wifiInterface;
     vmName = "ubuntu";
     splitDnsServer = "100.64.0.2";
     splitDnsDomains = [
@@ -128,6 +131,8 @@ delib.host {
           middle-click-to-close-in-overview
           vitals
         ];
+
+        programs.btop.settings.net_iface = wifiInterface;
 
         home.packages = [
           unstable-pkgs.kargo

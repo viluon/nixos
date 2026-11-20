@@ -19,5 +19,11 @@ delib.module {
         cfg.loadavgTarget
       ];
     };
+
+    systemd.services."beesd@root".serviceConfig = {
+      Nice = 19;
+      CPUSchedulingPolicy = "idle";
+      IOSchedulingClass = "idle";
+    };
   };
 }

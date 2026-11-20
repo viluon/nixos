@@ -1,5 +1,5 @@
 let
-  btrfsMountOptions = [ "compress-force=zstd:15" "noatime" ];
+  btrfsMountOptions = [ "compress=zstd:3" "noatime" "commit=60" ];
 in
 {
   disko.devices.disk.usb = {

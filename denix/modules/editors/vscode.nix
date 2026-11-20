@@ -1,4 +1,4 @@
-{ delib, host, pkgs, unstable-pkgs, ... }:
+{ delib, host, lib, pkgs, unstable-pkgs, ... }:
 delib.module {
   name = "editors.vscode";
 
@@ -14,7 +14,7 @@ delib.module {
       profiles.default = {
         userSettings = import ./vscode-settings.nix;
 
-        extensions = pkgs.nix4vscode.forVscodeVersion unstable-pkgs.vscode.version [
+        extensions = pkgs.nix4vscode.forVscodeVersion (lib.versions.pad 3 unstable-pkgs.vscode.version) [
           "dbaeumer.vscode-eslint"
           "esbenp.prettier-vscode"
           "github.codespaces"

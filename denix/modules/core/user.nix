@@ -18,8 +18,8 @@ delib.module {
         outputHash = "sha256-yTZogYWwpAJVONDLOmwU1v1TrN4XxBJd88p0PaVco+M=";
 
         buildPhase = ''
-          curl "https://api.github.com/users/${username}/keys" | \
-            jq 'map(.key) | sort' > keys.json
+          curl -fsS "https://github.com/${username}.keys" | \
+            jq -R -s 'split("\n") | map(select(length > 0)) | sort' > keys.json
         '';
 
         installPhase = ''

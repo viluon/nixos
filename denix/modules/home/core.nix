@@ -1,4 +1,4 @@
-{ delib, pkgs, ... }:
+{ delib, pkgs, unstable-pkgs, ... }:
 delib.module {
   name = "home.core";
 
@@ -17,6 +17,7 @@ delib.module {
       nixd
       ripgrep
       shellcheck
+      unstable-pkgs.tailcat
       unzip
       vivid
     ];

@@ -6,6 +6,7 @@ delib.module {
     home.stateVersion = "25.05";
 
     home.packages = with pkgs; [
+      appimage-run
       cachix
       fd
       figlet

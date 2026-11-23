@@ -14,6 +14,7 @@ delib.module {
 
     environment.systemPackages = with pkgs; [
       (import ./niri/idea-terminals.nix helperArgs)
+      ddcutil
       grim
       libsecret
       networkmanagerapplet
@@ -34,6 +35,7 @@ delib.module {
       })
     ];
 
+    hardware.i2c.enable = true;
     fonts.packages = [ pkgs.maple-mono.NF-CN ];
     security.pam.services.hyprlock.enable = true;
 

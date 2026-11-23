@@ -140,6 +140,7 @@
       backlight = {
         format = "{icon} {percent}%";
         format-icons = [ "" "" "" "" "" "" "" "" "" ];
+        on-click = "vicinae cmd launch @viluon/display-brightness:display-brightness";
       };
 
       tray = {

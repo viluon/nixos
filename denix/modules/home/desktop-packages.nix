@@ -17,7 +17,6 @@ delib.module {
       btrfs-assistant
       cliphist
       compsize
-      ddcui
       networkmanager
       pavucontrol
       playerctl

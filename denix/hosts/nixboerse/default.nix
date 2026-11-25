@@ -82,6 +82,21 @@ delib.host {
           };
         };
 
+        systemd.services.sync-ubuntu-vm-clock = {
+          description = "Sync Ubuntu VM clock from RTC";
+          after = [ "resume-ubuntu-vm.service" ];
+          requires = [ "resume-ubuntu-vm.service" ];
+          wantedBy = [ "resume-ubuntu-vm.service" ];
+          serviceConfig = {
+            Type = "oneshot";
+            User = config.myconfig.constants.username;
+          };
+          script = ''
+            ${pkgs.openssh}/bin/ssh -o BatchMode=yes -o ConnectTimeout=5 -o ConnectionAttempts=12 \
+              xr587@192.168.122.110 sudo -n /usr/sbin/hwclock --hctosys
+          '';
+        };
+
         myconfig.system.btrfsDedupe = {
           enable = true;
           spec = config.fileSystems."/".device;

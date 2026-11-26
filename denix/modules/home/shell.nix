@@ -61,11 +61,17 @@ delib.module {
           }
 
           _git-open() {
-            if (( CURRENT == 2 )); then
-              _values 'git open arguments' ready
-            elif (( CURRENT == 3 )) && [[ "''${words[2]}" == "ready" ]]; then
-              _values 'git open arguments' auto
+            local -a args=("''${(@)words[2,CURRENT-1]}")
+            if [[ "''${args[1]}" == "stacked" ]]; then
+              shift args
+            elif (( CURRENT == 2 )); then
+              _values 'git open arguments' stacked ready
+              return
             fi
+            case "''${args[*]}" in
+              "") _values 'git open arguments' ready ;;
+              ready) _values 'git open arguments' auto ;;
+            esac
           }
 
           [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"

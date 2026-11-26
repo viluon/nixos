@@ -71,6 +71,20 @@ pkgs.writeShellApplication {
       fi
     }
 
+    stack_parent_branch() {
+      local default_ref=$1 commit
+      local -a branches
+      for commit in $(git rev-list --first-parent HEAD^ "^$default_ref"); do
+        mapfile -t branches < <(git for-each-ref --points-at="$commit" --format='%(refname:short)' refs/heads/)
+        case "''${#branches[@]}" in
+          0) ;;
+          1) printf '%s\n' "''${branches[0]}"; return ;;
+          *) fail "multiple local branches at $commit: ''${branches[*]}" ;;
+        esac
+      done
+      fail "no local branch between HEAD and $default_ref"
+    }
+
     current_pr_state() { gh pr view --state all --json state --jq '.state'; }
 
     gh_host() {
@@ -85,7 +99,7 @@ pkgs.writeShellApplication {
 
     get_diff_stats() {
       local merge_base additions=0 deletions=0
-      merge_base=$(git merge-base HEAD origin/main)
+      merge_base=$(git merge-base HEAD "$diff_base")
 
       while IFS=$'\t' read -r add del _; do
         # Skip binary files (numstat outputs "-" for binary)
@@ -147,6 +161,9 @@ pkgs.writeShellApplication {
     create_pr() {
       local stats additions deletions grug_body
       local -a new_args=(--fill-first)
+      if [ -n "$pr_base" ]; then
+        new_args+=(--base "$pr_base")
+      fi
       stats=$(get_diff_stats)
       additions=$(echo "$stats" | cut -d' ' -f1)
       deletions=$(echo "$stats" | cut -d' ' -f2)
@@ -169,10 +186,12 @@ pkgs.writeShellApplication {
       fi
     }
 
-    usage() { fail "usage: git open [ready [auto]]"; }
+    usage() { fail "usage: git open [stacked] [ready [auto]]"; }
 
+    stacked_requested=0
     ready_requested=0
     auto_merge_requested=0
+    if [ "''${1:-}" = "stacked" ]; then stacked_requested=1; shift; fi
     if [ "$#" -gt 2 ]; then usage; fi
     if [ "$#" -ge 1 ]; then [ "$1" = "ready" ] || usage; ready_requested=1; fi
     if [ "$#" -ge 2 ]; then [ "$2" = "auto" ] || usage; auto_merge_requested=1; fi
@@ -180,6 +199,17 @@ pkgs.writeShellApplication {
     ensure_repo_root
     ensure_branch
     ensure_feature_branch
+
+    pr_base=""
+    diff_base=origin/main
+    if [ "$stacked_requested" -eq 1 ]; then
+      default_remote=$(branch_remote "$(current_branch)")
+      default_ref="$default_remote/$(default_branch)"
+      stack_parent=$(stack_parent_branch "$default_ref")
+      diff_base=$(git rev-parse --abbrev-ref "$stack_parent@{upstream}" 2>/dev/null) \
+        || fail "stack parent '$stack_parent' has no upstream; push it first"
+      pr_base=''${diff_base#*/}
+    fi
 
     pr_state=""
     if pr_state=$(current_pr_state 2>/dev/null); then
